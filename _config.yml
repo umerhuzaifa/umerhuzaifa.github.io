@@ -1,1 +1,6 @@
 theme: jekyll-theme-minimal
+name: Umer Huzaifa
+description: Assistant Professor, DePaul University
+url: "https://www.umerhuzaifa.github.io"
+markdown: kramdown
+highlighter: rouge
