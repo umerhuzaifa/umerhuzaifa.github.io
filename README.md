@@ -2,7 +2,7 @@ Hi there 👋 I'm Umer,
 
 My work is best accessed at https://umerhuzaifa.com/
 
-⛏ I work on Dynamics and Control of Legged and Assistive Robotics
+⛏ I teach and work on firmware design and other aspects of low level programming and device design. 
 
 🖐 I’m frequently looking for collaborators on my projects. If that's you, let's get in touch!
 
