@@ -1,0 +1,17 @@
+{{ define "main" }}
+
+<section class="section page-not-found">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-6 mx-auto text-center">
+        <h1>404</h1>
+        <p>{{i18n `page_not_found`}}</p>
+        <span>{{i18n `page_not_found_description`}}</span>
+        <br>
+        <a href="{{site.BaseURL | relLangURL}}" class="btn btn-primary mt-5">{{i18n `back_to_home`}}</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{{ end }}
