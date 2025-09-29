@@ -1,5 +1,7 @@
 
+@import "{{ site.theme }}";
 /* Minimal add-on styles to complement the existing theme */
+
 .nav { padding: 1rem; }
 .nav-links { list-style: none; padding: 0; margin: 0; text-align: center; }
 .nav-links li { display: inline-block; margin: 0 .75rem; }
