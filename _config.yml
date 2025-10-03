@@ -1,8 +1,8 @@
 title: Umer Huzaifa, PhD
 logo: /assets/img/profile_huzaifa.png
 description: Umer Huzaifa's personal website.
-show_downloads: true
-google_analytics:
+show_downloads: false
+# google_analytics: 
 theme: jekyll-theme-minimal
 
 # Add this to _config.yml
