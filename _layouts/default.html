@@ -13,6 +13,116 @@
     {% include head-custom.html %}
     
     <style>
+      /* Navigation Bar Styles */
+      .top-nav {
+        background-color: #fff;
+        border-bottom: 1px solid #e1e4e8;
+        padding: 0;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      }
+
+      .nav-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 60px;
+      }
+
+      .nav-menu {
+        display: flex;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        gap: 40px;
+      }
+
+      .nav-menu li {
+        margin: 0;
+      }
+
+      .nav-menu a {
+        color: #222;
+        text-decoration: none;
+        font-size: 1em;
+        font-weight: 500;
+        padding: 8px 12px;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+        display: block;
+      }
+
+      .nav-menu a:hover {
+        color: #0366d6;
+        background-color: #f6f8fa;
+      }
+
+      .nav-menu a.active {
+        color: #0366d6;
+        font-weight: 600;
+      }
+
+      /* Mobile Menu Toggle */
+      .nav-toggle {
+        display: none;
+        background: none;
+        border: none;
+        font-size: 1.5em;
+        cursor: pointer;
+        color: #222;
+        padding: 5px;
+      }
+
+      /* Adjust body to account for fixed nav */
+      body {
+        padding-top: 60px;
+      }
+
+      @media (max-width: 768px) {
+        .nav-toggle {
+          display: block;
+        }
+
+        .nav-menu {
+          position: fixed;
+          top: 60px;
+          left: 0;
+          right: 0;
+          background-color: #fff;
+          flex-direction: column;
+          gap: 0;
+          padding: 10px 0;
+          border-bottom: 1px solid #e1e4e8;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+          display: none;
+        }
+
+        .nav-menu.active {
+          display: flex;
+        }
+
+        .nav-menu li {
+          width: 100%;
+        }
+
+        .nav-menu a {
+          padding: 15px 20px;
+          border-radius: 0;
+        }
+
+        .nav-container {
+          justify-content: space-between;
+        }
+      }
+
+      /* Existing styles */
       .recent-news {
         margin-top: 50px;
         margin-bottom: 50px;
@@ -116,6 +226,21 @@
     </style>
   </head>
   <body>
+    <!-- Top Navigation Bar -->
+    <nav class="top-nav">
+      <div class="nav-container">
+        <button class="nav-toggle" aria-label="Toggle navigation">
+          ☰
+        </button>
+        <ul class="nav-menu" id="navMenu">
+          <li><a href="{{ "/" | relative_url }}" {% if page.url == "/" %}class="active"{% endif %}>News</a></li>
+          <li><a href="{{ "/research/" | relative_url }}" {% if page.url contains "/research" %}class="active"{% endif %}>Research</a></li>
+          <li><a href="{{ "/teaching/" | relative_url }}" {% if page.url contains "/teaching" %}class="active"{% endif %}>Teaching</a></li>
+          <li><a href="{{ "/blog/" | relative_url }}" {% if page.url contains "/blog" %}class="active"{% endif %}>Blog</a></li>
+        </ul>
+      </div>
+    </nav>
+
     <div class="wrapper">
       <header>
         <h1><a href="{{ "/" | absolute_url }}">{{ site.title | default: site.github.repository_name }}</a></h1>
@@ -170,6 +295,26 @@
         {{/*  <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>  */}}
       </footer>
     </div>
+
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
+    <script>
+      // Mobile menu toggle
+      const navToggle = document.querySelector('.nav-toggle');
+      const navMenu = document.getElementById('navMenu');
+
+      if (navToggle) {
+        navToggle.addEventListener('click', function() {
+          navMenu.classList.toggle('active');
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+          const isClickInside = navToggle.contains(event.target) || navMenu.contains(event.target);
+          if (!isClickInside && navMenu.classList.contains('active')) {
+            navMenu.classList.remove('active');
+          }
+        });
+      }
+    </script>
   </body>
 </html>
