@@ -161,26 +161,6 @@
           </ul>
         </div>
 
-        <!-- Full News Archive by Year -->
-        {% assign posts_by_year = site.posts | group_by_exp: "post", "post.date | date: '%Y'" %}
-        
-        {% for year in posts_by_year %}
-          <div class="year-section">
-            <h2 class="year-header">{{ year.name }}</h2>
-            
-            {% for post in year.items %}
-              <div class="news-item">
-                <div class="news-title">
-                  <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-                </div>
-                <div class="news-date">
-                  {{ post.date | date: "%B %-d, %Y" }}
-                </div>
-              </div>
-            {% endfor %}
-          </div>
-        {% endfor %}
-      </div>
 
       </section>
       <footer>
