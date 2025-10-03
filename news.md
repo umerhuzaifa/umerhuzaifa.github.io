@@ -2,7 +2,7 @@
 layout: news
 ---
 
-[Link to another page](./another-page.html).
+[More News Items](./news.html).
 
 
 I am an Assistant Professor and Program Chair of Intelligent Systems Engineering at Jarvis College of Computing and Digital Media, DePaul University.
