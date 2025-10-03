@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>News</title>
+    <style>
+        .news-list {
+            list-style: none;
+            padding: 0;
+        }
+        .news-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1.5em;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 1em;
+        }
+        .news-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            margin-right: 1em;
+            border-radius: 8px;
+            background: #f0f0f0;
+        }
+        .news-content {
+            flex: 1;
+        }
+        .news-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin: 0 0 0.3em 0;
+        }
+        .news-date {
+            font-size: 0.9em;
+            color: #888;
+            margin-bottom: 0.5em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Latest News</h1>
+    <ul class="news-list">
+        {% for post in site.posts %}
+        <li class="news-item">
+            {% if post.image %}
+                <img src="{{ post.image }}" alt="News image" class="news-image">
+            {% else %}
+                <div class="news-image"></div>
+            {% endif %}
+            <div class="news-content">
+                <div class="news-title">
+                    <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+                </div>
+                <div class="news-date">{{ post.date | date: "%B %d, %Y" }}</div>
+                <div class="news-excerpt">{{ post.excerpt }}</div>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
