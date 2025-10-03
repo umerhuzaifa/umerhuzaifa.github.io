@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-{% seo %}
+    {% seo %}
     <link rel="stylesheet" href="{{ "/assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
     <!--[if lt IE 9]>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -15,24 +15,25 @@
 
 <body>
   <div class="news-container">
-    <h1>{{ page.title }}</h1>
+        <h1>{{ page.title }}</h1>
 
-  {% assign posts_by_year = site.posts | group_by_exp: "post", "post.date | date: '%Y'" %}
-  
-  {% for year in posts_by_year %}
-    <div class="year-section">
-      <h2 class="year-header">{{ year.name }}</h2>
-      
-      {% for post in year.items %}
-        <div class="news-item">
-          <div class="news-title">
-            <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-          </div>
-          <div class="news-date">
-            {{ post.date | date: "%B %-d, %Y" }}
-          </div>
+    {% assign posts_by_year = site.posts | group_by_exp: "post", "post.date | date: '%Y'" %}
+    
+    {% for year in posts_by_year %}
+        <div class="year-section">
+        <h2 class="year-header">{{ year.name }}</h2>
+        
+        {% for post in year.items %}
+            <div class="news-item">
+            <div class="news-title">
+                <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+            </div>
+            <div class="news-date">
+                {{ post.date | date: "%B %-d, %Y" }}
+            </div>
+            </div>
+        {% endfor %}
         </div>
-      {% endfor %}
+    {% endfor %}
     </div>
-  {% endfor %}
-</div>
+</body>
