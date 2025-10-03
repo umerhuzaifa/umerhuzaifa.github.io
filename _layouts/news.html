@@ -1,62 +1,95 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>News</title>
-    <style>
-        .news-list {
-            list-style: none;
-            padding: 0;
-        }
-        .news-item {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 1.5em;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 1em;
-        }
-        .news-image {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            margin-right: 1em;
-            border-radius: 8px;
-            background: #f0f0f0;
-        }
-        .news-content {
-            flex: 1;
-        }
-        .news-title {
-            font-size: 1.1em;
-            font-weight: bold;
-            margin: 0 0 0.3em 0;
-        }
-        .news-date {
-            font-size: 0.9em;
-            color: #888;
-            margin-bottom: 0.5em;
-        }
-    </style>
-</head>
-<body>
-    <h1>Latest News</h1>
-    <ul class="news-list">
-        {% for post in site.posts %}
-        <li class="news-item">
-            {% if post.image %}
-                <img src="{{ post.image }}" alt="News image" class="news-image">
-            {% else %}
-                <div class="news-image"></div>
-            {% endif %}
-            <div class="news-content">
-                <div class="news-title">
-                    <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-                </div>
-                <div class="news-date">{{ post.date | date: "%B %d, %Y" }}</div>
-                <div class="news-excerpt">{{ post.excerpt }}</div>
-            </div>
-        </li>
-        {% endfor %}
-    </ul>
-</body>
-</html>
+---
+layout: default
+---
+
+<style>
+  .news-container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .year-section {
+    margin-bottom: 60px;
+  }
+
+  .year-header {
+    font-size: 2.5em;
+    font-weight: 300;
+    margin-bottom: 30px;
+    margin-top: 50px;
+    color: #222;
+  }
+
+  .news-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+  }
+
+  .news-title {
+    flex: 1;
+    margin-right: 20px;
+  }
+
+  .news-title a {
+    font-size: 1.1em;
+    font-weight: 600;
+    color: #222;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .news-title a:hover {
+    color: #0366d6;
+  }
+
+  .news-date {
+    white-space: nowrap;
+    color: #586069;
+    font-size: 0.95em;
+    min-width: 150px;
+    text-align: right;
+  }
+
+  @media (max-width: 768px) {
+    .news-item {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .news-date {
+      text-align: left;
+      margin-top: 5px;
+      font-size: 0.9em;
+    }
+
+    .year-header {
+      font-size: 2em;
+    }
+  }
+</style>
+
+<div class="news-container">
+  <h1>{{ page.title }}</h1>
+
+  {% assign posts_by_year = site.posts | group_by_exp: "post", "post.date | date: '%Y'" %}
+  
+  {% for year in posts_by_year %}
+    <div class="year-section">
+      <h2 class="year-header">{{ year.name }}</h2>
+      
+      {% for post in year.items %}
+        <div class="news-item">
+          <div class="news-title">
+            <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+          </div>
+          <div class="news-date">
+            {{ post.date | date: "%B %-d, %Y" }}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endfor %}
+</div>
