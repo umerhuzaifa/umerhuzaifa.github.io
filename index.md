@@ -6,21 +6,15 @@ Text can be **bold**, _italic_, or ~~strikethrough~~.
 
 [Link to another page](./another-page.html).
 
-There should be whitespace between paragraphs.
 
-There should be whitespace between paragraphs. We recommend including a README, or a file with information about your project.
+I am an Assistant Professor of Cyber-Physical Systems Engineeringat DePaul University, and also chairing the Program Committee for Engineering in the College of Computing and Digital Media.
 
-# Header 1
+My goal for teaching is to lower the barrier of entry into the disciplines of embedded systems and robotics for undergraduate students. I also have my own research group called Robotic Assisted Locomotion (RAL) Lab where we study the modeling of novel robot systems and applications to assisting humans in locomotion.
 
-This is a normal paragraph following a header. GitHub is a code hosting platform for version control and collaboration. It lets you and others work together on projects from anywhere.
 
-## Header 2
 
-> This is a blockquote following a header.
->
-> When something is important enough, you do it even if the odds are not in your favor.
+## For Research Opportunity: I am looking for student researchers at all levels (undergrad, Master’s, and PhD), and collaborators. Please feel free to email me about potential projects.
 
-### Header 3
 
 ```js
 // Javascript code with syntax highlighting.
@@ -36,7 +30,7 @@ GitHubPages::Dependencies.gems.each do |gem, version|
   s.add_dependency(gem, "= #{version}")
 end
 ```
-
+<!-- 
 #### Header 4
 
 *   This is an unordered list following a header.
@@ -90,7 +84,7 @@ end
 - level 1 item
   - level 2 item
   - level 2 item
-- level 1 item
+- level 1 item -->
 
 ### Small image
 
