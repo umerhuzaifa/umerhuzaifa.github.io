@@ -5,4 +5,3 @@ date: 2023-10-15
 ---
 
 Some images here. 
-![alt text](robot_umer.png)

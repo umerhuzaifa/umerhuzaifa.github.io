@@ -51,6 +51,43 @@
         {{/*  <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>  */}}
       </footer>
     </div>
+        
+    <div class="news-container">
+      <h1>{{ page.title }}</h1>
+
+      <!-- Recent News Section -->
+      <div class="recent-news">
+        <h2>Recent News</h2>
+        <ul>
+          {% for post in site.posts limit:10 %}
+            <li>
+              <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+              <span class="item-date">{{ post.date | date: "%b %d, %Y" }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <!-- Full News Archive by Year -->
+      {% assign posts_by_year = site.posts | group_by_exp: "post", "post.date | date: '%Y'" %}
+      
+      {% for year in posts_by_year %}
+        <div class="year-section">
+          <h2 class="year-header">{{ year.name }}</h2>
+          
+          {% for post in year.items %}
+            <div class="news-item">
+              <div class="news-title">
+                <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+              </div>
+              <div class="news-date">
+                {{ post.date | date: "%B %-d, %Y" }}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% endfor %}
+    </div>
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
   </body>
 </html>
