@@ -4,4 +4,5 @@ title: "Robotics and Assisted Locomotion Lab demonstrated robots at the inaugura
 date: 2023-10-15
 ---
 
+Some images here. 
 ![alt text](robot_umer.png)

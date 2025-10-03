@@ -1,78 +1,21 @@
----
-layout: default
----
+<!DOCTYPE html>
+<html lang="{{ site.lang | default: "en-US" }}">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<style>
-  .news-container {
-    max-width: 900px;
-    margin: 0 auto;
-  }
+{% seo %}
+    <link rel="stylesheet" href="{{ "/assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
+    <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+    {% include head-custom.html %}
+  </head>
 
-  .year-section {
-    margin-bottom: 60px;
-  }
-
-  .year-header {
-    font-size: 2.5em;
-    font-weight: 300;
-    margin-bottom: 30px;
-    margin-top: 50px;
-    color: #222;
-  }
-
-  .news-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 25px;
-    padding-bottom: 15px;
-  }
-
-  .news-title {
-    flex: 1;
-    margin-right: 20px;
-  }
-
-  .news-title a {
-    font-size: 1.1em;
-    font-weight: 600;
-    color: #222;
-    text-decoration: none;
-    transition: color 0.2s ease;
-  }
-
-  .news-title a:hover {
-    color: #0366d6;
-  }
-
-  .news-date {
-    white-space: nowrap;
-    color: #586069;
-    font-size: 0.95em;
-    min-width: 150px;
-    text-align: right;
-  }
-
-  @media (max-width: 768px) {
-    .news-item {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    .news-date {
-      text-align: left;
-      margin-top: 5px;
-      font-size: 0.9em;
-    }
-
-    .year-header {
-      font-size: 2em;
-    }
-  }
-</style>
-
-<div class="news-container">
-  <h1>{{ page.title }}</h1>
+<body>
+  <div class="news-container">
+    <h1>{{ page.title }}</h1>
 
   {% assign posts_by_year = site.posts | group_by_exp: "post", "post.date | date: '%Y'" %}
   
