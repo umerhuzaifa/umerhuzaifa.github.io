@@ -14,14 +14,12 @@ We are working in the following areas:
 
 - System Identification using Machine Learning
 
-## Current Research Team
-- 
-- 
-- 
+
 
 ## Lab Alumni
 
 - 
 - 
 - 
-- 
+
+
