@@ -116,6 +116,20 @@
     </style>
   </head>
   <body>
+    <!-- Top Navigation Bar -->
+    <nav class="top-nav">
+      <div class="nav-container">
+        <button class="nav-toggle" aria-label="Toggle navigation">
+          ☰
+        </button>
+        <ul class="nav-menu" id="navMenu">
+          <li><a href="{{ "/news.html" | relative_url }}" {% if page.url contains "news.html" %}class="active"{% endif %}>News</a></li>
+          <li><a href="{{ "/research.html" | relative_url }}" {% if page.url contains "research.html" %}class="active"{% endif %}>Research</a></li>
+          <li><a href="{{ "/teaching.html" | relative_url }}" {% if page.url contains "teaching.html" %}class="active"{% endif %}>Teaching</a></li>
+          <li><a href="{{ "/blog.html" | relative_url }}" {% if page.url contains "blog.html" %}class="active"{% endif %}>Blog</a></li>
+        </ul>
+      </div>
+    </nav>
     <div class="wrapper">
       <header>
         <h1><a href="{{ "/" | absolute_url }}">{{ site.title | default: site.github.repository_name }}</a></h1>
