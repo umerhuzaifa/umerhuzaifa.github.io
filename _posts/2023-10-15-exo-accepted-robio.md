@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Two Papers Accepted in IEEE ROBIO 2023"
+title: "Paper on Cost-effective Lower-limb Exoskeleton Accepted in IEEE ROBIO 2023"
 date: 2023-10-15
 ---
 
