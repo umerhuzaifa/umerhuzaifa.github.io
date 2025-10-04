@@ -7,9 +7,6 @@ layout: default
 
 I am an Assistant Professor and Program Chair of Intelligent Systems Engineering at Jarvis College of Computing and Digital Media, DePaul University.
 
-My goal for teaching is to lower the barrier of entry into the disciplines of embedded systems and robotics for undergraduate students. I also have my own research group called Robotic Assisted Locomotion (RAL) Lab where we study the modeling of novel robot systems and applications to assisting humans in locomotion.
-
-
 
 ## For Research Opportunity: 
 
