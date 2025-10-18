@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Research</title>
+    
+    <style>
+      /* Navigation Bar Styles */
+      .top-nav {
+        background-color: #fff;
+        border-bottom: 1px solid #e1e4e8;
+        padding: 0;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      }
+
+      .nav-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 60px;
+      }
+
+      .nav-menu {
+        display: flex;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        gap: 40px;
+      }
+
+      .nav-menu li {
+        margin: 0;
+      }
+
+      .nav-menu a {
+        color: #222;
+        text-decoration: none;
+        font-size: 1em;
+        font-weight: 500;
+        padding: 8px 12px;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+        display: block;
+      }
+
+      .nav-menu a:hover {
+        color: #0366d6;
+        background-color: #f6f8fa;
+      }
+
+      .nav-menu a.active {
+        color: #0366d6;
+        font-weight: 600;
+      }
+
+      .nav-toggle {
+        display: none;
+        background: none;
+        border: none;
+        font-size: 1.5em;
+        cursor: pointer;
+        color: #222;
+        padding: 5px;
+      }
+
+      body {
+        padding-top: 60px;
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background-color: #f6f8fa;
+      }
+
+      .wrapper {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 20px;
+      }
+
+      h1 {
+        text-align: center;
+        font-size: 2.5em;
+        font-weight: 300;
+        color: #222;
+        margin-bottom: 50px;
+      }
+
+      /* Tiles Grid */
+      .tiles-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+        margin-bottom: 40px;
+      }
+
+      .tile {
+        background: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        cursor: pointer;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .tile:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      }
+
+      .tile-content {
+        padding: 20px;
+        text-align: center;
+      }
+
+      .tile-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+      }
+
+      .tile:hover .tile-image {
+        transform: scale(1.1);
+      }
+
+      .tile-title {
+        font-size: 1.3em;
+        font-weight: 600;
+        color: #222;
+        margin-top: 15px;
+        transition: font-size 0.3s ease;
+      }
+
+      .tile:hover .tile-title {
+        font-size: 1.5em;
+        color: #0366d6;
+      }
+
+      /* Expandable Details */
+      .tile-details {
+        max-height: 0;
+        overflow: hidden;
+        background: #f6f8fa;
+        border-top: 1px solid #e1e4e8;
+        transition: max-height 0.4s ease, padding 0.4s ease;
+        padding: 0 20px;
+      }
+
+      .tile-details.active {
+        max-height: 500px;
+        padding: 20px;
+      }
+
+      .details-content {
+        color: #586069;
+        line-height: 1.6;
+      }
+
+      .details-content p {
+        margin-bottom: 15px;
+      }
+
+      .publications-list {
+        margin-top: 15px;
+        padding-left: 20px;
+      }
+
+      .publications-list li {
+        margin-bottom: 8px;
+        color: #222;
+      }
+
+      .publications-list a {
+        color: #0366d6;
+        text-decoration: none;
+      }
+
+      .publications-list a:hover {
+        text-decoration: underline;
+      }
+
+      @media (max-width: 768px) {
+        .nav-toggle {
+          display: block;
+        }
+
+        .nav-menu {
+          position: fixed;
+          top: 60px;
+          left: 0;
+          right: 0;
+          background-color: #fff;
+          flex-direction: column;
+          gap: 0;
+          padding: 10px 0;
+          border-bottom: 1px solid #e1e4e8;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+          display: none;
+        }
+
+        .nav-menu.active {
+          display: flex;
+        }
+
+        .nav-menu li {
+          width: 100%;
+        }
+
+        .nav-menu a {
+          padding: 15px 20px;
+          border-radius: 0;
+        }
+
+        .nav-container {
+          justify-content: space-between;
+        }
+
+        .tiles-container {
+          grid-template-columns: 1fr;
+        }
+
+        h1 {
+          font-size: 2em;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Top Navigation Bar -->
+    <nav class="top-nav">
+      <div class="nav-container">
+        <button class="nav-toggle" aria-label="Toggle navigation">
+          ☰
+        </button>
+        <ul class="nav-menu" id="navMenu">
+          <li><a href="/news.html">News</a></li>
+          <li><a href="/research.html" class="active">Research</a></li>
+          <li><a href="/publications.html">Publications</a></li>
+          <li><a href="/teaching.html">Teaching</a></li>
+          <li><a href="/blog.html">Blog</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="wrapper">
+      <h1>Research Areas</h1>
+
+      <div class="tiles-container">
+        <!-- Tile 1 -->
+        <div class="tile" data-tile="1">
+          <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600" alt="Machine Learning" class="tile-image">
+          <div class="tile-content">
+            <h2 class="tile-title">Machine Learning</h2>
+          </div>
+          <div class="tile-details" id="details-1">
+            <div class="details-content">
+              <p>Our machine learning research focuses on developing novel algorithms and frameworks for deep learning, with applications in computer vision, natural language processing, and reinforcement learning. We explore efficient training methods, model interpretability, and transfer learning techniques.</p>
+              <h3>Related Publications:</h3>
+              <ul class="publications-list">
+                <li><a href="#">Deep Neural Networks for Image Classification (2024)</a></li>
+                <li><a href="#">Efficient Transfer Learning Methods (2023)</a></li>
+                <li><a href="#">Interpretable AI: A Survey (2023)</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tile 2 -->
+        <div class="tile" data-tile="2">
+          <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600" alt="Quantum Computing" class="tile-image">
+          <div class="tile-content">
+            <h2 class="tile-title">Quantum Computing</h2>
+          </div>
+          <div class="tile-details" id="details-2">
+            <div class="details-content">
+              <p>We investigate quantum algorithms and their applications to solve complex computational problems. Our work includes quantum error correction, quantum machine learning, and the development of near-term quantum algorithms for practical applications in optimization and simulation.</p>
+              <h3>Related Publications:</h3>
+              <ul class="publications-list">
+                <li><a href="#">Quantum Error Correction Codes (2024)</a></li>
+                <li><a href="#">NISQ Algorithms for Optimization (2023)</a></li>
+                <li><a href="#">Quantum Machine Learning Framework (2022)</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tile 3 -->
+        <div class="tile" data-tile="3">
+          <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600" alt="Network Science" class="tile-image">
+          <div class="tile-content">
+            <h2 class="tile-title">Network Science</h2>
+          </div>
+          <div class="tile-details" id="details-3">
+            <div class="details-content">
+              <p>Our network science research examines complex systems through the lens of graph theory and network analysis. We study social networks, biological networks, and infrastructure systems to understand their structure, dynamics, and resilience properties.</p>
+              <h3>Related Publications:</h3>
+              <ul class="publications-list">
+                <li><a href="#">Community Detection in Large-Scale Networks (2024)</a></li>
+                <li><a href="#">Network Resilience and Cascading Failures (2023)</a></li>
+                <li><a href="#">Dynamics of Information Spread (2023)</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tile 4 -->
+        <div class="tile" data-tile="4">
+          <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=600" alt="Robotics" class="tile-image">
+          <div class="tile-content">
+            <h2 class="tile-title">Robotics & Automation</h2>
+          </div>
+          <div class="tile-details" id="details-4">
+            <div class="details-content">
+              <p>We develop intelligent robotic systems with capabilities in perception, planning, and control. Our research spans autonomous navigation, human-robot interaction, and collaborative robotics, with applications in manufacturing, healthcare, and service domains.</p>
+              <h3>Related Publications:</h3>
+              <ul class="publications-list">
+                <li><a href="#">Vision-Based Navigation for Autonomous Robots (2024)</a></li>
+                <li><a href="#">Human-Robot Collaboration Framework (2023)</a></li>
+                <li><a href="#">Learning from Demonstration (2022)</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Mobile menu toggle
+      const navToggle = document.querySelector('.nav-toggle');
+      const navMenu = document.getElementById('navMenu');
+
+      if (navToggle) {
+        navToggle.addEventListener('click', function() {
+          navMenu.classList.toggle('active');
+        });
+
+        document.addEventListener('click', function(event) {
+          const isClickInside = navToggle.contains(event.target) || navMenu.contains(event.target);
+          if (!isClickInside && navMenu.classList.contains('active')) {
+            navMenu.classList.remove('active');
+          }
+        });
+      }
+
+      // Tile click functionality
+      const tiles = document.querySelectorAll('.tile');
+      
+      tiles.forEach(tile => {
+        tile.addEventListener('click', function() {
+          const tileNum = this.getAttribute('data-tile');
+          const details = document.getElementById(`details-${tileNum}`);
+          
+          // Close all other details
+          document.querySelectorAll('.tile-details').forEach(detail => {
+            if (detail !== details) {
+              detail.classList.remove('active');
+            }
+          });
+          
+          // Toggle current details
+          details.classList.toggle('active');
+        });
+      });
+    </script>
+  </body>
+</html>
