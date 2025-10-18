@@ -1,36 +1,390 @@
----
-layout: research
----
+<!DOCTYPE html>
+<html lang="{{ site.lang | default: "en-US" }}">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-## Research
+{% seo %}
+    <link rel="stylesheet" href="{{ "/assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
+    <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+    {% include head-custom.html %}
+    
+    <style>
+      /* Navigation Bar Styles */
+      .top-nav {
+        background-color: #fff;
+        border-bottom: 1px solid #e1e4e8;
+        padding: 0;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      }
 
-We are working in the following areas:
+      .nav-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 60px;
+      }
 
-- Mathematical Models for Novel Robot systems
+      .nav-menu {
+        display: flex;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        gap: 40px;
+      }
 
-- Prototyping of Human-assistive Devices
+      .nav-menu li {
+        margin: 0;
+      }
 
-- Stylistic Movement Generation in Bipedal Robots
+      .nav-menu a {
+        color: #222;
+        text-decoration: none;
+        font-size: 1em;
+        font-weight: 500;
+        padding: 8px 12px;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+        display: block;
+      }
 
-- System Identification using Machine Learning
+      .nav-menu a:hover {
+        color: #0366d6;
+        background-color: #f6f8fa;
+      }
 
+      .nav-menu a.active {
+        color: #0366d6;
+        font-weight: 600;
+      }
 
-## Current Lab Members
+      .nav-toggle {
+        display: none;
+        background: none;
+        border: none;
+        font-size: 1.5em;
+        cursor: pointer;
+        color: #222;
+        padding: 5px;
+      }
 
-- Sameer Shaikh
-- Ebenezer Daniel
-- Brian Isbell
-- Khang Hyunh
+      body {
+        padding-top: 60px;
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      }
 
-## Lab Alumni
+      .wrapper {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 20px;
+      }
 
-- James Knea (Bosch)
-- Chris Nadolny (Amazon)
-- Thomas McNeal (Apple)
-- Sujay Pookkattuparambil
-- Agnel Fernando
-- Aisha Mujahid
-- Mya Von Behren
+      header {
+        text-align: center;
+        margin-bottom: 50px;
+      }
 
+      header h1 {
+        font-size: 2.5em;
+        font-weight: 300;
+        color: #222;
+        margin-bottom: 10px;
+      }
 
+      header h1 a {
+        color: #222;
+        text-decoration: none;
+      }
 
+      /* Tiles Grid */
+      .tiles-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+        margin-bottom: 60px;
+      }
+
+      .tile {
+        background: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        cursor: pointer;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .tile:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      }
+
+      .tile-image-container {
+        overflow: hidden;
+        height: 200px;
+      }
+
+      .tile-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+      }
+
+      .tile:hover .tile-image {
+        transform: scale(1.1);
+      }
+
+      .tile-content {
+        padding: 20px;
+        text-align: center;
+      }
+
+      .tile-title {
+        font-size: 1.3em;
+        font-weight: 600;
+        color: #222;
+        margin: 0;
+        transition: font-size 0.3s ease, color 0.3s ease;
+      }
+
+      .tile:hover .tile-title {
+        font-size: 1.5em;
+        color: #0366d6;
+      }
+
+      /* Expandable Details */
+      .tile-details {
+        max-height: 0;
+        overflow: hidden;
+        background: #f6f8fa;
+        border-top: 1px solid #e1e4e8;
+        transition: max-height 0.4s ease, padding 0.4s ease;
+        padding: 0 20px;
+      }
+
+      .tile-details.active {
+        max-height: 600px;
+        padding: 20px;
+      }
+
+      .details-content {
+        color: #586069;
+        line-height: 1.6;
+      }
+
+      .details-content p {
+        margin-bottom: 15px;
+        color: #222;
+      }
+
+      .publications-list {
+        margin-top: 15px;
+        padding-left: 20px;
+      }
+
+      .publications-list li {
+        margin-bottom: 8px;
+        color: #222;
+      }
+
+      .publications-list a {
+        color: #0366d6;
+        text-decoration: none;
+      }
+
+      .publications-list a:hover {
+        text-decoration: underline;
+      }
+
+      /* Content Section */
+      section {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      section h2 {
+        font-size: 1.8em;
+        font-weight: 600;
+        color: #222;
+        margin-top: 40px;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #e1e4e8;
+        padding-bottom: 10px;
+      }
+
+      section ul {
+        list-style-type: none;
+        padding-left: 0;
+      }
+
+      section li {
+        padding: 8px 0;
+        color: #222;
+        font-size: 1.05em;
+      }
+
+      footer {
+        text-align: center;
+        margin-top: 60px;
+        padding: 30px 0;
+        border-top: 1px solid #e1e4e8;
+        color: #586069;
+      }
+
+      @media (max-width: 768px) {
+        .nav-toggle {
+          display: block;
+        }
+
+        .nav-menu {
+          position: fixed;
+          top: 60px;
+          left: 0;
+          right: 0;
+          background-color: #fff;
+          flex-direction: column;
+          gap: 0;
+          padding: 10px 0;
+          border-bottom: 1px solid #e1e4e8;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+          display: none;
+        }
+
+        .nav-menu.active {
+          display: flex;
+        }
+
+        .nav-menu li {
+          width: 100%;
+        }
+
+        .nav-menu a {
+          padding: 15px 20px;
+          border-radius: 0;
+        }
+
+        .nav-container {
+          justify-content: space-between;
+        }
+
+        .tiles-container {
+          grid-template-columns: 1fr;
+        }
+
+        header h1 {
+          font-size: 2em;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Top Navigation Bar -->
+    <nav class="top-nav">
+      <div class="nav-container">
+        <button class="nav-toggle" aria-label="Toggle navigation">
+          ☰
+        </button>
+        <ul class="nav-menu" id="navMenu">
+          <li><a href="{{ "/news.html" | relative_url }}" {% if page.url contains "news.html" %}class="active"{% endif %}>News</a></li>
+          <li><a href="{{ "/research.html" | relative_url }}" {% if page.url contains "research.html" %}class="active"{% endif %}>Research</a></li>
+          <li><a href="{{ "/publications.html" | relative_url }}" {% if page.url contains "publications.html" %}class="active"{% endif %}>Publications</a></li>
+          <li><a href="{{ "/teaching.html" | relative_url }}" {% if page.url contains "teaching.html" %}class="active"{% endif %}>Teaching</a></li>
+          <li><a href="{{ "/blog.html" | relative_url }}" {% if page.url contains "blog.html" %}class="active"{% endif %}>Blog</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="wrapper">
+      <header>
+        <h1><a href="{{ "/" | absolute_url }}">{{ page.title | default: "Research" }}</a></h1>
+      </header>
+
+      <div class="tiles-container">
+        {% for area in page.research_areas %}
+        <div class="tile" data-tile="{{ forloop.index }}">
+          <div class="tile-image-container">
+            <img src="{{ area.image }}" alt="{{ area.title }}" class="tile-image">
+          </div>
+          <div class="tile-content">
+            <h2 class="tile-title">{{ area.title }}</h2>
+          </div>
+          <div class="tile-details" id="details-{{ forloop.index }}">
+            <div class="details-content">
+              <p>{{ area.description }}</p>
+              <h3>Related Publications:</h3>
+              <ul class="publications-list">
+                {% for pub in area.publications %}
+                <li><a href="{{ pub.url }}">{{ pub.title }}</a></li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <section>
+        {{ content }}
+      </section>
+
+      <footer>
+        {% if site.github.is_project_page %}
+        <p>This project is maintained by <a href="{{ site.github.owner_url }}">{{ site.github.owner_name }}</a></p>
+        {% endif %}
+        <p><small>Hosted on GitHub Pages</small></p>
+      </footer>
+    </div>
+
+    <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
+    <script>
+      // Mobile menu toggle
+      const navToggle = document.querySelector('.nav-toggle');
+      const navMenu = document.getElementById('navMenu');
+
+      if (navToggle) {
+        navToggle.addEventListener('click', function() {
+          navMenu.classList.toggle('active');
+        });
+
+        document.addEventListener('click', function(event) {
+          const isClickInside = navToggle.contains(event.target) || navMenu.contains(event.target);
+          if (!isClickInside && navMenu.classList.contains('active')) {
+            navMenu.classList.remove('active');
+          }
+        });
+      }
+
+      // Tile click functionality
+      const tiles = document.querySelectorAll('.tile');
+      
+      tiles.forEach(tile => {
+        tile.addEventListener('click', function() {
+          const tileNum = this.getAttribute('data-tile');
+          const details = document.getElementById(`details-${tileNum}`);
+          
+          // Close all other details
+          document.querySelectorAll('.tile-details').forEach(detail => {
+            if (detail !== details) {
+              detail.classList.remove('active');
+            }
+          });
+          
+          // Toggle current details
+          details.classList.toggle('active');
+        });
+      });
+    </script>
+  </body>
+</html>
