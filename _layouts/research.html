@@ -246,7 +246,9 @@
       <header>
         <h1><a href="{{ "/" | absolute_url }}">{{ site.title | default: site.github.repository_name }}</a></h1>
         {% if page.logo %}
-          <img src="{{ page.logo | relative_url }}" alt="Logo" style="max-width: 200px; margin: 20px auto; display: block;" />
+        <img src="{{ page.logo | relative_url }}" alt="Logo" 
+     style="height: 200px; max-width: 100%; margin: 20px auto; display: block; object-fit: contain;" />
+          <!-- <img src="{{ page.logo | relative_url }}" alt="Logo" style="max-width: 200px; margin: 20px auto; display: block;" /> -->
         {% elsif site.logo %}
           <img src="{{ site.logo | relative_url }}" alt="Logo" style="max-width: 200px; margin: 20px auto; display: block;" />
         {% endif %}
