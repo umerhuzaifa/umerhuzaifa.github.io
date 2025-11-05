@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: research
 logo: /assets/images/with-robots.jpg
 ---
 
