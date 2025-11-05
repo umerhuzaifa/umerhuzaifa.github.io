@@ -1,5 +1,6 @@
 ---
 layout: default
+logo: /assets/images/with-robots.jpg
 ---
 
 ## Research
