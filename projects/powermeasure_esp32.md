@@ -36,19 +36,19 @@ Ammeter Readings and circuit diagrams in action
 
 Violet LED: 
 
-![image.png](../assets/images/violet_ON.png)
+![Violet LED ON](../assets/images/violet_ON.png)
 
 Yellow LED:
 
-![image.png](../assets/images/yellow_ON.png)
+![Yellow LED ON](../assets/images/yellow_ON.png)
 
 Green LED:
 
-![image.png](../assets/images/green_ON.png)
+![Green LED ON](../assets/images/green_ON.png)
 
-red LED:
+Red LED:
 
-![image.png](../assets/images/red_ON.png)
+![Red LED ON](../assets/images/red_ON.png)
 
 $V_f = V_{in}-I\times 470$
 
@@ -63,16 +63,16 @@ $V_f = V_{in}-I\times 470$
 
 Violet:
 
-![image.png](violet_blink.png)
+![Violet LED Blinking](../assets/images/violet_blink.png)
 
 Yellow: (1.25 mA - 1.31 mA)
 
-![image.png](yellow_blink.png)
+![Yellow LED Blinking](../assets/images/yellow_blink.png)
 
 Green: (1.21 mA - 1.27 mA)
 
-![image.png](green_blink.png)
+![Green LED Blinking](../assets/images/green_blink.png)
 
 RED: (1.21 mA - 1.27 mA)
 
-![image.png](red_blink.png)
+![Red LED Blinking](../assets/images/red_blink.png)
