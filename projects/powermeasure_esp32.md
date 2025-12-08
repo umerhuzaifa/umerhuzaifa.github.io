@@ -35,19 +35,19 @@ title: Power Measure
 Ammeter Readings and circuit diagrams in action
 Violet LED: 
 
-<img src="/assets/images/violet_ON.png" alt="Violet LED ON" width="200">
+<img src="/assets/images/violet_ON.png" alt="Violet LED ON" width="400">
 
 Yellow LED:
 
-<img src="/assets/images/yellow_ON.png" alt="Yellow LED ON" width="200">
+<img src="/assets/images/yellow_ON.png" alt="Yellow LED ON" width="400">
 
 Green LED:
 
-<img src="/assets/images/green_ON.png" alt="Green LED ON" width="200">
+<img src="/assets/images/green_ON.png" alt="Green LED ON" width="400">
 
 Red LED:
 
-<img src="/assets/images/red_ON.png" alt="Red LED ON" width="200">
+<img src="/assets/images/red_ON.png" alt="Red LED ON" width="400">
 
 $$
 V_f = V_{in}-I\times 470
@@ -63,16 +63,16 @@ $$
 ### Blinking Pattern (30 Hz)
 Violet:
 
-<img src="/assets/images/violet_blink.png" alt="Violet LED Blinking" width="200">
+<img src="/assets/images/violet_blink.png" alt="Violet LED Blinking" width="400">
 
 Yellow: (1.25 mA - 1.31 mA)
 
-<img src="/assets/images/yellow_blink.png" alt="Yellow LED Blinking" width="200">
+<img src="/assets/images/yellow_blink.png" alt="Yellow LED Blinking" width="400">
 
 Green: (1.21 mA - 1.27 mA)
 
-<img src="/assets/images/green_blink.png" alt="Green LED Blinking" width="200">
+<img src="/assets/images/green_blink.png" alt="Green LED Blinking" width="400">
 
 RED: (1.21 mA - 1.27 mA)
 
-<img src="/assets/images/red_blink.png" alt="Red LED Blinking" width="200">
+<img src="/assets/images/red_blink.png" alt="Red LED Blinking" width="400">
