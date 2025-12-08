@@ -1,3 +1,8 @@
+---
+layout: projects
+title: Power Measure
+---
+
 # Power Monitoring and Comparison of ESP32 and nRF52 Device
 
 ### **Goal:**
