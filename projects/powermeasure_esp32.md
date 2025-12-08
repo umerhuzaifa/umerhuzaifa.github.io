@@ -1,5 +1,5 @@
 ---
-layout: projects
+layout: custom
 title: Power Measure
 ---
 
