@@ -8,8 +8,8 @@ title: Portfolio
 <!-- ## Power Measurement in an ESP32 Blinking an LED -->
 <div class="portfolio-grid">
   <div class="project-item">
-    <a href="./projects/soft-robotics.html" target="_blank">
-      <img src="/assets/images/violet_ON.png" alt="LED and ESP32">
+    <a href="./projects/powermeasure_esp32.html" target="_blank">
+      <img src="/assets/images/violet_ON.png" alt="LED and ESP32" style="max-width: 200px; margin: 20px auto; display: block;" />
       <h3>Power Measurement in an ESP32 Blinking an LED</h3>
     </a>
   </div>
