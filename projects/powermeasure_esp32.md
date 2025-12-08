@@ -40,15 +40,15 @@ Violet LED:
 
 Yellow LED:
 
-![image.png](![../assets/images/yellow_ON.png)
+![image.png](../assets/images/yellow_ON.png)
 
 Green LED:
 
-![image.png](green_ON.png)
+![image.png](../assets/images/green_ON.png)
 
 red LED:
 
-![image.png](red_ON.png)
+![image.png](../assets/images/red_ON.png)
 
 $V_f = V_{in}-I\times 470$
 
@@ -58,7 +58,6 @@ $V_f = V_{in}-I\times 470$
 | Yellow | 3.3 | 2.7 | 2.03 |
 | Green | 3.3 | 2.61 | 2.07 |
 | Red | 3.3 | 2.83 | 1.97 |
-|  |  |  |  |
 
 ### Blinking Pattern (30 Hz)
 
