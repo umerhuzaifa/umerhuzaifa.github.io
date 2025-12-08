@@ -49,7 +49,9 @@ Red LED:
 
 <img src="/assets/images/red_ON.png" alt="Red LED ON" width="200">
 
-$$V_f = V_{in}-I\times 470$$
+$$
+V_f = V_{in}-I\times 470
+$$
 
 | **LED Color** | **Applied Voltage (V)** | **Current Recorded (mA)** | **Forward Voltage (V)** |
 | --- | --- | --- | --- |
