@@ -26,7 +26,7 @@ title: Power Measure
 
 ### **ESP32 Circuit:**
 
-![image.png](esp32_ckt.png)
+![../assets/images/image.png](![../assets/images/esp32_ckt.png)
 
 ## LED Operation
 
@@ -36,11 +36,11 @@ Ammeter Readings and circuit diagrams in action
 
 Violet LED: 
 
-![image.png](violet_ON.png)
+![image.png](![../assets/images/violet_ON.png)
 
 Yellow LED:
 
-![image.png](yellow_ON.png)
+![image.png](![../assets/images/yellow_ON.png)
 
 Green LED:
 
