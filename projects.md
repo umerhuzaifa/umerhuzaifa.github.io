@@ -13,15 +13,16 @@ title: Portfolio
       <h3>Power Measurement in an ESP32 Blinking an LED</h3>
     </a>
   </div>
-<!-- 
+
 <div class="portfolio-grid">
   <div class="project-item">
-    <a href="./projects/soft-robotics.html" target="_blank">
-      <img src="/assets/images/soft-robotics-thumb.jpg" alt="Soft Robotics Project">
-      <h3>Soft Robotic Quadrupeds</h3>
+    <a href="./projects/systemID_2ndOrder.html" target="_blank">
+      <img src="/assets/images/sysID_GUI.png" alt="System ID with 2nd Order">
+      <h3>System Identification for Second Order Systems</h3>
     </a>
   </div>
-  
+
+<!--   
   <!-- <div class="project-item">
     <a href="./projects/bipedal-walker.html" target="_blank">
       <img src="/assets/images/bipedal-walker-thumb.jpg" alt="Bipedal Walker">
