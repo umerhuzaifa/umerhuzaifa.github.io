@@ -3,12 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Second-Order System Identification</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <title>Interactive System Identification - Dr. Umer Huzaifa</title>
+    <meta name="description" content="Interactive demonstration of second-order system identification for robotics and control systems.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         :root {
             --primary-light: #f8fafc;
             --primary-white: #ffffff;
@@ -25,20 +32,15 @@
             --error: #dc2626;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
             font-family: 'IBM Plex Sans', sans-serif;
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            background: linear-gradient(135deg, var(--primary-light) 0%, #e2e8f0 100%);
             color: var(--text-primary);
             min-height: 100vh;
-            padding: 2rem;
+            padding: 0;
             position: relative;
             overflow-x: hidden;
+            line-height: 1.6;
         }
 
         body::before {
@@ -62,6 +64,7 @@
             margin: 0 auto;
             position: relative;
             z-index: 1;
+            padding: 2rem;
         }
 
         header {
@@ -85,8 +88,96 @@
             font-size: 1rem;
             color: var(--text-secondary);
             max-width: 800px;
-            margin: 0 auto;
-            line-height: 1.6;
+            margin: 0 auto 0.5rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 1rem;
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: var(--accent-orange);
+            text-decoration: underline;
+        }
+
+        .back-link::before {
+            content: '← ';
+        }
+
+        .intro-section {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+            border: 1px solid var(--border-color);
+            animation: fadeInUp 0.8s ease-out 0.1s both;
+        }
+
+        .intro-section h2 {
+            color: var(--accent-blue);
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .intro-section h2::before {
+            content: '🎯 ';
+        }
+
+        .intro-section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .intro-section li {
+            padding: 0.75rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .intro-section li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent-blue);
+            font-weight: bold;
+        }
+
+        .intro-section strong {
+            color: var(--text-primary);
+        }
+
+        .guide-section {
+            background: var(--surface-light);
+            border-left: 4px solid var(--accent-orange);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        .guide-section h2 {
+            color: var(--accent-orange);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .guide-section ul {
+            list-style: disc;
+            padding-left: 2rem;
+            margin-top: 0.5rem;
+        }
+
+        .guide-section li {
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
         }
 
         .main-content {
@@ -97,7 +188,8 @@
                 0 8px 32px rgba(0, 0, 0, 0.08),
                 0 2px 8px rgba(0, 0, 0, 0.04);
             border: 1px solid var(--border-color);
-            animation: fadeInUp 0.8s ease-out 0.2s both;
+            animation: fadeInUp 0.8s ease-out 0.3s both;
+            margin-bottom: 2rem;
         }
 
         .info-panel {
@@ -108,7 +200,6 @@
             margin-bottom: 2rem;
             border: 1px solid var(--border-color);
             border-left: 4px solid var(--accent-orange);
-            animation: slideInLeft 0.8s ease-out 0.4s both;
         }
 
         .info-panel h3 {
@@ -126,27 +217,6 @@
             font-size: 1.2rem;
         }
 
-        .info-panel ul {
-            list-style: none;
-            padding-left: 0;
-        }
-
-        .info-panel li {
-            padding: 0.5rem 0;
-            padding-left: 1.5rem;
-            position: relative;
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-
-        .info-panel li::before {
-            content: '→';
-            position: absolute;
-            left: 0;
-            color: var(--accent-blue);
-            font-weight: bold;
-        }
-
         .chart-container {
             position: relative;
             height: 400px;
@@ -160,7 +230,6 @@
         .controls {
             display: grid;
             gap: 2rem;
-            animation: fadeInUp 0.8s ease-out 0.6s both;
         }
 
         .control-group {
@@ -305,6 +374,65 @@
             color: var(--text-primary);
         }
 
+        .applications-section {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+            border: 1px solid var(--border-color);
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+        }
+
+        .applications-section h2 {
+            color: var(--accent-blue);
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .applications-section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .applications-section li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .applications-section li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--accent-blue);
+            font-weight: bold;
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+
+        .applications-section strong {
+            color: var(--text-primary);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: 2rem;
+        }
+
+        footer a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
         @keyframes fadeInDown {
             from {
                 opacity: 0;
@@ -327,17 +455,6 @@
             }
         }
 
-        @keyframes slideInLeft {
-            from {
-                opacity: 0;
-                transform: translateX(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
         @keyframes pulse {
             0%, 100% {
                 box-shadow: 0 0 20px rgba(232, 93, 45, 0.15);
@@ -348,7 +465,7 @@
         }
 
         @media (max-width: 768px) {
-            body {
+            .container {
                 padding: 1rem;
             }
 
@@ -356,7 +473,7 @@
                 font-size: 1.75rem;
             }
 
-            .main-content {
+            .main-content, .intro-section, .applications-section {
                 padding: 1.5rem;
             }
 
@@ -375,22 +492,38 @@
 <body>
     <div class="container">
         <header>
-            <h1>Second-Order System Identification</h1>
+            <h1>Interactive System Identification</h1>
             <p class="subtitle">
-                Adjust the parameters to match the unknown system's step response and discover the underlying dynamics
+                Second-order dynamic system parameter estimation through interactive visualization
             </p>
+            <a href="/" class="back-link">Back to Home</a>
         </header>
 
-        <div class="main-content">
-            <div class="info-panel">
-                <h3>About System Identification</h3>
-                <ul>
-                    <li><strong>Identification of a dynamic system is of significance when the system parameters are not known</strong>. In real-world applications, we often encounter systems where the underlying dynamics are hidden or uncertain.</li>
-                    <li><strong>After identification, we are open to using the knowledge from dynamics systems and control theory to operate the behavior to our liking</strong>. Once we understand the system, we can design controllers and predict behavior.</li>
-                    <li><strong>This is a basic application in recognizing the system that gives rise to a second-order step response</strong>. The goal is to match the damping ratio (ζ) and natural frequency (ωₙ) by observing the response characteristics.</li>
-                </ul>
-            </div>
+        <div class="intro-section">
+            <h2>Learning Objectives</h2>
+            <ul>
+                <li><strong>System Identification</strong>: Identification of a dynamic system is of significance when the system parameters are not known. In robotics and control applications, understanding the underlying dynamics is essential for predicting and controlling behavior.</li>
+                <li><strong>Control Theory Application</strong>: After identification, we are open to using the knowledge from dynamics systems and control theory to operate the behavior to our liking. This enables us to design controllers, predict responses, and optimize performance.</li>
+                <li><strong>Practical Recognition</strong>: This is a basic application in recognizing the system that gives rise to a second-order step response. By matching damping ratio (ζ) and natural frequency (ωₙ), we can characterize many real-world systems.</li>
+            </ul>
+        </div>
 
+        <div class="guide-section">
+            <h2>How to Use</h2>
+            <p>Adjust the sliders to match the target system's step response. Watch how these parameters affect the system's behavior:</p>
+            <ul>
+                <li><strong>Damping Ratio (ζ)</strong>: Controls oscillation and settling behavior
+                    <ul>
+                        <li>ζ < 1: Underdamped (oscillatory)</li>
+                        <li>ζ = 1: Critically damped (fastest settling without overshoot)</li>
+                        <li>ζ > 1: Overdamped (slow response, no oscillation)</li>
+                    </ul>
+                </li>
+                <li><strong>Natural Frequency (ωₙ)</strong>: Determines the speed of response</li>
+            </ul>
+        </div>
+
+        <div class="main-content">
             <div class="target-system">
                 <span class="target-label">🎯 TARGET SYSTEM</span>
                 <span class="target-params">ζ = <span id="targetZeta">0.400</span> | ωₙ = <span id="targetWn">5.000</span> rad/s</span>
@@ -433,6 +566,24 @@
                 </div>
             </div>
         </div>
+
+        <div class="applications-section">
+            <h2>Applications in Robotics</h2>
+            <p>This fundamental concept appears throughout robotics and control systems:</p>
+            <ul>
+                <li><strong>Robot Joint Control</strong>: Modeling motor and actuator dynamics for precise motion control</li>
+                <li><strong>Quadrotor Dynamics</strong>: Understanding attitude and position control for stable flight</li>
+                <li><strong>Exoskeleton Systems</strong>: Characterizing human-robot interaction dynamics for safe assistance</li>
+                <li><strong>Mobile Robot Locomotion</strong>: Analyzing gait patterns and stability in legged robots</li>
+                <li><strong>Soft Robotics</strong>: Modeling compliant actuators and pneumatic systems</li>
+            </ul>
+            <p style="margin-top: 1rem;">The RAL (Robotics and Assisted Locomotion) Lab applies these principles to novel robot systems and human assistive devices, including variable gait synthesis in bipedal robots, soft robotic quadrupeds, and cable-driven rehabilitation exoskeletons.</p>
+        </div>
+
+        <footer>
+            <p>Interested in working on similar problems? Check out the <a href="/research.html">Research page</a> for opportunities to join the RAL Lab.</p>
+            <p style="margin-top: 0.5rem;">&copy; 2025 Dr. Umer Huzaifa | DePaul University</p>
+        </footer>
     </div>
 
     <script>
