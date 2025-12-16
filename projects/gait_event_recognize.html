@@ -403,8 +403,346 @@
 
 <body>
     <div class="container">        
-        Nothing here. 
-        
+        <h1>Recognizing Regions in Gait Data with K-Means and PCA</h1>
+
+<h2>Overview</h2>
+
+<p>This document describes the implementation of two unsupervised learning methods for recognizing different regions in accelerometer gait data (ax, ay, az):</p>
+
+<ol>
+  <li><strong>K-Means Clustering</strong> - Groups similar motion patterns into 4 clusters</li>
+  <li><strong>PCA Anomaly Detection</strong> - Identifies unusual motion patterns</li>
+</ol>
+
+<p>Both methods use sliding window feature extraction to analyze the time series data.</p>
+
+<hr>
+
+<h2>Data Format</h2>
+
+<p>The code expects a CSV file or DataFrame with three columns:</p>
+<ul>
+  <li><code>ax</code> - Acceleration in x-axis</li>
+  <li><code>ay</code> - Acceleration in y-axis</li>
+  <li><code>az</code> - Acceleration in z-axis</li>
+</ul>
+
+<p>The <code>load_accelerometer_data()</code> function automatically detects common column naming variations.</p>
+
+<hr>
+
+<h2>Feature Extraction</h2>
+
+<h3>Sliding Window Approach</h3>
+
+<p>Features are extracted using a sliding window with:</p>
+<ul>
+  <li><strong>Window size</strong>: 50 samples (default)</li>
+  <li><strong>Overlap</strong>: 50% (step size = 25 samples)</li>
+</ul>
+
+<h3>Features per Window</h3>
+
+<p>For each axis (ax, ay, az), 7 features are computed:</p>
+<ul>
+  <li>Mean</li>
+  <li>Standard deviation</li>
+  <li>Minimum</li>
+  <li>Maximum</li>
+  <li>25th percentile</li>
+  <li>75th percentile</li>
+  <li>RMS (Root Mean Square)</li>
+</ul>
+
+<p>Plus 3 magnitude features:</p>
+<ul>
+  <li>Mean magnitude: <code>sqrt(ax² + ay² + az²)</code></li>
+  <li>Std of magnitude</li>
+  <li>Range of magnitude (max - min)</li>
+</ul>
+
+<p><strong>Total: 24 features per window</strong></p>
+
+<hr>
+
+<h2>Method 1: K-Means Clustering</h2>
+
+<h3>How It Works</h3>
+
+<pre><code>detector = AccelerometerRegionDetector(df)
+labels_kmeans, features_kmeans = detector.kmeans_segmentation(n_clusters=4, window_size=50)</code></pre>
+
+<p><strong>Steps:</strong></p>
+<ol>
+  <li>Extract features from sliding windows</li>
+  <li>Standardize features (zero mean, unit variance)</li>
+  <li>Apply K-means with 4 clusters</li>
+  <li>Expand window labels to original time series length</li>
+</ol>
+
+<h3>Parameters</h3>
+
+<ul>
+  <li><code>n_clusters</code> (default: 5) - Number of regions to detect. <strong>Set to 4 for gait data.</strong></li>
+  <li><code>window_size</code> (default: 50) - Size of sliding window</li>
+  <li><code>random_state</code> (fixed: 42) - For reproducible results</li>
+  <li><code>n_init</code> (fixed: 10) - Number of K-means initializations</li>
+</ul>
+
+<h3>Output</h3>
+
+<ul>
+  <li><code>labels_kmeans</code>: Array of cluster labels for each time point</li>
+  <li><code>features_kmeans</code>: Scaled feature matrix</li>
+</ul>
+
+<h3>Example Output</h3>
+
+<pre><code>============================================================
+APPROACH 1: K-Means Clustering on Features
+============================================================
+Detected 4 different regions
+Cluster distribution: [13  5 13  7]</code></pre>
+
+<hr>
+
+<h2>Method 2: PCA Anomaly Detection</h2>
+
+<h3>How It Works</h3>
+
+<pre><code>detector = AccelerometerRegionDetector(df)
+labels_pca, recon_error = detector.pca_anomaly_detection(
+    window_size=50, 
+    n_components=3, 
+    threshold=2.0
+)</code></pre>
+
+<p><strong>Steps:</strong></p>
+<ol>
+  <li>Extract features from sliding windows</li>
+  <li>Standardize features</li>
+  <li>Apply PCA to reduce dimensionality to 3 components</li>
+  <li>Reconstruct features from PCA components</li>
+  <li>Calculate reconstruction error</li>
+  <li>Label windows as normal (0) or anomalous (1) based on threshold</li>
+</ol>
+
+<h3>Parameters</h3>
+
+<ul>
+  <li><code>window_size</code> (default: 50) - Size of sliding window</li>
+  <li><code>n_components</code> (default: 3) - Number of principal components to keep</li>
+  <li><code>threshold</code> (default: 2.0) - Z-score threshold for anomaly detection</li>
+</ul>
+
+<h3>Anomaly Detection Logic</h3>
+
+<pre><code>mean_error = np.mean(reconstruction_error)
+std_error = np.std(reconstruction_error)
+labels = reconstruction_error > (mean_error + threshold * std_error)</code></pre>
+
+<p>Windows with reconstruction error > <code>mean + 2.0 * std</code> are marked as anomalous.</p>
+
+<h3>Output</h3>
+
+<ul>
+  <li><code>labels_pca</code>: Binary labels (0=normal, 1=anomalous)</li>
+  <li><code>recon_error</code>: Reconstruction error for each window</li>
+</ul>
+
+<h3>Example Output</h3>
+
+<pre><code>============================================================
+APPROACH 4: PCA-based Anomaly Detection
+============================================================
+Variance explained: 92.47%
+Normal regions: 36
+Anomalous regions: 2</code></pre>
+
+<hr>
+
+<h2>Visualization</h2>
+
+<p>The <code>visualize_results()</code> function creates a 4-panel plot:</p>
+
+<ol>
+  <li><strong>ax axis</strong> - With colored regions overlay</li>
+  <li><strong>ay axis</strong> - With colored regions overlay</li>
+  <li><strong>az axis</strong> - With colored regions overlay</li>
+  <li><strong>Magnitude</strong> - <code>sqrt(ax² + ay² + az²)</code> with regions</li>
+</ol>
+
+<pre><code>fig = visualize_results(df, labels_kmeans, "K-Means Segmentation")
+plt.savefig('output.png', dpi=150, bbox_inches='tight')</code></pre>
+
+<hr>
+
+<h2>Complete Usage Example</h2>
+
+<pre><code>import pandas as pd
+from accelerometer_analysis import load_accelerometer_data, AccelerometerRegionDetector, visualize_results
+
+# Load data
+df = load_accelerometer_data('gait_data.csv')
+
+# Create detector
+detector = AccelerometerRegionDetector(df)
+
+# Method 1: K-Means with 4 clusters
+labels_kmeans, features = detector.kmeans_segmentation(n_clusters=4, window_size=50)
+
+# Method 2: PCA anomaly detection
+labels_pca, errors = detector.pca_anomaly_detection(window_size=50, n_components=3, threshold=2.0)
+
+# Visualize K-Means results
+fig = visualize_results(df, labels_kmeans, "K-Means (4 clusters)")
+plt.savefig('kmeans_results.png')
+
+# Visualize PCA results
+fig = visualize_results(df, labels_pca, "PCA Anomaly Detection")
+plt.savefig('pca_results.png')</code></pre>
+
+<hr>
+
+<h2>Synthetic Data Example</h2>
+
+<p>The code includes a synthetic data generator that creates 4 distinct regions:</p>
+
+<ol>
+  <li><strong>Region 1 (0-300)</strong>: Low activity / stationary</li>
+  <li><strong>Region 2 (300-600)</strong>: Walking (sinusoidal patterns)</li>
+  <li><strong>Region 3 (600-900)</strong>: Running (higher amplitude)</li>
+  <li><strong>Region 4 (900-1000)</strong>: Rest</li>
+</ol>
+
+<pre><code>if __name__ == "__main__":
+    df, results = main()</code></pre>
+
+<p>This generates:</p>
+<ul>
+  <li>1000 samples total</li>
+  <li>4 visualizations (K-Means, Change Point, DBSCAN, PCA)</li>
+  <li>Comparison summary</li>
+</ul>
+
+<hr>
+
+<h2>Key Differences: K-Means vs PCA</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Aspect</th>
+      <th>K-Means</th>
+      <th>PCA Anomaly Detection</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Output</strong></td>
+      <td>4 discrete clusters</td>
+      <td>Binary (normal/anomalous)</td>
+    </tr>
+    <tr>
+      <td><strong>Use Case</strong></td>
+      <td>Identify distinct gait phases</td>
+      <td>Detect unusual movements</td>
+    </tr>
+    <tr>
+      <td><strong>Parameters</strong></td>
+      <td>Must set n_clusters</td>
+      <td>Must set threshold</td>
+    </tr>
+    <tr>
+      <td><strong>Clusters</strong></td>
+      <td>Exactly 4 regions</td>
+      <td>2 regions (normal + anomaly)</td>
+    </tr>
+    <tr>
+      <td><strong>Interpretability</strong></td>
+      <td>Clear phase labels</td>
+      <td>Anomaly scores available</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr>
+
+<h2>When to Use Each Method</h2>
+
+<h3>Use K-Means when:</h3>
+<ul>
+  <li>You know the number of gait phases (set <code>n_clusters=4</code>)</li>
+  <li>You want to identify specific motion patterns</li>
+  <li>You need clear phase labels</li>
+  <li>You're analyzing walking, running, standing, etc.</li>
+</ul>
+
+<h3>Use PCA when:</h3>
+<ul>
+  <li>You want to detect outliers or unusual gait patterns</li>
+  <li>You don't know specific number of phases</li>
+  <li>You want to identify normal vs abnormal motion</li>
+  <li>You need reconstruction error scores for each window</li>
+</ul>
+
+<hr>
+
+<h2>Adjusting Parameters</h2>
+
+<h3>For K-Means:</h3>
+
+<p><strong>n_clusters (4 recommended for gait)</strong></p>
+<pre><code>detector.kmeans_segmentation(n_clusters=4)  # 4 distinct phases</code></pre>
+
+<p><strong>window_size</strong></p>
+<pre><code>detector.kmeans_segmentation(n_clusters=4, window_size=30)  # Shorter phases
+detector.kmeans_segmentation(n_clusters=4, window_size=100) # Longer phases</code></pre>
+
+<h3>For PCA:</h3>
+
+<p><strong>threshold</strong> (controls sensitivity)</p>
+<pre><code>detector.pca_anomaly_detection(threshold=1.5)  # More sensitive (more anomalies)
+detector.pca_anomaly_detection(threshold=3.0)  # Less sensitive (fewer anomalies)</code></pre>
+
+<p><strong>n_components</strong> (PCA dimensionality)</p>
+<pre><code>detector.pca_anomaly_detection(n_components=2)  # Less compression
+detector.pca_anomaly_detection(n_components=5)  # More features retained</code></pre>
+
+<hr>
+
+<h2>Helper Functions</h2>
+
+<h3>load_accelerometer_data()</h3>
+<p>Loads CSV and extracts ax, ay, az columns with automatic column name detection.</p>
+
+<h3>compute_features()</h3>
+<p>Extracts 24 statistical features from a sliding window.</p>
+
+<h3>_expand_labels()</h3>
+<p>Converts window-based labels back to original time series length.</p>
+
+<hr>
+
+<h2>Summary</h2>
+
+<p>This implementation provides two complementary approaches:</p>
+
+<ol>
+  <li><strong>K-Means with 4 clusters</strong> - For identifying distinct gait phases</li>
+  <li><strong>PCA anomaly detection</strong> - For finding unusual patterns</li>
+</ol>
+
+<p>Both methods:</p>
+<ul>
+  <li>Use sliding window feature extraction</li>
+  <li>Standardize features before processing</li>
+  <li>Work with 3-axis accelerometer data (ax, ay, az)</li>
+  <li>Include visualization functions</li>
+</ul>
+
+<p>The code is designed for gait analysis but works with any accelerometer time series data.</p>
+
     </div>
 </body>
 </html>
