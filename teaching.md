@@ -1,17 +1,19 @@
 ---
 layout: default
 title: My Page
-logo: /assets/img/teaching.png
+logo: /assets/images/math_collage.png
 ---
 
 My goal for teaching is to lower the barrier of entry into the disciplines of embedded systems and robotics for undergraduate students. I also have my own research group called Robotic Assisted Locomotion (RAL) Lab where we study the modeling of novel robot systems and applications to assisting humans in locomotion.
 
 The courses I have developed from span both the fundamentals engineering and computer science, and advanced topics in control systems, robotics and embedded systems.
 
-### Current Schedule: Fall 2025
+### Current Schedule: Winter 2025
 
-CSE 351 Embedded Systems I
-CSE 361 Mathematical Foundations of Autonomous Systems
+CSE 362 - Logical Foundations of Cyberphysical Computing
+CSE 394 - Cyberphysical Systems Engineering Practicum II
+<!-- CSE 351 Embedded Systems I
+CSE 362 Mathematical Foundations of Autonomous Systems -->
 
 ### Other courses taught
 

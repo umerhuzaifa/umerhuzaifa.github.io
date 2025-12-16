@@ -4,7 +4,9 @@ description: #Umer Huzaifa's personal website.
 show_downloads: false
 # google_analytics: 
 theme: jekyll-theme-minimal
-
+markdown: kramdown
+kramdown:
+  math_engine: mathjax
 # Add this to _config.yml
 navigation:
   - title: Home
