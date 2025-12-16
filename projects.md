@@ -21,7 +21,7 @@ title: Portfolio
       <h3>System Identification for Second Order Systems</h3>
     </a>
   </div>
-![alt text](gait_events.png)
+<!-- ![alt text](gait_events.png) -->
 <div class="portfolio-grid">
   <div class="project-item">
     <a href="./projects/gait_event_recognize.html" target="_blank">
