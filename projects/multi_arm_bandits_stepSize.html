@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Armed Bandit: Step Size Comparison</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        h2 {
+            color: #764ba2;
+            margin-top: 25px;
+            margin-bottom: 12px;
+            font-size: 1.4em;
+        }
+        
+        h3 {
+            color: #555;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+        
+        .intro {
+            background: #f8f9fa;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .formula {
+            background: #fff8e1;
+            padding: 10px 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            font-size: 1.1em;
+            border: 2px solid #ffd54f;
+        }
+        
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .method {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+        }
+        
+        .method h3 {
+            color: #667eea;
+            margin-top: 0;
+        }
+        
+        .results {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .warning {
+            background: #fff3e0;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #ff9800;
+        }
+        
+        ul {
+            margin-left: 25px;
+            margin-top: 8px;
+        }
+        
+        li {
+            margin-bottom: 6px;
+        }
+        
+        .highlight {
+            background: #fff59d;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+        
+        
+        .cta-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            border-radius: 8px;
+            margin-top: 2rem;
+        }
+
+        .cta-section h2 {
+            color: white;
+            border: none;
+            margin-bottom: 1rem;
+        }
+
+        .cta-section p {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Multi-Armed Bandit: Step Size Comparison</h1>
+        
+        <div class="intro">
+            <strong>Problem:</strong> In reinforcement learning, how should an agent update its value estimates? 
+            This project compares constant and non-constant step sizes in the multi-armed bandit problem.
+        </div>
+
+        <h2>The Update Rule</h2>
+        <div class="formula">
+            Q(a) ← Q(a) + α × [Reward - Q(a)]
+        </div>
+        <p>Where <strong>α</strong> is the step size that determines how much weight we give to new information.</p>
+
+        <div class="comparison">
+            <div class="method">
+                <h3>📊 Non-Constant (Sample Average)</h3>
+                <p><strong>α = 1/n</strong></p>
+                <p>where <em>n</em> is the number of times action was taken</p>
+                <ul>
+                    <li>Decreases over time</li>
+                    <li>All observations equally weighted</li>
+                    <li>Computes true average</li>
+                </ul>
+            </div>
+            
+            <div class="method">
+                <h3>🎯 Constant Step Size</h3>
+                <p><strong>α = 0.1</strong> (or another fixed value)</p>
+                <ul>
+                    <li>Stays fixed over time</li>
+                    <li>Recent rewards weighted more</li>
+                    <li>Exponential recency-weighted average</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2>Experimental Setup</h2>
+        <ul>
+            <li><strong>Bandit:</strong> 10 arms with Gaussian rewards</li>
+            <li><strong>Strategy:</strong> ε-greedy (ε = 0.1) action selection</li>
+            <li><strong>Trials:</strong> 2000 independent runs × 1000 steps each</li>
+            <li><strong>Conditions:</strong> Stationary and non-stationary environments</li>
+        </ul>
+
+        <h2>Key Findings</h2>
+        
+        <div class="results">
+            <h3>✅ Stationary Problems (Rewards Don't Change)</h3>
+            <ul>
+                <li><span class="highlight">Sample average performs best</span> - converges to true values</li>
+                <li>Constant step sizes work well but may converge slightly slower</li>
+                <li>All methods eventually reach similar performance</li>
+            </ul>
+        </div>
+        
+        <div class="warning">
+            <h3>🔄 Non-Stationary Problems (Rewards Drift Over Time)</h3>
+            <ul>
+                <li><span class="highlight">Constant α = 0.1 significantly outperforms</span> sample average</li>
+                <li>Sample average struggles because old data drags down estimates</li>
+                <li>Higher constant step sizes adapt faster to changes</li>
+                <li>The "forgetting" property becomes an advantage</li>
+            </ul>
+        </div>
+
+        <h2>Conclusion</h2>
+        <p>
+            <strong>The choice of step size matters!</strong> For stationary problems, sample averaging provides 
+            unbiased estimates. However, in non-stationary environments—which are common in real-world 
+            applications—constant step sizes excel by giving more weight to recent observations and 
+            naturally tracking changes over time.
+        </p>
+        <!-- Call to Action Section -->
+            <div class="cta-section">
+                <h2>Interested in This Research?</h2>
+                <p>
+                    I'm passionate about advancing the field of activity recognition and wearable sensing technologies. 
+                    If you'd like to discuss this research, explore potential collaborations, or have thoughtful comments and questions, 
+                    I'd love to hear from you!
+                </p>
+                <a href="https://github.com/umerhuzaifa" class="btn" target="_blank">View My GitHub</a>
+                <a href="mailto:mhuzaifa@depaul.edu" class="btn btn-secondary">Contact Me</a>
+            </div>
+
+        <footer>
+            <p>&copy; 2025 Umer Huzaifa | <a href="https://umerhuzaifa.github.io">umerhuzaifa.github.io</a></p>
+            <p>Built with ❤️ for open science and reproducible research</p>
+        </footer>
+
+    </div>
+</body>
+</html>

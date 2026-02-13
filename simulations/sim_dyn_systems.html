@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2D Dynamical Systems Phase Portraits</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+                sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const DynamicalSystemsVisualization = () => {
+          const canvasRef = useRef(null);
+          const [trajectories, setTrajectories] = useState([]);
+          const [isAnimating, setIsAnimating] = useState(false);
+          const [selectedSystem, setSelectedSystem] = useState('vanDerPol');
+          const animationRef = useRef(null);
+          const timeoutRef = useRef(null);
+          
+          // Canvas dimensions and scaling
+          const width = 800;
+          const height = 600;
+          const scale = 60;
+          const offsetX = width / 2;
+          const offsetY = height / 2;
+          
+          // Define all dynamical systems
+          const systems = {
+            vanDerPol: {
+              name: "Van der Pol Oscillator",
+              params: { mu: 1.0 },
+              equations: "dx/dt = y, dy/dt = μ(1 - x²)y - x",
+              description: "Models nonlinear oscillations with self-exciting and damping effects",
+              derivatives: (x, y, params) => ({
+                dx: y,
+                dy: params.mu * (1 - x * x) * y - x
+              }),
+              scale: 60,
+              limits: { x: [-3, 3], y: [-3, 3] }
+            },
+            duffing: {
+              name: "Duffing Oscillator",
+              params: { alpha: -1, beta: 1, delta: 0.3, gamma: 0.3, omega: 1.2 },
+              equations: "dx/dt = y, dy/dt = -δy - αx - βx³ + γcos(ωt)",
+              description: "Models forced oscillations with nonlinear restoring force",
+              derivatives: (x, y, params, t) => ({
+                dx: y,
+                dy: -params.delta * y - params.alpha * x - params.beta * Math.pow(x, 3) + 
+                     params.gamma * Math.cos(params.omega * t)
+              }),
+              scale: 50,
+              limits: { x: [-2.5, 2.5], y: [-2.5, 2.5] }
+            },
+            pendulum: {
+              name: "Nonlinear Pendulum",
+              params: { g: 9.8, L: 1, damping: 0.1 },
+              equations: "dθ/dt = ω, dω/dt = -(g/L)sin(θ) - bω",
+              description: "Models a damped pendulum with nonlinear restoring torque",
+              derivatives: (theta, omega, params) => ({
+                dx: omega,
+                dy: -(params.g / params.L) * Math.sin(theta) - params.damping * omega
+              }),
+              scale: 40,
+              limits: { x: [-4, 4], y: [-4, 4] }
+            },
+            lotkaVolterra: {
+              name: "Lotka-Volterra (Predator-Prey)",
+              params: { alpha: 1.5, beta: 1.0, gamma: 1.0, delta: 3.0 },
+              equations: "dx/dt = αx - βxy, dy/dt = δxy - γy",
+              description: "Models population dynamics between predators and prey",
+              derivatives: (x, y, params) => ({
+                dx: params.alpha * x - params.beta * x * y,
+                dy: params.delta * x * y - params.gamma * y
+              }),
+              scale: 100,
+              limits: { x: [0, 3], y: [0, 3] }
+            },
+            fitzHughNagumo: {
+              name: "FitzHugh-Nagumo",
+              params: { a: 0.7, b: 0.8, tau: 12.5, I: 0.5 },
+              equations: "dv/dt = v - v³/3 - w + I, dw/dt = (v + a - bw)/τ",
+              description: "Simplified model of neuronal excitation and inhibition",
+              derivatives: (v, w, params) => ({
+                dx: v - Math.pow(v, 3) / 3 - w + params.I,
+                dy: (v + params.a - params.b * w) / params.tau
+              }),
+              scale: 80,
+              limits: { x: [-2.5, 2.5], y: [-1.5, 1.5] }
+            }
+          };
+          
+          const currentSystem = systems[selectedSystem];
+          const currentScale = currentSystem.scale;
+          
+          // RK4 numerical integration
+          const rk4Step = (x, y, t, dt, system) => {
+            const k1 = system.derivatives(x, y, system.params, t);
+            const k2 = system.derivatives(
+              x + k1.dx * dt / 2,
+              y + k1.dy * dt / 2,
+              system.params,
+              t + dt / 2
+            );
+            const k3 = system.derivatives(
+              x + k2.dx * dt / 2,
+              y + k2.dy * dt / 2,
+              system.params,
+              t + dt / 2
+            );
+            const k4 = system.derivatives(
+              x + k3.dx * dt,
+              y + k3.dy * dt,
+              system.params,
+              t + dt
+            );
+            
+            return {
+              x: x + (k1.dx + 2 * k2.dx + 2 * k3.dx + k4.dx) * dt / 6,
+              y: y + (k1.dy + 2 * k2.dy + 2 * k3.dy + k4.dy) * dt / 6,
+              t: t + dt
+            };
+          };
+          
+          // Convert coordinates to canvas coordinates
+          const project = (x, y) => {
+            return {
+              px: offsetX + x * currentScale,
+              py: offsetY - y * currentScale
+            };
+          };
+          
+          // Inverse projection
+          const unproject = (px, py) => {
+            return {
+              x: (px - offsetX) / currentScale,
+              y: (offsetY - py) / currentScale
+            };
+          };
+          
+          // Draw vector field
+          const drawVectorField = (ctx, system) => {
+            ctx.strokeStyle = 'rgba(100, 100, 255, 0.3)';
+            ctx.lineWidth = 1;
+            
+            const gridSpacing = 40;
+            const arrowScale = 0.4;
+            
+            for (let px = 0; px < width; px += gridSpacing) {
+              for (let py = 0; py < height; py += gridSpacing) {
+                const { x, y } = unproject(px, py);
+                
+                const deriv = system.derivatives(x, y, system.params, 0);
+                const magnitude = Math.sqrt(deriv.dx * deriv.dx + deriv.dy * deriv.dy);
+                
+                if (magnitude < 0.01) continue;
+                
+                const normDx = deriv.dx / magnitude * arrowScale * gridSpacing / 2;
+                const normDy = deriv.dy / magnitude * arrowScale * gridSpacing / 2;
+                
+                const { px: px1, py: py1 } = project(x, y);
+                const { px: px2, py: py2 } = project(x + normDx / currentScale, y + normDy / currentScale);
+                
+                ctx.beginPath();
+                ctx.moveTo(px1, py1);
+                ctx.lineTo(px2, py2);
+                ctx.stroke();
+                
+                // Arrow head
+                const angle = Math.atan2(py2 - py1, px2 - px1);
+                const arrowSize = 4;
+                ctx.beginPath();
+                ctx.moveTo(px2, py2);
+                ctx.lineTo(
+                  px2 - arrowSize * Math.cos(angle - Math.PI / 6),
+                  py2 - arrowSize * Math.sin(angle - Math.PI / 6)
+                );
+                ctx.moveTo(px2, py2);
+                ctx.lineTo(
+                  px2 - arrowSize * Math.cos(angle + Math.PI / 6),
+                  py2 - arrowSize * Math.sin(angle + Math.PI / 6)
+                );
+                ctx.stroke();
+              }
+            }
+          };
+          
+          // Draw axes
+          const drawAxes = (ctx) => {
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+            ctx.lineWidth = 2;
+            
+            // X axis
+            ctx.beginPath();
+            ctx.moveTo(0, offsetY);
+            ctx.lineTo(width, offsetY);
+            ctx.stroke();
+            
+            // Y axis
+            ctx.beginPath();
+            ctx.moveTo(offsetX, 0);
+            ctx.lineTo(offsetX, height);
+            ctx.stroke();
+            
+            // Labels
+            ctx.fillStyle = 'black';
+            ctx.font = '14px Arial';
+            ctx.fillText('x', width - 30, offsetY - 10);
+            ctx.fillText('y', offsetX + 10, 20);
+          };
+          
+          // Draw all trajectories
+          const drawTrajectories = (ctx) => {
+            trajectories.forEach((trajectory, idx) => {
+              if (trajectory.systemType !== selectedSystem) return;
+              
+              const hue = (idx * 137.5) % 360;
+              ctx.strokeStyle = `hsla(${hue}, 70%, 50%, 0.8)`;
+              ctx.lineWidth = 2;
+              
+              ctx.beginPath();
+              for (let i = 0; i < trajectory.points.length; i++) {
+                const { px, py } = project(trajectory.points[i].x, trajectory.points[i].y);
+                if (i === 0) {
+                  ctx.moveTo(px, py);
+                } else {
+                  ctx.lineTo(px, py);
+                }
+              }
+              ctx.stroke();
+              
+              // Draw starting point
+              if (trajectory.points.length > 0) {
+                const { px, py } = project(trajectory.points[0].x, trajectory.points[0].y);
+                ctx.fillStyle = `hsl(${hue}, 70%, 50%)`;
+                ctx.beginPath();
+                ctx.arc(px, py, 5, 0, 2 * Math.PI);
+                ctx.fill();
+              }
+            });
+          };
+          
+          // Render the canvas
+          const render = () => {
+            const canvas = canvasRef.current;
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, width, height);
+            
+            // Background
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, width, height);
+            
+            drawAxes(ctx);
+            drawVectorField(ctx, currentSystem);
+            drawTrajectories(ctx);
+          };
+          
+          // Animation loop
+          const animate = () => {
+            setTrajectories(prev => {
+              const updated = prev.map(traj => {
+                if (traj.isComplete) {
+                  return traj;
+                }
+                
+                const last = traj.points[traj.points.length - 1];
+                const dt = 0.01;
+                const system = systems[traj.systemType];
+                const next = rk4Step(last.x, last.y, last.t || 0, dt, system);
+                
+                return {
+                  ...traj,
+                  points: [...traj.points, next]
+                };
+              });
+              
+              return updated;
+            });
+            
+            animationRef.current = requestAnimationFrame(animate);
+          };
+          
+          useEffect(() => {
+            render();
+          }, [trajectories, selectedSystem]);
+          
+          useEffect(() => {
+            if (isAnimating) {
+              animationRef.current = requestAnimationFrame(animate);
+            }
+            return () => {
+              if (animationRef.current) {
+                cancelAnimationFrame(animationRef.current);
+              }
+            };
+          }, [isAnimating]);
+          
+          // Handle canvas click
+          const handleClick = (e) => {
+            const canvas = canvasRef.current;
+            const rect = canvas.getBoundingClientRect();
+            const px = e.clientX - rect.left;
+            const py = e.clientY - rect.top;
+            
+            const { x, y } = unproject(px, py);
+            
+            // Create new trajectory
+            const trajectoryId = Date.now();
+            const newTrajectory = {
+              id: trajectoryId,
+              systemType: selectedSystem,
+              points: [{ x, y, t: 0 }],
+              isComplete: false,
+              startTime: Date.now()
+            };
+            
+            setTrajectories(prev => [...prev, newTrajectory]);
+            setIsAnimating(true);
+            
+            // Set timeout to stop this trajectory after 1 minute
+            setTimeout(() => {
+              setTrajectories(prev => 
+                prev.map(traj => 
+                  traj.id === trajectoryId 
+                    ? { ...traj, isComplete: true }
+                    : traj
+                )
+              );
+            }, 60000); // 60 seconds = 1 minute
+          };
+          
+          const handleClear = () => {
+            setTrajectories([]);
+            setIsAnimating(false);
+          };
+          
+          const handleSystemChange = (e) => {
+            setSelectedSystem(e.target.value);
+          };
+          
+          const activeTrajectories = trajectories.filter(
+            t => t.systemType === selectedSystem && !t.isComplete
+          ).length;
+          
+          const completedTrajectories = trajectories.filter(
+            t => t.systemType === selectedSystem && t.isComplete
+          ).length;
+          
+          return (
+            <div className="flex flex-col items-center gap-4 p-6 bg-gray-50 min-h-screen">
+              <div className="bg-white rounded-lg shadow-lg p-6 max-w-4xl">
+                <h1 className="text-3xl font-bold mb-2 text-gray-800">
+                  2D Dynamical Systems Phase Portraits
+                </h1>
+                <p className="text-gray-600 mb-4">
+                  Select a system and click anywhere to trace trajectories (auto-stops after 1 minute)
+                </p>
+                
+                {/* System Selection */}
+                <div className="mb-4">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Select Dynamical System:
+                  </label>
+                  <select
+                    value={selectedSystem}
+                    onChange={handleSystemChange}
+                    className="w-full p-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-base"
+                  >
+                    {Object.entries(systems).map(([key, system]) => (
+                      <option key={key} value={key}>
+                        {system.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                
+                {/* Canvas */}
+                <div className="border-2 border-gray-300 rounded">
+                  <canvas
+                    ref={canvasRef}
+                    width={width}
+                    height={height}
+                    onClick={handleClick}
+                    className="cursor-crosshair"
+                  />
+                </div>
+                
+                {/* Controls */}
+                <div className="mt-4 flex gap-4 items-center flex-wrap">
+                  <button
+                    onClick={handleClear}
+                    className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
+                  >
+                    Clear All Trajectories
+                  </button>
+                  
+                  <div className="text-sm text-gray-600">
+                    <div>Active: {activeTrajectories} | Completed: {completedTrajectories}</div>
+                  </div>
+                </div>
+                
+                {/* System Information */}
+                <div className="mt-4 p-4 bg-blue-50 rounded text-sm text-gray-700">
+                  <p className="font-semibold mb-2">{currentSystem.name}</p>
+                  <div className="font-mono text-xs mb-2">
+                    {currentSystem.equations}
+                  </div>
+                  <p className="text-xs text-gray-600">
+                    {currentSystem.description}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-2">
+                    ⏱️ Each trajectory automatically stops after 60 seconds
+                  </p>
+                </div>
+              </div>
+            </div>
+          );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<DynamicalSystemsVisualization />);
+    </script>
+</body>
+</html>

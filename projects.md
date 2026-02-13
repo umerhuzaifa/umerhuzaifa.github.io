@@ -4,6 +4,13 @@ title: Portfolio
 ---
 
 # Projects
+<div class="portfolio-grid">
+  <div class="project-item">
+    <a href="./projects/adc_waveform_sampler.html" target="_blank">
+      <img src="/assets/images/sin_quantize.png" alt="LED and ESP32" style="max-width: 400px; margin: 20px auto; display: block;" />
+      <h3>Demonstration of Quantization using ADC</h3>
+    </a>
+  </div>
 
 <!-- ## Power Measurement in an ESP32 Blinking an LED -->
 <div class="portfolio-grid">
@@ -30,13 +37,13 @@ title: Portfolio
     </a>
   </div>
 
-<!--   
-  <!-- <div class="project-item">
-    <a href="./projects/bipedal-walker.html" target="_blank">
-      <img src="/assets/images/bipedal-walker-thumb.jpg" alt="Bipedal Walker">
-      <h3>Variable Gait Bipedal Robot</h3>
+<div class="portfolio-grid">
+  <div class="project-item">
+    <a href="./simulations/sim_dyn_systems.html" target="_blank">
+      <img src="/assets/images/dynamic_systems.png" alt="Simulating Dynamical Systems">
+      <h3>A GUI for Simulating Dynamical Systems</h3>
     </a>
   </div>
-   --> 
-  <!-- Add more projects as needed -->
+
+
 </div>

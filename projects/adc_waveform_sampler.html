@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sinusoidal Waveform Sampling & ADC Conversion</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Lexend:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --analog-color: #f97316;
+            --quantized-color: #3b82f6;
+            --grid-color: #e2e8f0;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --slider-track: #e2e8f0;
+            --slider-thumb: #3b82f6;
+        }
+
+        body {
+            font-family: 'Lexend', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            padding: 2.5rem;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            text-align: center;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+        }
+
+        .legend {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-line {
+            width: 40px;
+            height: 3px;
+            border-radius: 2px;
+        }
+
+        .legend-line.analog {
+            background: var(--analog-color);
+        }
+
+        .legend-line.quantized {
+            background: var(--quantized-color);
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            cursor: crosshair;
+        }
+
+        .controls {
+            margin-bottom: 2rem;
+        }
+
+        .slider-container {
+            margin-bottom: 2rem;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .slider-label span:first-child {
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.75rem;
+        }
+
+        .slider-label span:last-child {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .slider-track {
+            position: relative;
+            height: 8px;
+            background: var(--slider-track);
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            background: transparent;
+            position: relative;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-track {
+            height: 8px;
+            background: linear-gradient(to right, var(--slider-thumb) 0%, var(--slider-thumb) var(--slider-progress, 50%), var(--slider-track) var(--slider-progress, 50%), var(--slider-track) 100%);
+            border-radius: 4px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--slider-thumb);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+            transition: transform 0.2s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+
+        input[type="range"]::-moz-range-track {
+            height: 8px;
+            background: var(--slider-track);
+            border-radius: 4px;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: var(--slider-thumb);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .button-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        button {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Lexend', sans-serif;
+            letter-spacing: 0.01em;
+        }
+
+        .btn-start {
+            background: var(--accent-green);
+            color: white;
+        }
+
+        .btn-start:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-start:active {
+            transform: translateY(0);
+        }
+
+        .btn-stop {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        .btn-stop:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-stop:active {
+            transform: translateY(0);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .info-item {
+            background: var(--bg-secondary);
+            padding: 1.25rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .info-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .info-value {
+            font-size: 1.125rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: var(--text-primary);
+            color: var(--bg-card);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            pointer-events: none;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .tooltip.visible {
+            opacity: 1;
+        }
+
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid var(--text-primary);
+        }
+
+        .canvas-container {
+            position: relative;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sinusoidal Waveform Sampling & ADC Conversion</h1>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-line analog"></div>
+                <span>Analog Signal</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-line quantized"></div>
+                <span>Quantized Signal</span>
+            </div>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="waveformCanvas"></canvas>
+            <div class="tooltip" id="tooltip"></div>
+        </div>
+
+        <div class="controls">
+            <div class="slider-container">
+                <div class="slider-label">
+                    <span>Sampling Frequency</span>
+                    <span id="sliderValue">10 Hz</span>
+                </div>
+                <input type="range" id="samplingSlider" min="1" max="100" value="10" step="1">
+                <div class="slider-labels">
+                    <span>1 Hz Slow</span>
+                    <span>100 Hz Fast</span>
+                </div>
+            </div>
+
+            <div class="button-container">
+                <button class="btn-start" id="startBtn">Start Animation</button>
+                <button class="btn-stop" id="stopBtn">Stop</button>
+            </div>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Waveform</div>
+                <div class="info-value">-5V to +5V</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Frequency</div>
+                <div class="info-value">1 Hz (3 cycles)</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">ADC Resolution</div>
+                <div class="info-value">8-bit (256 levels)</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Sample Count</div>
+                <div class="info-value" id="sampleCount">80</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('waveformCanvas');
+        const ctx = canvas.getContext('2d');
+        const slider = document.getElementById('samplingSlider');
+        const sliderValue = document.getElementById('sliderValue');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const sampleCountDisplay = document.getElementById('sampleCount');
+        const tooltip = document.getElementById('tooltip');
+
+        // Set canvas size
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            const rect = container.getBoundingClientRect();
+            canvas.width = rect.width - 64; // Account for padding
+            canvas.height = 400;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Configuration
+        const config = {
+            amplitude: 5, // Volts
+            frequency: 1, // Hz
+            cycles: 3,
+            duration: 3, // seconds
+            adcBits: 8,
+            adcLevels: 256,
+            samplingFrequency: 10 // Hz
+        };
+
+        let animationId = null;
+        let currentTime = 0;
+        let isAnimating = false;
+        let samples = [];
+
+        // Convert voltage to digital value (0-255)
+        function voltageToDigital(voltage) {
+            const normalized = (voltage + config.amplitude) / (2 * config.amplitude); // 0 to 1
+            const level = Math.round(normalized * (config.adcLevels - 1));
+            return Math.max(0, Math.min(config.adcLevels - 1, level));
+        }
+
+        // Get canvas coordinates from mouse event
+        function getCanvasCoordinates(e) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top
+            };
+        }
+
+        // Check if a point is near a sample point
+        function findNearestSample(mouseX, mouseY, threshold = 10) {
+            let nearestSample = null;
+            let minDistance = threshold;
+
+            samples.forEach(sample => {
+                const x = timeToX(sample.time);
+                const y = voltageToY(sample.quantized);
+                const distance = Math.sqrt(Math.pow(mouseX - x, 2) + Math.pow(mouseY - y, 2));
+
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    nearestSample = sample;
+                }
+            });
+
+            return nearestSample;
+        }
+
+        // Show tooltip with digital value
+        function showTooltip(sample, mouseX, mouseY) {
+            const digitalValue = voltageToDigital(sample.quantized);
+            const rect = canvas.getBoundingClientRect();
+            
+            tooltip.innerHTML = `
+                <div><strong>Time:</strong> ${sample.time.toFixed(3)}s</div>
+                <div><strong>Analog:</strong> ${sample.analog.toFixed(3)}V</div>
+                <div><strong>Quantized:</strong> ${sample.quantized.toFixed(3)}V</div>
+                <div><strong>Digital Value:</strong> ${digitalValue}</div>
+                <div><strong>Binary:</strong> ${digitalValue.toString(2).padStart(8, '0')}</div>
+                <div><strong>Hex:</strong> 0x${digitalValue.toString(16).toUpperCase().padStart(2, '0')}</div>
+            `;
+            
+            tooltip.style.left = `${mouseX}px`;
+            tooltip.style.top = `${mouseY - 140}px`;
+            tooltip.classList.add('visible');
+        }
+
+        // Hide tooltip
+        function hideTooltip() {
+            tooltip.classList.remove('visible');
+        }
+
+        // Canvas click event
+        canvas.addEventListener('click', (e) => {
+            const coords = getCanvasCoordinates(e);
+            const nearestSample = findNearestSample(coords.x, coords.y, 15);
+
+            if (nearestSample) {
+                showTooltip(nearestSample, coords.x, coords.y);
+            } else {
+                hideTooltip();
+            }
+        });
+
+        // Canvas hover effect
+        canvas.addEventListener('mousemove', (e) => {
+            const coords = getCanvasCoordinates(e);
+            const nearestSample = findNearestSample(coords.x, coords.y, 15);
+
+            if (nearestSample) {
+                canvas.style.cursor = 'pointer';
+            } else {
+                canvas.style.cursor = 'crosshair';
+            }
+        });
+
+        // Hide tooltip when clicking outside
+        document.addEventListener('click', (e) => {
+            if (e.target !== canvas) {
+                hideTooltip();
+            }
+        });
+
+        // Update slider value display
+        slider.addEventListener('input', (e) => {
+            const value = e.target.value;
+            sliderValue.textContent = `${value} Hz`;
+            config.samplingFrequency = parseInt(value);
+            
+            // Update slider progress
+            const progress = ((value - slider.min) / (slider.max - slider.min)) * 100;
+            slider.style.setProperty('--slider-progress', `${progress}%`);
+            
+            if (!isAnimating) {
+                currentTime = 0;
+                samples = [];
+                drawWaveform();
+            }
+        });
+
+        // Initialize slider progress
+        const initialProgress = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
+        slider.style.setProperty('--slider-progress', `${initialProgress}%`);
+
+        // Generate analog signal value
+        function getAnalogValue(t) {
+            return config.amplitude * Math.sin(2 * Math.PI * config.frequency * t);
+        }
+
+        // Quantize value to ADC levels
+        function quantize(value) {
+            const normalized = (value + config.amplitude) / (2 * config.amplitude); // 0 to 1
+            const level = Math.round(normalized * (config.adcLevels - 1));
+            const clampedLevel = Math.max(0, Math.min(config.adcLevels - 1, level));
+            return (clampedLevel / (config.adcLevels - 1)) * (2 * config.amplitude) - config.amplitude;
+        }
+
+        // Convert time to canvas x coordinate
+        function timeToX(t) {
+            const padding = 40;
+            const usableWidth = canvas.width - 2 * padding;
+            return padding + (t / config.duration) * usableWidth;
+        }
+
+        // Convert voltage to canvas y coordinate
+        function voltageToY(v) {
+            const padding = 30;
+            const usableHeight = canvas.height - 2 * padding;
+            return padding + usableHeight / 2 - (v / config.amplitude) * (usableHeight / 2);
+        }
+
+        // Draw grid
+        function drawGrid() {
+            ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--grid-color');
+            ctx.lineWidth = 1;
+
+            // Vertical lines (time)
+            for (let t = 0; t <= config.duration; t += 0.5) {
+                const x = timeToX(t);
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+
+            // Horizontal lines (voltage)
+            for (let v = -5; v <= 5; v += 1) {
+                const y = voltageToY(v);
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+        }
+
+        // Draw axes labels
+        function drawLabels() {
+            ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary');
+            ctx.font = '12px "JetBrains Mono", monospace';
+            ctx.textAlign = 'center';
+
+            // X-axis labels (time)
+            for (let t = 0; t <= config.duration; t += 1) {
+                const x = timeToX(t);
+                ctx.fillText(`${t}s`, x, canvas.height - 10);
+            }
+
+            // Y-axis labels (voltage)
+            ctx.textAlign = 'right';
+            for (let v = -5; v <= 5; v += 2) {
+                const y = voltageToY(v);
+                ctx.fillText(`${v}V`, 30, y + 4);
+            }
+        }
+
+        // Draw analog signal
+        function drawAnalogSignal(upToTime = null) {
+            ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--analog-color');
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+
+            const endTime = upToTime !== null ? upToTime : config.duration;
+            const step = 0.001;
+
+            let firstPoint = true;
+            for (let t = 0; t <= endTime; t += step) {
+                const x = timeToX(t);
+                const y = voltageToY(getAnalogValue(t));
+
+                if (firstPoint) {
+                    ctx.moveTo(x, y);
+                    firstPoint = false;
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+
+            ctx.stroke();
+        }
+
+        // Draw quantized signal
+        function drawQuantizedSignal() {
+            if (samples.length < 2) return;
+
+            ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--quantized-color');
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 3]);
+
+            for (let i = 0; i < samples.length - 1; i++) {
+                const x1 = timeToX(samples[i].time);
+                const y1 = voltageToY(samples[i].quantized);
+                const x2 = timeToX(samples[i + 1].time);
+                const y2 = voltageToY(samples[i].quantized);
+
+                // Horizontal line
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
+
+                // Vertical line
+                const y3 = voltageToY(samples[i + 1].quantized);
+                ctx.beginPath();
+                ctx.moveTo(x2, y2);
+                ctx.lineTo(x2, y3);
+                ctx.stroke();
+            }
+
+            // Last horizontal segment
+            if (samples.length > 0) {
+                const lastSample = samples[samples.length - 1];
+                const x1 = timeToX(lastSample.time);
+                const y1 = voltageToY(lastSample.quantized);
+                const x2 = timeToX(Math.min(currentTime, config.duration));
+
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y1);
+                ctx.stroke();
+            }
+
+            ctx.setLineDash([]);
+        }
+
+        // Draw sample points
+        function drawSamplePoints() {
+            samples.forEach(sample => {
+                const x = timeToX(sample.time);
+                const yAnalog = voltageToY(sample.analog);
+                const yQuantized = voltageToY(sample.quantized);
+
+                // Analog point
+                ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--analog-color');
+                ctx.beginPath();
+                ctx.arc(x, yAnalog, 4, 0, 2 * Math.PI);
+                ctx.fill();
+
+                // Quantized point - larger and with stroke for better visibility
+                ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--quantized-color');
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(x, yQuantized, 6, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.stroke();
+            });
+        }
+
+        // Main draw function
+        function drawWaveform() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            drawGrid();
+            drawLabels();
+            drawAnalogSignal(isAnimating ? currentTime : null);
+            drawQuantizedSignal();
+            drawSamplePoints();
+        }
+
+        // Animation loop
+        function animate(timestamp) {
+            if (!isAnimating) return;
+
+            if (currentTime >= config.duration) {
+                isAnimating = false;
+                startBtn.textContent = 'Restart Animation';
+                return;
+            }
+
+            // Calculate sample interval from frequency
+            const sampleInterval = 1 / config.samplingFrequency; // Convert frequency to interval in seconds
+            const lastSampleTime = samples.length > 0 ? samples[samples.length - 1].time : -sampleInterval;
+
+            if (currentTime - lastSampleTime >= sampleInterval) {
+                const analogValue = getAnalogValue(currentTime);
+                const quantizedValue = quantize(analogValue);
+                samples.push({
+                    time: currentTime,
+                    analog: analogValue,
+                    quantized: quantizedValue
+                });
+                sampleCountDisplay.textContent = samples.length;
+            }
+
+            currentTime += 0.016; // Approximately 60 FPS
+            drawWaveform();
+
+            animationId = requestAnimationFrame(animate);
+        }
+
+        // Start animation
+        startBtn.addEventListener('click', () => {
+            if (isAnimating) return;
+
+            if (currentTime >= config.duration) {
+                currentTime = 0;
+                samples = [];
+                startBtn.textContent = 'Start Animation';
+            }
+
+            isAnimating = true;
+            animate();
+        });
+
+        // Stop animation
+        stopBtn.addEventListener('click', () => {
+            isAnimating = false;
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+            }
+        });
+
+        // Initial draw
+        drawWaveform();
+    </script>
+</body>
+</html>

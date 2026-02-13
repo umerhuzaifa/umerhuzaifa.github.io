@@ -3,13 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Power Monitoring - ESP32 and nRF52 Comparison - Dr. Umer Huzaifa</title>
-    <meta name="description" content="Comprehensive power consumption analysis and comparison of ESP32 and nRF52 devices with LED operation patterns.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <title>Gait Activity Classification Using CNN-LSTM | Research</title>
     <style>
         * {
             margin: 0;
@@ -17,333 +11,206 @@
             box-sizing: border-box;
         }
 
-        :root {
-            --primary-light: #f8fafc;
-            --primary-white: #ffffff;
-            --accent-orange: #e85d2d;
-            --accent-blue: #0066cc;
-            --text-primary: #1e293b;
-            --text-secondary: #475569;
-            --surface: #ffffff;
-            --surface-light: #f1f5f9;
-            --grid-color: rgba(0, 0, 0, 0.03);
-            --border-color: #e2e8f0;
-            --success: #059669;
-            --warning: #d97706;
-            --error: #dc2626;
-            --code-bg: #f8fafc;
-        }
-
         body {
-            font-family: 'IBM Plex Sans', sans-serif;
-            background: linear-gradient(135deg, var(--primary-light) 0%, #e2e8f0 100%);
-            color: var(--text-primary);
-            min-height: 100vh;
-            padding: 0;
-            position: relative;
-            overflow-x: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                repeating-linear-gradient(0deg, transparent, transparent 2px, var(--grid-color) 2px, var(--grid-color) 3px),
-                repeating-linear-gradient(90deg, transparent, transparent 2px, var(--grid-color) 2px, var(--grid-color) 3px);
-            background-size: 30px 30px;
-            pointer-events: none;
-            z-index: 0;
-            opacity: 0.5;
+            color: #333;
+            background-color: #f4f4f4;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 900px;
             margin: 0 auto;
-            position: relative;
-            z-index: 1;
-            padding: 2rem;
+            background-color: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
         }
 
         header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 2rem;
             text-align: center;
-            margin-bottom: 2rem;
-            animation: fadeInDown 0.8s ease-out;
         }
 
-        h1 {
-            font-family: 'JetBrains Mono', monospace;
+        header h1 {
             font-size: 2.2rem;
-            font-weight: 600;
             margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, var(--accent-blue), var(--accent-orange));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            line-height: 1.3;
+            font-weight: 600;
         }
 
-        .subtitle {
+        header p {
             font-size: 1.1rem;
-            color: var(--text-secondary);
-            max-width: 800px;
-            margin: 0 auto 0.5rem;
+            opacity: 0.95;
         }
 
-        .back-link {
-            display: inline-block;
-            margin-top: 1rem;
-            color: var(--accent-blue);
-            text-decoration: none;
-            font-size: 0.95rem;
-            transition: color 0.2s ease;
-        }
-
-        .back-link:hover {
-            color: var(--accent-orange);
-            text-decoration: underline;
-        }
-
-        .back-link::before {
-            content: '← ';
-        }
-
-        .content-section {
-            background: var(--surface);
-            border-radius: 12px;
+        .content {
             padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-            border: 1px solid var(--border-color);
-            animation: fadeInUp 0.8s ease-out both;
         }
 
-        .content-section:nth-child(2) {
-            animation-delay: 0.1s;
-        }
-
-        .content-section:nth-child(3) {
-            animation-delay: 0.2s;
-        }
-
-        .content-section:nth-child(4) {
-            animation-delay: 0.3s;
+        section {
+            margin-bottom: 2.5rem;
         }
 
         h2 {
-            color: var(--accent-blue);
-            font-size: 1.6rem;
+            color: #667eea;
+            font-size: 1.8rem;
             margin-bottom: 1rem;
-            font-weight: 600;
-            border-bottom: 3px solid var(--accent-blue);
             padding-bottom: 0.5rem;
+            border-bottom: 3px solid #667eea;
         }
 
         h3 {
-            color: var(--text-primary);
+            color: #764ba2;
             font-size: 1.3rem;
-            margin: 1.5rem 0 1rem;
-            font-weight: 600;
-        }
-
-        h4 {
-            color: var(--accent-orange);
-            font-size: 1.1rem;
-            margin: 1rem 0 0.75rem;
-            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 0.8rem;
         }
 
         p {
             margin-bottom: 1rem;
-            color: var(--text-secondary);
+            text-align: justify;
+        }
+
+        .highlight-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .highlight-box strong {
+            color: #667eea;
         }
 
         ul {
+            margin-left: 2rem;
             margin-bottom: 1rem;
-            padding-left: 2rem;
         }
 
         li {
             margin-bottom: 0.5rem;
-            color: var(--text-secondary);
-        }
-
-        strong {
-            color: var(--text-primary);
-            font-weight: 600;
-        }
-
-        .goal-section {
-            background: linear-gradient(135deg, rgba(0, 102, 204, 0.08), rgba(0, 102, 204, 0.04));
-            border-left: 4px solid var(--accent-blue);
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-        }
-
-        .goal-section h3 {
-            color: var(--accent-blue);
-            margin-top: 0;
-        }
-
-        .components-section {
-            background: var(--surface-light);
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-            border: 1px solid var(--border-color);
-        }
-
-        .components-section h3 {
-            color: var(--accent-orange);
-            margin-top: 0;
-        }
-
-        .image-container {
-            text-align: center;
-            margin: 2rem 0;
-            padding: 1rem;
-            background: var(--surface-light);
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-        }
-
-        .image-container img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 6px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .led-gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .led-card {
-            background: var(--surface-light);
-            padding: 1.5rem;
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
-            transition: all 0.3s ease;
-        }
-
-        .led-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-            border-color: var(--accent-blue);
-        }
-
-        .led-card h4 {
-            text-align: center;
-            margin-bottom: 1rem;
-        }
-
-        .led-card img {
-            width: 100%;
-            height: auto;
-            border-radius: 6px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 2rem 0;
-            background: var(--surface);
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin: 1.5rem 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        thead {
-            background: linear-gradient(135deg, var(--accent-blue), #0052a3);
-        }
-
-        thead th {
-            color: white;
-            font-weight: 600;
+        th, td {
             padding: 1rem;
             text-align: left;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.95rem;
+            border-bottom: 1px solid #ddd;
         }
 
-        tbody tr {
-            border-bottom: 1px solid var(--border-color);
-            transition: background 0.2s ease;
-        }
-
-        tbody tr:hover {
-            background: var(--surface-light);
-        }
-
-        tbody tr:last-child {
-            border-bottom: none;
-        }
-
-        tbody td {
-            padding: 1rem;
-            color: var(--text-secondary);
-        }
-
-        tbody td:first-child {
+        th {
+            background-color: #667eea;
+            color: white;
             font-weight: 600;
-            color: var(--text-primary);
         }
 
-        .equation {
-            background: var(--code-bg);
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
             padding: 1.5rem;
             border-radius: 8px;
-            margin: 1.5rem 0;
-            text-align: center;
-            border: 1px solid var(--border-color);
-            font-family: 'JetBrains Mono', monospace;
+            border: 2px solid #667eea30;
+            transition: transform 0.3s ease;
+        }
+
+        .result-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .result-card h4 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
             font-size: 1.1rem;
         }
 
-        code {
-            background: var(--code-bg);
-            padding: 0.2rem 0.4rem;
-            border-radius: 4px;
-            font-family: 'JetBrains Mono', monospace;
+        .result-card .metric {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #764ba2;
+            margin: 0.5rem 0;
+        }
+
+        .result-card p {
             font-size: 0.9rem;
-            color: var(--accent-orange);
-            border: 1px solid var(--border-color);
+            color: #666;
+            margin-bottom: 0;
         }
 
-        .note {
-            background: linear-gradient(135deg, rgba(232, 93, 45, 0.08), rgba(232, 93, 45, 0.04));
-            border-left: 4px solid var(--accent-orange);
-            padding: 1rem;
-            border-radius: 6px;
-            margin: 1rem 0;
-        }
-
-        .note::before {
-            content: '💡 Note: ';
-            font-weight: 600;
-            color: var(--accent-orange);
-        }
-
-        footer {
+        .cta-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
             text-align: center;
-            padding: 2rem 0;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            border-top: 1px solid var(--border-color);
+            border-radius: 8px;
             margin-top: 2rem;
         }
 
+        .cta-section h2 {
+            color: white;
+            border: none;
+            margin-bottom: 1rem;
+        }
+
+        .cta-section p {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background-color: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 0.5rem;
+        }
+
+        .btn:hover {
+            background-color: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            border: 2px solid white;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+        }
+
         footer a {
-            color: var(--accent-blue);
+            color: #667eea;
             text-decoration: none;
         }
 
@@ -351,398 +218,236 @@
             text-decoration: underline;
         }
 
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        code {
+            background-color: #f4f4f4;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
         }
 
         @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
+            header h1 {
+                font-size: 1.8rem;
             }
 
-            h1 {
-                font-size: 1.6rem;
-            }
-
-            .content-section {
+            .content {
                 padding: 1.5rem;
             }
 
-            .led-gallery {
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .results-grid {
                 grid-template-columns: 1fr;
             }
 
             table {
-                font-size: 0.85rem;
+                font-size: 0.9rem;
             }
 
-            thead th, tbody td {
-                padding: 0.75rem 0.5rem;
+            th, td {
+                padding: 0.7rem;
             }
         }
     </style>
 </head>
-
 <body>
-    <div class="container">        
-        <h1>Recognizing Regions in Gait Data with K-Means and PCA</h1>
-
-<h2>Overview</h2>
-
-<p>This document describes the implementation of two unsupervised learning methods for recognizing different regions in accelerometer gait data (ax, ay, az):</p>
-
-<ol>
-  <li><strong>K-Means Clustering</strong> - Groups similar motion patterns into 4 clusters</li>
-  <li><strong>PCA Anomaly Detection</strong> - Identifies unusual motion patterns</li>
-</ol>
-
-<p>Both methods use sliding window feature extraction to analyze the time series data.</p>
-
-<hr>
-
-<h2>Data Format</h2>
-
-<p>The code expects a CSV file or DataFrame with three columns:</p>
-<ul>
-  <li><code>ax</code> - Acceleration in x-axis</li>
-  <li><code>ay</code> - Acceleration in y-axis</li>
-  <li><code>az</code> - Acceleration in z-axis</li>
-</ul>
-
-<p>The <code>load_accelerometer_data()</code> function automatically detects common column naming variations.</p>
-
-<hr>
-
-<h2>Feature Extraction</h2>
-
-<h3>Sliding Window Approach</h3>
-
-<p>Features are extracted using a sliding window with:</p>
-<ul>
-  <li><strong>Window size</strong>: 50 samples (default)</li>
-  <li><strong>Overlap</strong>: 50% (step size = 25 samples)</li>
-</ul>
-
-<h3>Features per Window</h3>
-
-<p>For each axis (ax, ay, az), 7 features are computed:</p>
-<ul>
-  <li>Mean</li>
-  <li>Standard deviation</li>
-  <li>Minimum</li>
-  <li>Maximum</li>
-  <li>25th percentile</li>
-  <li>75th percentile</li>
-  <li>RMS (Root Mean Square)</li>
-</ul>
-
-<p>Plus 3 magnitude features:</p>
-<ul>
-  <li>Mean magnitude: <code>sqrt(ax² + ay² + az²)</code></li>
-  <li>Std of magnitude</li>
-  <li>Range of magnitude (max - min)</li>
-</ul>
-
-<p><strong>Total: 24 features per window</strong></p>
-
-<hr>
-
-<h2>Method 1: K-Means Clustering</h2>
-
-<h3>How It Works</h3>
-
-<pre><code>detector = AccelerometerRegionDetector(df)
-labels_kmeans, features_kmeans = detector.kmeans_segmentation(n_clusters=4, window_size=50)</code></pre>
-
-<p><strong>Steps:</strong></p>
-<ol>
-  <li>Extract features from sliding windows</li>
-  <li>Standardize features (zero mean, unit variance)</li>
-  <li>Apply K-means with 4 clusters</li>
-  <li>Expand window labels to original time series length</li>
-</ol>
-
-<h3>Parameters</h3>
-
-<ul>
-  <li><code>n_clusters</code> (default: 5) - Number of regions to detect. <strong>Set to 4 for gait data.</strong></li>
-  <li><code>window_size</code> (default: 50) - Size of sliding window</li>
-  <li><code>random_state</code> (fixed: 42) - For reproducible results</li>
-  <li><code>n_init</code> (fixed: 10) - Number of K-means initializations</li>
-</ul>
-
-<h3>Output</h3>
-
-<ul>
-  <li><code>labels_kmeans</code>: Array of cluster labels for each time point</li>
-  <li><code>features_kmeans</code>: Scaled feature matrix</li>
-</ul>
-
-<h3>Example Output</h3>
-
-<pre><code>============================================================
-APPROACH 1: K-Means Clustering on Features
-============================================================
-Detected 4 different regions
-Cluster distribution: [13  5 13  7]</code></pre>
-
-<hr>
-
-<h2>Method 2: PCA Anomaly Detection</h2>
-
-<h3>How It Works</h3>
-
-<pre><code>detector = AccelerometerRegionDetector(df)
-labels_pca, recon_error = detector.pca_anomaly_detection(
-    window_size=50, 
-    n_components=3, 
-    threshold=2.0
-)</code></pre>
-
-<p><strong>Steps:</strong></p>
-<ol>
-  <li>Extract features from sliding windows</li>
-  <li>Standardize features</li>
-  <li>Apply PCA to reduce dimensionality to 3 components</li>
-  <li>Reconstruct features from PCA components</li>
-  <li>Calculate reconstruction error</li>
-  <li>Label windows as normal (0) or anomalous (1) based on threshold</li>
-</ol>
-
-<h3>Parameters</h3>
-
-<ul>
-  <li><code>window_size</code> (default: 50) - Size of sliding window</li>
-  <li><code>n_components</code> (default: 3) - Number of principal components to keep</li>
-  <li><code>threshold</code> (default: 2.0) - Z-score threshold for anomaly detection</li>
-</ul>
-
-<h3>Anomaly Detection Logic</h3>
-
-<pre><code>mean_error = np.mean(reconstruction_error)
-std_error = np.std(reconstruction_error)
-labels = reconstruction_error > (mean_error + threshold * std_error)</code></pre>
-
-<p>Windows with reconstruction error > <code>mean + 2.0 * std</code> are marked as anomalous.</p>
-
-<h3>Output</h3>
-
-<ul>
-  <li><code>labels_pca</code>: Binary labels (0=normal, 1=anomalous)</li>
-  <li><code>recon_error</code>: Reconstruction error for each window</li>
-</ul>
-
-<h3>Example Output</h3>
-
-<pre><code>============================================================
-APPROACH 4: PCA-based Anomaly Detection
-============================================================
-Variance explained: 92.47%
-Normal regions: 36
-Anomalous regions: 2</code></pre>
-
-<hr>
-
-<h2>Visualization</h2>
-
-<p>The <code>visualize_results()</code> function creates a 4-panel plot:</p>
-
-<ol>
-  <li><strong>ax axis</strong> - With colored regions overlay</li>
-  <li><strong>ay axis</strong> - With colored regions overlay</li>
-  <li><strong>az axis</strong> - With colored regions overlay</li>
-  <li><strong>Magnitude</strong> - <code>sqrt(ax² + ay² + az²)</code> with regions</li>
-</ol>
-
-<pre><code>fig = visualize_results(df, labels_kmeans, "K-Means Segmentation")
-plt.savefig('output.png', dpi=150, bbox_inches='tight')</code></pre>
-
-<hr>
-
-<h2>Complete Usage Example</h2>
-
-<pre><code>import pandas as pd
-from accelerometer_analysis import load_accelerometer_data, AccelerometerRegionDetector, visualize_results
-
-# Load data
-df = load_accelerometer_data('gait_data.csv')
-
-# Create detector
-detector = AccelerometerRegionDetector(df)
-
-# Method 1: K-Means with 4 clusters
-labels_kmeans, features = detector.kmeans_segmentation(n_clusters=4, window_size=50)
-
-# Method 2: PCA anomaly detection
-labels_pca, errors = detector.pca_anomaly_detection(window_size=50, n_components=3, threshold=2.0)
-
-# Visualize K-Means results
-fig = visualize_results(df, labels_kmeans, "K-Means (4 clusters)")
-plt.savefig('kmeans_results.png')
-
-# Visualize PCA results
-fig = visualize_results(df, labels_pca, "PCA Anomaly Detection")
-plt.savefig('pca_results.png')</code></pre>
-
-<hr>
-
-<h2>Synthetic Data Example</h2>
-
-<p>The code includes a synthetic data generator that creates 4 distinct regions:</p>
-
-<ol>
-  <li><strong>Region 1 (0-300)</strong>: Low activity / stationary</li>
-  <li><strong>Region 2 (300-600)</strong>: Walking (sinusoidal patterns)</li>
-  <li><strong>Region 3 (600-900)</strong>: Running (higher amplitude)</li>
-  <li><strong>Region 4 (900-1000)</strong>: Rest</li>
-</ol>
-
-<pre><code>if __name__ == "__main__":
-    df, results = main()</code></pre>
-
-<p>This generates:</p>
-<ul>
-  <li>1000 samples total</li>
-  <li>4 visualizations (K-Means, Change Point, DBSCAN, PCA)</li>
-  <li>Comparison summary</li>
-</ul>
-
-<hr>
-
-<h2>Key Differences: K-Means vs PCA</h2>
-
-<table>
-  <thead>
-    <tr>
-      <th>Aspect</th>
-      <th>K-Means</th>
-      <th>PCA Anomaly Detection</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><strong>Output</strong></td>
-      <td>4 discrete clusters</td>
-      <td>Binary (normal/anomalous)</td>
-    </tr>
-    <tr>
-      <td><strong>Use Case</strong></td>
-      <td>Identify distinct gait phases</td>
-      <td>Detect unusual movements</td>
-    </tr>
-    <tr>
-      <td><strong>Parameters</strong></td>
-      <td>Must set n_clusters</td>
-      <td>Must set threshold</td>
-    </tr>
-    <tr>
-      <td><strong>Clusters</strong></td>
-      <td>Exactly 4 regions</td>
-      <td>2 regions (normal + anomaly)</td>
-    </tr>
-    <tr>
-      <td><strong>Interpretability</strong></td>
-      <td>Clear phase labels</td>
-      <td>Anomaly scores available</td>
-    </tr>
-  </tbody>
-</table>
-
-<hr>
-
-<h2>When to Use Each Method</h2>
-
-<h3>Use K-Means when:</h3>
-<ul>
-  <li>You know the number of gait phases (set <code>n_clusters=4</code>)</li>
-  <li>You want to identify specific motion patterns</li>
-  <li>You need clear phase labels</li>
-  <li>You're analyzing walking, running, standing, etc.</li>
-</ul>
-
-<h3>Use PCA when:</h3>
-<ul>
-  <li>You want to detect outliers or unusual gait patterns</li>
-  <li>You don't know specific number of phases</li>
-  <li>You want to identify normal vs abnormal motion</li>
-  <li>You need reconstruction error scores for each window</li>
-</ul>
-
-<hr>
-
-<h2>Adjusting Parameters</h2>
-
-<h3>For K-Means:</h3>
-
-<p><strong>n_clusters (4 recommended for gait)</strong></p>
-<pre><code>detector.kmeans_segmentation(n_clusters=4)  # 4 distinct phases</code></pre>
-
-<p><strong>window_size</strong></p>
-<pre><code>detector.kmeans_segmentation(n_clusters=4, window_size=30)  # Shorter phases
-detector.kmeans_segmentation(n_clusters=4, window_size=100) # Longer phases</code></pre>
-
-<h3>For PCA:</h3>
-
-<p><strong>threshold</strong> (controls sensitivity)</p>
-<pre><code>detector.pca_anomaly_detection(threshold=1.5)  # More sensitive (more anomalies)
-detector.pca_anomaly_detection(threshold=3.0)  # Less sensitive (fewer anomalies)</code></pre>
-
-<p><strong>n_components</strong> (PCA dimensionality)</p>
-<pre><code>detector.pca_anomaly_detection(n_components=2)  # Less compression
-detector.pca_anomaly_detection(n_components=5)  # More features retained</code></pre>
-
-<hr>
-
-<h2>Helper Functions</h2>
-
-<h3>load_accelerometer_data()</h3>
-<p>Loads CSV and extracts ax, ay, az columns with automatic column name detection.</p>
-
-<h3>compute_features()</h3>
-<p>Extracts 24 statistical features from a sliding window.</p>
-
-<h3>_expand_labels()</h3>
-<p>Converts window-based labels back to original time series length.</p>
-
-<hr>
-
-<h2>Summary</h2>
-
-<p>This implementation provides two complementary approaches:</p>
-
-<ol>
-  <li><strong>K-Means with 4 clusters</strong> - For identifying distinct gait phases</li>
-  <li><strong>PCA anomaly detection</strong> - For finding unusual patterns</li>
-</ol>
-
-<p>Both methods:</p>
-<ul>
-  <li>Use sliding window feature extraction</li>
-  <li>Standardize features before processing</li>
-  <li>Work with 3-axis accelerometer data (ax, ay, az)</li>
-  <li>Include visualization functions</li>
-</ul>
-
-<p>The code is designed for gait analysis but works with any accelerometer time series data.</p>
-
+    <div class="container">
+        <header>
+            <h1>Gait Activity Classification Using CNN-LSTM Networks</h1>
+            <p>Multi-modal Sensor Fusion for Enhanced Activity Recognition</p>
+        </header>
+
+        <div class="content">
+            <!-- Objective Section -->
+            <section id="objective">
+                <h2>Objective</h2>
+                <p>
+                    The primary objective of this research is to develop and evaluate a hybrid deep learning architecture that effectively classifies human gait activities using multi-modal sensor data. Specifically, this study aims to:
+                </p>
+                <ul>
+                    <li>Leverage convolutional neural networks (CNN) for automatic feature extraction from sequential sensor data</li>
+                    <li>Utilize Long Short-Term Memory (LSTM) networks to capture temporal dependencies in gait patterns</li>
+                    <li>Investigate the performance improvement gained by fusing inertial measurement unit (IMU) data with GPS information</li>
+                    <li>Compare classification accuracy across subject-specific and multi-subject training scenarios</li>
+                    <li>Classify gait activities based on terrain inclination and surface characteristics</li>
+                </ul>
+
+                <div class="highlight-box">
+                    <strong>Research Question:</strong> Can the integration of GPS data with IMU sensors significantly enhance the accuracy of gait activity classification in a CNN-LSTM framework, and how does this improvement vary between subject-specific and generalized models?
+                </div>
+            </section>
+
+            <!-- Approach Section -->
+            <section id="approach">
+                <h2>Approach</h2>
+                
+                <h3>Model Architecture</h3>
+                <p>
+                    This study employs a hybrid CNN-LSTM architecture that combines the strengths of both neural network types. The CNN component processes subsequences of input data to automatically extract relevant features, while the LSTM backend interprets these features as temporal sequences to capture long-term dependencies in gait patterns.
+                </p>
+
+                <h3>Data Processing Pipeline</h3>
+                <ul>
+                    <li><strong>Sliding Window Segmentation:</strong> Time-series data is partitioned into overlapping windows for activity classification</li>
+                    <li><strong>Data Augmentation:</strong> Gaussian noise is added to the training set to improve model robustness and generalization</li>
+                    <li><strong>Train-Test Split:</strong> A balanced 50-50 split ensures comprehensive coverage of all gait activities in both training and testing sets</li>
+                    <li><strong>Feature Normalization:</strong> Sensor readings are standardized to facilitate efficient model training</li>
+                </ul>
+
+                <h3>Experimental Design</h3>
+                <p>
+                    Multiple experimental trials were conducted to evaluate different configurations:
+                </p>
+                <ul>
+                    <li><strong>Subject-Specific Models:</strong> Trained and tested on individual subjects to maximize personalization</li>
+                    <li><strong>Multi-Subject Models:</strong> Trained across multiple subjects to assess generalization capabilities</li>
+                    <li><strong>Sensor Modalities:</strong> Compared IMU-only versus IMU+GPS data fusion</li>
+                    <li><strong>Classification Targets:</strong> Two complexity levels - 4-class (inclination only) and 7-class (inclination + terrain)</li>
+                </ul>
+
+                <div class="highlight-box">
+                    <strong>Key Innovation:</strong> The integration of GPS spatial information with IMU temporal dynamics provides complementary data streams that enhance the model's ability to distinguish between similar gait patterns occurring in different environmental contexts.
+                </div>
+            </section>
+
+            <!-- Dataset Section -->
+            <section id="dataset">
+                <h2>Dataset</h2>
+                
+                <h3>Data Collection</h3>
+                <p>
+                    The dataset comprises synchronized IMU and GPS sensor recordings captured during various gait activities across different terrains and inclinations. Data was collected from multiple subjects performing standardized locomotion tasks in controlled and natural environments.
+                </p>
+
+                <h3>Sensor Configuration</h3>
+                <ul>
+                    <li><strong>IMU Sensors:</strong> Tri-axial accelerometer and gyroscope measurements capturing linear and angular motion</li>
+                    <li><strong>GPS Data:</strong> Location coordinates, altitude, and velocity information providing spatial context</li>
+                    <li><strong>Sampling Rate:</strong> High-frequency data collection to capture subtle gait variations</li>
+                </ul>
+
+                <h3>Activity Classes</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Classification Level</th>
+                            <th>Number of Classes</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Inclination Only</td>
+                            <td>4 classes</td>
+                            <td>Level ground, uphill, downhill, variable incline</td>
+                        </tr>
+                        <tr>
+                            <td>Inclination + Terrain</td>
+                            <td>7 classes</td>
+                            <td>Combinations of incline with surface types (paved, gravel, grass, etc.)</td>
+                        </tr>
+                        <tr>
+                            <td>Original Labels</td>
+                            <td>22 classes</td>
+                            <td>Consolidated into the above categories for classification</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Data Characteristics</h3>
+                <div class="highlight-box">
+                    <strong>Dataset Size:</strong> The dataset includes extensive recordings from both single-subject and multi-subject trials, with balanced representation across all activity classes to prevent bias. The 50-50 train-test split was specifically designed to ensure that all gait activities appear in the test set for comprehensive evaluation.
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section id="results">
+                <h2>Results & Discussion</h2>
+                
+                <h3>Performance Improvements with GPS Integration</h3>
+                <p>
+                    The experimental results demonstrate substantial performance gains when GPS data is incorporated alongside IMU measurements in the CNN-LSTM architecture. The improvements are particularly pronounced in subject-specific models, though multi-subject models also show meaningful enhancements.
+                </p>
+
+                <div class="results-grid">
+                    <div class="result-card">
+                        <h4>Subject-Specific (4-class)</h4>
+                        <div class="metric">+23.8%</div>
+                        <p>F1 Score improvement for inclination classification</p>
+                    </div>
+                    <div class="result-card">
+                        <h4>Subject-Specific (7-class)</h4>
+                        <div class="metric">+30.4%</div>
+                        <p>F1 Score improvement for inclination + terrain classification</p>
+                    </div>
+                    <div class="result-card">
+                        <h4>Multi-Subject (4-class)</h4>
+                        <div class="metric">+13.4%</div>
+                        <p>F1 Score improvement for inclination classification</p>
+                    </div>
+                    <div class="result-card">
+                        <h4>Multi-Subject (7-class)</h4>
+                        <div class="metric">+9.1%</div>
+                        <p>F1 Score improvement for inclination + terrain classification</p>
+                    </div>
+                </div>
+
+                <h3>Key Findings</h3>
+                <ul>
+                    <li><strong>Multi-modal Sensor Fusion Effectiveness:</strong> The integration of GPS data consistently improved classification performance across all experimental conditions, validating the hypothesis that spatial context enhances gait activity recognition</li>
+                    <li><strong>Subject-Specific vs. Multi-Subject Trade-offs:</strong> While subject-specific models achieved higher accuracy gains (+23.8% to +30.4%), they may be more susceptible to overfitting. Multi-subject models showed more modest improvements (+9.1% to +13.4%) but demonstrate better generalization potential</li>
+                    <li><strong>Classification Complexity Impact:</strong> The 7-class problem (inclination + terrain) showed higher improvement rates for subject-specific models, suggesting that GPS data is particularly valuable for disambiguating complex activity patterns</li>
+                    <li><strong>CNN-LSTM Architecture Suitability:</strong> The hybrid architecture effectively leverages both spatial feature extraction (CNN) and temporal pattern recognition (LSTM) capabilities, making it well-suited for time-series gait data</li>
+                </ul>
+
+                <h3>Discussion</h3>
+                <p>
+                    The substantial performance improvements observed with GPS integration can be attributed to several factors. GPS data provides complementary spatial information that helps distinguish between activities that may produce similar IMU patterns but occur in different environmental contexts. For instance, walking on level ground versus a slight incline might generate comparable acceleration patterns, but GPS altitude data can disambiguate these scenarios.
+                </p>
+                <p>
+                    The higher improvement rates in subject-specific models suggest that individual gait patterns interact uniquely with environmental factors. This finding has important implications for personalized activity monitoring systems, where user-specific calibration could significantly enhance accuracy. However, the risk of overfitting in subject-specific models must be carefully managed through appropriate regularization and validation strategies.
+                </p>
+                <p>
+                    The positive results for multi-subject models, while more modest, are encouraging for developing generalized activity recognition systems. These models could be deployed without extensive per-user calibration while still benefiting from multi-modal sensor fusion. The 9.1% to 13.4% improvements represent meaningful gains that could translate to more reliable activity tracking in practical applications.
+                </p>
+
+                <div class="highlight-box">
+                    <strong>Practical Implications:</strong> These results demonstrate that incorporating GPS sensors into wearable activity monitoring devices can significantly enhance classification accuracy without requiring complex algorithmic changes. The CNN-LSTM architecture provides a scalable framework for processing multi-modal sensor streams in real-time applications.
+                </div>
+
+                <h3>Future Directions</h3>
+                <p>
+                    Future research could explore several promising avenues:
+                </p>
+                <ul>
+                    <li>Investigating attention mechanisms to automatically weight the contribution of different sensor modalities</li>
+                    <li>Exploring transfer learning approaches to leverage subject-specific gains while maintaining generalization</li>
+                    <li>Evaluating performance with additional sensor types (e.g., barometric pressure, heart rate)</li>
+                    <li>Testing real-time implementation feasibility on resource-constrained wearable devices</li>
+                    <li>Extending classification to more granular activity types and transition states</li>
+                </ul>
+            </section>
+
+            <!-- Call to Action Section -->
+            <div class="cta-section">
+                <h2>Interested in This Research?</h2>
+                <p>
+                    I'm passionate about advancing the field of activity recognition and wearable sensing technologies. 
+                    If you'd like to discuss this research, explore potential collaborations, or have thoughtful comments and questions, 
+                    I'd love to hear from you!
+                </p>
+                <a href="https://github.com/umerhuzaifa" class="btn" target="_blank">View My GitHub</a>
+                <a href="mailto:mhuzaifa@depaul.edu" class="btn btn-secondary">Contact Me</a>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2025 Umer Huzaifa | <a href="https://umerhuzaifa.github.io">umerhuzaifa.github.io</a></p>
+            <p>Built with ❤️ for open science and reproducible research</p>
+        </footer>
     </div>
 </body>
 </html>
