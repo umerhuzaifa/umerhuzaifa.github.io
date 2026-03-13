@@ -4,14 +4,13 @@ title: Portfolio
 ---
 
 # Projects
-<!-- <div class="portfolio-grid">
+<div class="portfolio-grid">
   <div class="project-item">
     <a href="./projects/adc_waveform_sampler.html" target="_blank">
-    <a href="./projects/powermeasure_esp32.html" target="_blank">
       <img src="/assets/images/sin_quantize.png" alt="LED and ESP32" style="max-width: 400px; margin: 20px auto; display: block;" />
       <h3>Demonstration of Quantization using ADC</h3>
     </a>
-  </div> -->
+  </div>
 
 <!-- ## Power Measurement in an ESP32 Blinking an LED -->
 <div class="portfolio-grid">
