@@ -45,5 +45,9 @@ title: Portfolio
     </a>
   </div>
 
-
+<div class="project-item">
+  <a href="./projects/astar_rrt_planner_2.html" target="_blank">
+    <img src="/assets/images/robot_planner.webp" alt="Comparison of Robot Path Planners">
+    <h3>Animation for Comparing the Performance of Robot Path Planners</h3>
+    </a>
 </div>

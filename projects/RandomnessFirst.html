@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gaussian MLE Explorer</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f4f0;
+    --bg-tertiary: #edecea;
+    --text-primary: #1a1a18;
+    --text-secondary: #6b6a65;
+    --text-tertiary: #9a9994;
+    --border-subtle: rgba(0,0,0,0.10);
+    --border-medium: rgba(0,0,0,0.18);
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --font-sans: 'Georgia', serif;
+    --font-mono: 'Courier New', Courier, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-primary: #1c1c1a;
+      --bg-secondary: #252523;
+      --bg-tertiary: #2e2e2b;
+      --text-primary: #f0ede8;
+      --text-secondary: #9a9994;
+      --text-tertiary: #6b6a65;
+      --border-subtle: rgba(255,255,255,0.08);
+      --border-medium: rgba(255,255,255,0.16);
+    }
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+
+  .container {
+    max-width: 820px;
+    margin: 0 auto;
+    background: var(--bg-primary);
+    border-radius: var(--radius-lg);
+    border: 0.5px solid var(--border-subtle);
+    padding: 2rem 2.25rem;
+  }
+
+  h1 {
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: .25rem;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    margin-bottom: 1.75rem;
+  }
+
+  .ctrl-strip {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 1.5rem;
+  }
+
+  @media(max-width: 560px) {
+    .ctrl-strip { grid-template-columns: 1fr 1fr; }
+    .two-col    { grid-template-columns: 1fr !important; }
+    .stat-grid  { grid-template-columns: repeat(2, 1fr) !important; }
+  }
+
+  .ctrl-lbl {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+    font-family: var(--font-mono);
+    letter-spacing: .04em;
+  }
+
+  .ctrl-row { display: flex; align-items: center; gap: 8px; }
+
+  input[type=range] {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 4px;
+    background: var(--border-medium);
+    border-radius: 2px;
+    outline: none;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--text-primary);
+    cursor: pointer;
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--text-primary);
+    border: none;
+    cursor: pointer;
+  }
+
+  .ctrl-val {
+    font-size: 13px;
+    font-weight: 500;
+    min-width: 40px;
+    text-align: right;
+    font-family: var(--font-mono);
+    color: var(--text-primary);
+  }
+
+  button {
+    height: 36px;
+    padding: 0 18px;
+    background: transparent;
+    border: 0.5px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background .15s;
+  }
+  button:hover { background: var(--bg-secondary); }
+  button:active { transform: scale(0.98); }
+
+  .sec {
+    font-size: 10px;
+    color: var(--text-tertiary);
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    margin: 1.5rem 0 .5rem;
+    border-bottom: 0.5px solid var(--border-subtle);
+    padding-bottom: 4px;
+    font-family: var(--font-mono);
+  }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+    margin: .75rem 0;
+  }
+
+  .stat-card {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+  }
+
+  .stat-lbl {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-bottom: 2px;
+    font-family: var(--font-mono);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .stat-val {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+  }
+
+  .stat-sub {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    margin-top: 2px;
+    font-family: var(--font-mono);
+  }
+
+  .badge {
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-weight: 500;
+  }
+  .b-blue   { background: #E6F1FB; color: #185FA5; }
+  .b-teal   { background: #E1F5EE; color: #0F6E56; }
+  .b-amber  { background: #FAEEDA; color: #854F0B; }
+
+  @media(prefers-color-scheme: dark) {
+    .b-blue  { background: #0C447C; color: #B5D4F4; }
+    .b-teal  { background: #085041; color: #9FE1CB; }
+    .b-amber { background: #633806; color: #FAC775; }
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin: 6px 0 4px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+  }
+  .leg-item { display: flex; align-items: center; gap: 6px; }
+  .leg-sw   { width: 18px; height: 3px; border-radius: 2px; }
+
+  .chart-wrap { position: relative; width: 100%; height: 260px; margin-top: 4px; }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .formula-block {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+    margin: 0;
+  }
+
+  .f-title {
+    font-size: 10px;
+    color: var(--text-tertiary);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    font-family: var(--font-mono);
+  }
+
+  .f-eq {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--text-primary);
+    line-height: 1.7;
+  }
+
+  .f-note {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    margin-top: 5px;
+    font-family: var(--font-mono);
+  }
+
+  .pos { color: #3B6D11; }
+  .neg { color: #A32D2D; }
+  .neu { color: var(--text-secondary); }
+
+  .mle-note {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: .75rem;
+    line-height: 1.7;
+    padding: 10px 16px;
+    border-left: 2px solid var(--border-medium);
+    background: var(--bg-secondary);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    font-family: var(--font-mono);
+  }
+
+  .mle-note strong { color: var(--text-primary); }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1>Gaussian MLE Explorer</h1>
+  <p class="subtitle">randomly generated data · analytical vs empirical estimators · maximum likelihood</p>
+
+  <div class="ctrl-strip">
+    <div>
+      <p class="ctrl-lbl">true mean μ</p>
+      <div class="ctrl-row">
+        <input type="range" id="mu" min="-5" max="5" step="0.5" value="2">
+        <span class="ctrl-val" id="mu-v">2.0</span>
+      </div>
+    </div>
+    <div>
+      <p class="ctrl-lbl">true std dev σ</p>
+      <div class="ctrl-row">
+        <input type="range" id="sigma" min="0.5" max="4" step="0.25" value="1.5">
+        <span class="ctrl-val" id="sigma-v">1.50</span>
+      </div>
+    </div>
+    <div>
+      <p class="ctrl-lbl">sample size N</p>
+      <div class="ctrl-row">
+        <input type="range" id="nsamp" min="30" max="2000" step="10" value="300">
+        <span class="ctrl-val" id="n-v">300</span>
+      </div>
+    </div>
+    <div><button id="regen">↺ resample</button></div>
+  </div>
+
+  <p class="sec">parameter estimates</p>
+  <div class="stat-grid" id="stat-grid"></div>
+
+  <p class="sec">empirical distribution</p>
+  <div class="legend">
+    <div class="leg-item"><div class="leg-sw" style="background:rgba(55,138,221,0.55)"></div>histogram density</div>
+    <div class="leg-item"><div class="leg-sw" style="background:#1D9E75;height:0;border-top:2px dashed #1D9E75;width:18px"></div>true N(μ, σ²)</div>
+    <div class="leg-item"><div class="leg-sw" style="background:#D85A30"></div>MLE fit N(μ̂, σ̂²)</div>
+  </div>
+  <div class="chart-wrap"><canvas id="chart"></canvas></div>
+
+  <p class="sec">analytical expressions</p>
+  <div class="two-col">
+    <div class="formula-block">
+      <p class="f-title">mean — first moment</p>
+      <div class="f-eq">E[X] = μ<br>     = ∫ x · p(x|μ,σ²) dx</div>
+      <p class="f-note">closed form for Gaussian: = μ</p>
+    </div>
+    <div class="formula-block">
+      <p class="f-title">variance — second central moment</p>
+      <div class="f-eq">Var[X] = σ²<br>       = E[(X − μ)²]</div>
+      <p class="f-note">= ∫ (x−μ)² · p(x|μ,σ²) dx</p>
+    </div>
+  </div>
+
+  <p class="sec">empirical (sample) estimators</p>
+  <div class="two-col">
+    <div class="formula-block">
+      <p class="f-title">sample mean</p>
+      <div class="f-eq">x̄ = (1/N) Σᵢ xᵢ</div>
+      <p class="f-note">E[x̄] = μ  →  unbiased ✓</p>
+    </div>
+    <div class="formula-block">
+      <p class="f-title">sample variance (Bessel corrected)</p>
+      <div class="f-eq">s² = 1/(N−1) Σᵢ (xᵢ−x̄)²</div>
+      <p class="f-note">E[s²] = σ²  →  unbiased ✓</p>
+    </div>
+  </div>
+
+  <p class="sec">maximum likelihood estimation</p>
+  <div class="formula-block" style="margin-bottom:8px">
+    <p class="f-title">log-likelihood for Gaussian</p>
+    <div class="f-eq">ℓ(μ,σ²) = −(N/2) ln(2πσ²) − (1/2σ²) Σᵢ (xᵢ − μ)²</div>
+  </div>
+  <div class="two-col">
+    <div class="formula-block">
+      <p class="f-title">MLE mean  ∂ℓ/∂μ = 0</p>
+      <div class="f-eq">μ̂_MLE = (1/N) Σᵢ xᵢ</div>
+      <p class="f-note">identical to sample mean x̄</p>
+    </div>
+    <div class="formula-block">
+      <p class="f-title">MLE variance  ∂ℓ/∂σ² = 0</p>
+      <div class="f-eq">σ̂²_MLE = (1/N) Σᵢ (xᵢ − μ̂)²</div>
+      <p class="f-note">biased: E[σ̂²_MLE] = σ²(N−1)/N</p>
+    </div>
+  </div>
+  <div class="mle-note" id="mle-note"></div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const AXIS_MIN = -20, AXIS_MAX = 20, N_BINS = 80;
+const BIN_W       = (AXIS_MAX - AXIS_MIN) / N_BINS;
+const BIN_CENTERS = Array.from({ length: N_BINS }, (_, i) => AXIS_MIN + (i + 0.5) * BIN_W);
+const BIN_LABELS  = BIN_CENTERS.map(x => x.toFixed(1));
+
+let chart = null;
+
+function rng(mu, sig) {
+  let u;
+  do { u = Math.random(); } while (u === 0);
+  return mu + sig * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * Math.random());
+}
+
+function pdf(x, mu, v) {
+  return (1 / Math.sqrt(2 * Math.PI * v)) * Math.exp(-0.5 * (x - mu) ** 2 / v);
+}
+
+function computeStats(data) {
+  const N = data.length;
+  const mu = data.reduce((a, b) => a + b, 0) / N;
+  const v  = data.reduce((a, b) => a + (b - mu) ** 2, 0) / N;
+  return { mu, vBias: v, vUnbias: v * N / (N - 1) };
+}
+
+function makeDens(data) {
+  const cnts = Array(N_BINS).fill(0);
+  data.forEach(x => {
+    const k = Math.floor((x - AXIS_MIN) / BIN_W);
+    if (k >= 0 && k < N_BINS) cnts[k]++;
+  });
+  return cnts.map(c => c / (data.length * BIN_W));
+}
+
+function pct(est, truth) {
+  const d = ((est - truth) / Math.abs(truth)) * 100;
+  const cls = Math.abs(d) < 2 ? 'pos' : Math.abs(d) < 8 ? 'neu' : 'neg';
+  return `<span class="${cls}">${d >= 0 ? '+' : ''}${d.toFixed(1)}%</span>`;
+}
+
+function render() {
+  const mu  = +document.getElementById('mu').value;
+  const sig = +document.getElementById('sigma').value;
+  const N   = +document.getElementById('nsamp').value;
+  const v   = sig * sig;
+
+  const data = Array.from({ length: N }, () => rng(mu, sig));
+  const s    = computeStats(data);
+
+  const grid = document.getElementById('stat-grid');
+  grid.innerHTML = [
+    { lbl: 'true μ',        val: mu.toFixed(3),        badge: 'true',     bc: 'b-blue',  sub: '&nbsp;' },
+    { lbl: 'true σ²',       val: v.toFixed(4),          badge: 'true',     bc: 'b-blue',  sub: '&nbsp;' },
+    { lbl: 'empirical x̄',  val: s.mu.toFixed(4),       badge: 'unbiased', bc: 'b-teal',  sub: `vs true: ${pct(s.mu, mu)}` },
+    { lbl: 'empirical s²',  val: s.vUnbias.toFixed(4),  badge: 'unbiased', bc: 'b-teal',  sub: `vs true: ${pct(s.vUnbias, v)}` },
+    { lbl: 'MLE μ̂',        val: s.mu.toFixed(4),       badge: 'MLE',      bc: 'b-amber', sub: '= x̄' },
+    { lbl: 'MLE σ̂²',       val: s.vBias.toFixed(4),    badge: 'biased',   bc: 'b-amber', sub: `vs true: ${pct(s.vBias, v)}` },
+  ].map(c =>
+    `<div class="stat-card">
+      <p class="stat-lbl">${c.lbl} <span class="badge ${c.bc}">${c.badge}</span></p>
+      <p class="stat-val">${c.val}</p>
+      <p class="stat-sub">${c.sub}</p>
+    </div>`
+  ).join('');
+
+  const theorBias = -(v / N);
+  const obsBias   = s.vBias - v;
+  document.getElementById('mle-note').innerHTML =
+    `<strong>MLE bias:</strong> the MLE variance estimator is systematically low by a factor of (N−1)/N = ${((N - 1) / N).toFixed(4)}. ` +
+    `Theoretical bias = −σ²/N ≈ <strong>${theorBias.toFixed(5)}</strong>. ` +
+    `Observed bias this draw: <strong>${obsBias >= 0 ? '+' : ''}${obsBias.toFixed(5)}</strong>. ` +
+    `Bessel's correction (dividing by N−1 instead of N) restores unbiasedness.`;
+
+  const dens     = makeDens(data);
+  const trueLine = BIN_CENTERS.map(x => pdf(x, mu, v));
+  const mleLine  = BIN_CENTERS.map(x => pdf(x, s.mu, s.vBias));
+
+  if (chart) {
+    chart.data.datasets[0].data = dens;
+    chart.data.datasets[1].data = trueLine;
+    chart.data.datasets[2].data = mleLine;
+    chart.update();
+  } else {
+    chart = new Chart(document.getElementById('chart'), {
+      type: 'bar',
+      data: {
+        labels: BIN_LABELS,
+        datasets: [
+          { type: 'bar',  data: dens,     backgroundColor: 'rgba(55,138,221,.28)', borderColor: 'rgba(55,138,221,.55)', borderWidth: 0.5, barPercentage: 1, categoryPercentage: 1 },
+          { type: 'line', data: trueLine, borderColor: '#1D9E75', borderWidth: 2.5, borderDash: [5, 4], pointRadius: 0, tension: .4, fill: false },
+          { type: 'line', data: mleLine,  borderColor: '#D85A30', borderWidth: 2.5, pointRadius: 0, tension: .4, fill: false },
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { mode: 'nearest', intersect: false }
+        },
+        scales: {
+          x: { ticks: { maxTicksLimit: 10, font: { size: 10 } }, grid: { color: 'rgba(128,128,128,.08)' }, title: { display: true, text: 'x', font: { size: 11 } } },
+          y: { beginAtZero: true, ticks: { font: { size: 10 } }, grid: { color: 'rgba(128,128,128,.08)' }, title: { display: true, text: 'probability density', font: { size: 11 } } }
+        }
+      }
+    });
+  }
+}
+
+['mu', 'sigma', 'nsamp'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => {
+    document.getElementById('mu-v').textContent    = (+document.getElementById('mu').value).toFixed(1);
+    document.getElementById('sigma-v').textContent = (+document.getElementById('sigma').value).toFixed(2);
+    document.getElementById('n-v').textContent     = document.getElementById('nsamp').value;
+    render();
+  });
+});
+document.getElementById('regen').addEventListener('click', render);
+render();
+</script>
+</body>
+</html>

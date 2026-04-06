@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A* vs RRT vs Informed RRT* — Motion Planning</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #f8f7f4;
+      --bg2:       #f1efe8;
+      --border:    rgba(0,0,0,0.12);
+      --border2:   rgba(0,0,0,0.22);
+      --text:      #1a1a18;
+      --text2:     #5f5e5a;
+      --text3:     #88877f;
+      --info-bg:   #e6f1fb;
+      --info-text: #0c447c;
+      --warn-text: #633806;
+      --ok-text:   #085041;
+      --opt-text:  #185FA5;
+      --radius:    8px;
+      --radius-lg: 12px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg:        #1a1a18;
+        --bg2:       #222220;
+        --border:    rgba(255,255,255,0.1);
+        --border2:   rgba(255,255,255,0.2);
+        --text:      #e8e6df;
+        --text2:     #b4b2a9;
+        --text3:     #888780;
+        --info-bg:   #0c447c;
+        --info-text: #b5d4f4;
+        --warn-text: #fac775;
+        --ok-text:   #9fe1cb;
+        --opt-text:  #85B7EB;
+      }
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px 16px 40px;
+    }
+
+    h1 { font-size: 20px; font-weight: 500; margin-bottom: 4px; }
+    .subtitle { font-size: 13px; color: var(--text2); margin-bottom: 20px; }
+
+    .toolbar {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    button {
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-weight: 500;
+      border: 0.5px solid var(--border2);
+      background: var(--bg);
+      color: var(--text);
+      transition: background 0.12s;
+      font-family: inherit;
+    }
+    button:hover          { background: var(--bg2); }
+    button.primary        { background: #378ADD; color: #fff; border-color: #185FA5; }
+    button.primary:hover  { background: #185FA5; }
+    button.active         { background: var(--info-bg); color: var(--info-text); border-color: #378ADD; }
+    button:disabled       { opacity: 0.4; cursor: default; }
+
+    .sep { width: 1px; height: 20px; background: var(--border); flex-shrink: 0; }
+
+    .spd {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text2);
+      margin-left: auto;
+    }
+    input[type=range] { width: 80px; accent-color: #378ADD; }
+
+    .canvases {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .cv-wrap {
+      border-radius: var(--radius-lg);
+      border: 0.5px solid var(--border);
+      overflow: hidden;
+      background: var(--bg2);
+    }
+
+    .cv-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 10px 5px;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .cv-head span:first-child { font-size: 11px; font-weight: 500; color: var(--text); }
+
+    .status         { font-size: 10px; color: var(--text3); }
+    .status.found   { color: var(--ok-text); }
+    .status.running { color: var(--warn-text); }
+    .status.opt     { color: var(--opt-text); }
+
+    canvas { display: block; width: 100%; cursor: crosshair; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .sbox {
+      background: var(--bg2);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+    }
+    .sbox-title { font-size: 11px; font-weight: 500; color: var(--text2); margin-bottom: 6px; }
+    .srow       { display: flex; justify-content: space-between; font-size: 11px; padding: 2px 0; }
+    .srow .k    { color: var(--text2); }
+    .srow .v    { font-weight: 500; color: var(--text); }
+
+    .legend {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+      font-size: 11px;
+      color: var(--text2);
+    }
+    .li  { display: flex; align-items: center; gap: 5px; }
+    .lsq { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+    .lci { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .lln { width: 14px; height: 2px; border-radius: 1px; flex-shrink: 0; }
+
+    .hint { font-size: 11px; color: var(--text3); text-align: center; padding: 8px 0 0; }
+
+    @media (max-width: 800px) {
+      .canvases, .stats { grid-template-columns: 1fr; }
+      .spd { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>A* vs RRT vs Informed RRT*</h1>
+  <p class="subtitle">Three motion planning algorithms on a shared 2D obstacle map</p>
+
+  <div class="toolbar">
+    <button class="primary" id="btn-run" onclick="runAll()">Run all</button>
+    <button id="btn-reset" onclick="resetPaths()">Reset</button>
+    <button id="btn-clear" onclick="resetAll()">Clear all</button>
+    <div class="sep"></div>
+    <button id="btn-s"     onclick="setMode('start')">Set S</button>
+    <button id="btn-g"     onclick="setMode('goal')">Set G</button>
+    <button id="btn-draw"  onclick="setMode('draw')">Draw walls</button>
+    <button id="btn-erase" onclick="setMode('erase')">Erase</button>
+    <div class="spd">
+      <span>Speed</span>
+      <input type="range" id="spd" min="1" max="30" value="8" step="1">
+    </div>
+  </div>
+
+  <div class="canvases">
+    <div class="cv-wrap">
+      <div class="cv-head">
+        <span>A* — grid search</span>
+        <span class="status" id="as-status">ready</span>
+      </div>
+      <canvas id="ac" width="560" height="380"></canvas>
+    </div>
+    <div class="cv-wrap">
+      <div class="cv-head">
+        <span>RRT</span>
+        <span class="status" id="rr-status">ready</span>
+      </div>
+      <canvas id="rc" width="560" height="380"></canvas>
+    </div>
+    <div class="cv-wrap">
+      <div class="cv-head">
+        <span>Informed RRT*</span>
+        <span class="status" id="ir-status">ready</span>
+      </div>
+      <canvas id="ic" width="560" height="380"></canvas>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="sbox">
+      <div class="sbox-title">A*</div>
+      <div class="srow"><span class="k">Cells explored</span><span class="v" id="as-exp">—</span></div>
+      <div class="srow"><span class="k">Path (cells)</span><span class="v" id="as-plen">—</span></div>
+      <div class="srow"><span class="k">Result</span><span class="v" id="as-res">—</span></div>
+    </div>
+    <div class="sbox">
+      <div class="sbox-title">RRT</div>
+      <div class="srow"><span class="k">Tree nodes</span><span class="v" id="rr-nodes">—</span></div>
+      <div class="srow"><span class="k">Path (waypoints)</span><span class="v" id="rr-plen">—</span></div>
+      <div class="srow"><span class="k">Result</span><span class="v" id="rr-res">—</span></div>
+    </div>
+    <div class="sbox">
+      <div class="sbox-title">Informed RRT*</div>
+      <div class="srow"><span class="k">Tree nodes</span><span class="v" id="ir-nodes">—</span></div>
+      <div class="srow"><span class="k">Best cost</span><span class="v" id="ir-cost">—</span></div>
+      <div class="srow"><span class="k">Iterations</span><span class="v" id="ir-iter">—</span></div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="li"><div class="lci" style="background:#378ADD"></div>Start (S)</div>
+    <div class="li"><div class="lci" style="background:#1D9E75"></div>Goal (G)</div>
+    <div class="li"><div class="lsq" style="background:rgba(239,159,39,0.3)"></div>A* explored</div>
+    <div class="li"><div class="lsq" style="background:#EF9F27"></div>A* frontier</div>
+    <div class="li"><div class="lln" style="background:#9390d8"></div>RRT tree</div>
+    <div class="li"><div class="lln" style="background:#1D9E75;opacity:.7"></div>RRT* tree</div>
+    <div class="li"><span style="letter-spacing:1px;color:#0F6E56">– –</span><span style="margin-left:3px">ellipse</span></div>
+    <div class="li"><div class="lln" style="background:#D85A30"></div>Path</div>
+    <div class="li"><div class="lsq" style="background:#3d3d3a"></div>Obstacle</div>
+  </div>
+
+  <div class="hint" id="hint">
+    Click <strong>Run all</strong> to animate. The teal ellipse on Informed RRT* shrinks as it finds shorter paths.
+  </div>
+
+  <script>
+    const COLS = 40, ROWS = 28, CW = 560, CH = 380;
+    const cw = CW / COLS, ch = CH / ROWS;
+    const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+    const IRRT_MAX = 2500;
+
+    const PAL = {
+      bg:    dark ? '#1c1c1a' : '#f1efe8',
+      grid:  dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.055)',
+      obs:   dark ? '#5F5E5A' : '#3d3d3a',
+      expl:  dark ? 'rgba(186,117,23,0.35)' : 'rgba(239,159,39,0.22)',
+      front: dark ? 'rgba(239,159,39,0.75)' : 'rgba(239,159,39,0.65)',
+      rrtT:  dark ? 'rgba(143,138,210,0.55)' : 'rgba(127,119,221,0.5)',
+      irT:   dark ? 'rgba(29,158,117,0.45)'  : 'rgba(15,110,86,0.32)',
+      ellF:  dark ? 'rgba(29,158,117,0.06)'  : 'rgba(15,110,86,0.05)',
+      ellS:  dark ? 'rgba(29,158,117,0.7)'   : 'rgba(15,110,86,0.6)',
+      path:  '#D85A30',
+      start: '#378ADD',
+      goal:  '#1D9E75',
+      samp:  dark ? 'rgba(29,158,117,0.5)' : 'rgba(29,158,117,0.4)',
+    };
+
+    const cellPx = (c, r) => ({ x: (c + 0.5) * cw, y: (r + 0.5) * ch });
+    const pxCell = (x, y) => ({
+      c: Math.max(0, Math.min(COLS - 1, Math.floor(x / CW * COLS))),
+      r: Math.max(0, Math.min(ROWS - 1, Math.floor(y / CH * ROWS)))
+    });
+
+    let obs = Array.from({ length: ROWS }, () => new Array(COLS).fill(false));
+    let SC = { c: 3, r: 13 }, GC = { c: 37, r: 13 };
+    let mode = 'idle', AS = null, RR = null, IR = null;
+    let raf = null, running = false;
+
+    function presetObs() {
+      for (let r = 0; r < ROWS; r++) if (r < 8  || r > 16) obs[r][13] = true;
+      for (let r = 0; r < ROWS; r++) if (r < 10 || r > 19) obs[r][26] = true;
+      [[7,21],[7,22],[8,21],[8,22],[8,23],
+       [19,5],[20,5],[20,6],[21,5],
+       [31,18],[31,19],[32,18]]
+        .forEach(([c, r]) => { if (r < ROWS && c < COLS) obs[r][c] = true; });
+    }
+    presetObs();
+
+    const ac = document.getElementById('ac');
+    const rc = document.getElementById('rc');
+    const ic = document.getElementById('ic');
+    const ax = ac.getContext('2d'), rx = rc.getContext('2d'), ix = ic.getContext('2d');
+
+    // ── Shared draw helpers ───────────────────────────────────────────────────
+
+    function drawMarker(ctx, x, y, lbl, col) {
+      ctx.beginPath(); ctx.arc(x, y, 9, 0, Math.PI * 2);
+      ctx.fillStyle = col; ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 10px -apple-system, sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(lbl, x, y);
+    }
+
+    function drawSE(ctx) {
+      const sp = cellPx(SC.c, SC.r), gp = cellPx(GC.c, GC.r);
+      drawMarker(ctx, sp.x, sp.y, 'S', PAL.start);
+      drawMarker(ctx, gp.x, gp.y, 'G', PAL.goal);
+    }
+
+    // ── A* draw ───────────────────────────────────────────────────────────────
+
+    function drawAstar() {
+      const ctx = ax;
+      ctx.fillStyle = PAL.bg; ctx.fillRect(0, 0, CW, CH);
+      ctx.strokeStyle = PAL.grid; ctx.lineWidth = 0.5;
+      for (let c = 0; c <= COLS; c++) {
+        ctx.beginPath(); ctx.moveTo(c * cw, 0); ctx.lineTo(c * cw, CH); ctx.stroke();
+      }
+      for (let r = 0; r <= ROWS; r++) {
+        ctx.beginPath(); ctx.moveTo(0, r * ch); ctx.lineTo(CW, r * ch); ctx.stroke();
+      }
+      for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++)
+        if (obs[r][c]) { ctx.fillStyle = PAL.obs; ctx.fillRect(c*cw+.5, r*ch+.5, cw-1, ch-1); }
+
+      if (AS) {
+        for (const k of AS.closed) {
+          const [c, r] = k.split(',').map(Number);
+          ctx.fillStyle = PAL.expl; ctx.fillRect(c*cw+.5, r*ch+.5, cw-1, ch-1);
+        }
+        for (const [k] of AS.open) {
+          const [c, r] = k.split(',').map(Number);
+          ctx.fillStyle = PAL.front; ctx.fillRect(c*cw+.5, r*ch+.5, cw-1, ch-1);
+        }
+        if (AS.path.length) {
+          ctx.beginPath(); ctx.strokeStyle = PAL.path; ctx.lineWidth = 3;
+          ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+          AS.path.forEach(([c, r], i) => {
+            const x = (c + .5) * cw, y = (r + .5) * ch;
+            i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+          });
+          ctx.stroke();
+        }
+      }
+      drawSE(ctx);
+    }
+
+    // ── RRT draw ──────────────────────────────────────────────────────────────
+
+    function drawRRT() {
+      const ctx = rx;
+      ctx.fillStyle = PAL.bg; ctx.fillRect(0, 0, CW, CH);
+      for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++)
+        if (obs[r][c]) { ctx.fillStyle = PAL.obs; ctx.fillRect(c*cw, r*ch, cw, ch); }
+
+      if (RR) {
+        const ps = new Set(RR.path);
+        ctx.lineWidth = 1;
+        for (let i = 1; i < RR.tree.length; i++) {
+          const n = RR.tree[i], p = RR.tree[n.parent];
+          if (!ps.has(i) || !ps.has(n.parent)) {
+            ctx.strokeStyle = PAL.rrtT;
+            ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(n.x, n.y); ctx.stroke();
+          }
+        }
+        if (RR.path.length > 1) {
+          ctx.beginPath(); ctx.strokeStyle = PAL.path; ctx.lineWidth = 3;
+          ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+          RR.path.forEach((i, idx) => {
+            const n = RR.tree[i];
+            idx ? ctx.lineTo(n.x, n.y) : ctx.moveTo(n.x, n.y);
+          });
+          ctx.stroke();
+        }
+        if (RR.lastSamp && !RR.done) {
+          ctx.beginPath(); ctx.arc(RR.lastSamp.x, RR.lastSamp.y, 3, 0, Math.PI * 2);
+          ctx.fillStyle = PAL.samp; ctx.fill();
+        }
+      }
+      drawSE(ctx);
+    }
+
+    // ── Informed RRT* draw ────────────────────────────────────────────────────
+
+    function drawIRRT() {
+      const ctx = ix;
+      ctx.fillStyle = PAL.bg; ctx.fillRect(0, 0, CW, CH);
+      for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++)
+        if (obs[r][c]) { ctx.fillStyle = PAL.obs; ctx.fillRect(c*cw, r*ch, cw, ch); }
+
+      if (IR) {
+        if (IR.found && IR.bestCost < Infinity) {
+          const a  = IR.bestCost / 2;
+          const b  = Math.sqrt(Math.max(0, IR.bestCost * IR.bestCost - IR.cMin * IR.cMin)) / 2;
+          const cx = (IR.sp.x + IR.gp.x) / 2, cy = (IR.sp.y + IR.gp.y) / 2;
+          const th = Math.atan2(IR.gp.y - IR.sp.y, IR.gp.x - IR.sp.x);
+          ctx.beginPath(); ctx.ellipse(cx, cy, a, Math.max(1, b), th, 0, Math.PI * 2);
+          ctx.fillStyle = PAL.ellF; ctx.fill();
+          ctx.strokeStyle = PAL.ellS; ctx.lineWidth = 1.5;
+          ctx.setLineDash([6, 4]); ctx.stroke(); ctx.setLineDash([]);
+        }
+        const ps = new Set(IR.path);
+        ctx.lineWidth = 0.8;
+        for (let i = 1; i < IR.tree.length; i++) {
+          const n = IR.tree[i], p = IR.tree[n.parent];
+          if (!ps.has(i) || !ps.has(n.parent)) {
+            ctx.strokeStyle = PAL.irT;
+            ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(n.x, n.y); ctx.stroke();
+          }
+        }
+        if (IR.path.length > 1) {
+          ctx.beginPath(); ctx.strokeStyle = PAL.path; ctx.lineWidth = 3;
+          ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+          IR.path.forEach((i, idx) => {
+            const n = IR.tree[i];
+            idx ? ctx.lineTo(n.x, n.y) : ctx.moveTo(n.x, n.y);
+          });
+          ctx.stroke();
+        }
+      }
+      drawSE(ctx);
+    }
+
+    // ── Shared collision check ────────────────────────────────────────────────
+
+    function lineHits(x1, y1, x2, y2) {
+      const steps = Math.ceil(Math.hypot(x2-x1, y2-y1) / Math.min(cw, ch) * 2.5);
+      for (let t = 0; t <= steps; t++) {
+        const x = x1 + (x2-x1)*t/steps, y = y1 + (y2-y1)*t/steps;
+        const c = Math.max(0, Math.min(COLS-1, Math.floor(x/CW*COLS)));
+        const r = Math.max(0, Math.min(ROWS-1, Math.floor(y/CH*ROWS)));
+        if (obs[r][c]) return true;
+      }
+      return false;
+    }
+
+    function makeRnd(salt = 0) {
+      let s = (Date.now() ^ (0x5ea + salt)) & 0xffff;
+      return () => { s = (s * 1664525 + 1013904223) & 0xffffffff; return (s >>> 0) / 4294967296; };
+    }
+
+    // ── A* algorithm ──────────────────────────────────────────────────────────
+
+    const D8 = [[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,1],[1,-1],[-1,-1]];
+
+    function initAS() {
+      const key = (c, r) => `${c},${r}`, h = (c, r) => Math.hypot(c - GC.c, r - GC.r);
+      const open = new Map(), g = new Map(), came = new Map();
+      const sk = key(SC.c, SC.r);
+      g.set(sk, 0); open.set(sk, h(SC.c, SC.r));
+      AS = { open, g, came, closed: new Set(), path: [], done: false, found: false, exp: 0, key, h };
+    }
+
+    function stepAS(n) {
+      const s = AS; if (s.done) return;
+      for (let i = 0; i < n; i++) {
+        if (!s.open.size) { s.done = true; return; }
+        let bk = null, bf = Infinity;
+        for (const [k, f] of s.open) if (f < bf) { bf = f; bk = k; }
+        const [cc, cr] = bk.split(',').map(Number);
+        s.open.delete(bk); s.closed.add(bk); s.exp++;
+        if (cc === GC.c && cr === GC.r) {
+          const path = []; let cur = bk;
+          while (cur) { const [c, r] = cur.split(',').map(Number); path.unshift([c, r]); cur = s.came.get(cur); }
+          s.path = path; s.done = true; s.found = true; return;
+        }
+        for (const [dc, dr] of D8) {
+          const nc = cc + dc, nr = cr + dr;
+          if (nc < 0 || nc >= COLS || nr < 0 || nr >= ROWS || obs[nr][nc]) continue;
+          const nk = s.key(nc, nr); if (s.closed.has(nk)) continue;
+          const ng = (s.g.get(bk) || 0) + (dc && dr ? 1.414 : 1);
+          if (!s.g.has(nk) || ng < s.g.get(nk)) {
+            s.g.set(nk, ng); s.came.set(nk, bk); s.open.set(nk, ng + s.h(nc, nr));
+          }
+        }
+      }
+    }
+
+    // ── RRT algorithm ─────────────────────────────────────────────────────────
+
+    function initRR() {
+      const sp = cellPx(SC.c, SC.r), gp = cellPx(GC.c, GC.r);
+      RR = { tree: [{ x: sp.x, y: sp.y, parent: -1 }], path: [], done: false, found: false,
+             gp, rnd: makeRnd(1), lastSamp: null, STEP: 20, THRESH: 15 };
+    }
+
+    function stepRR(n) {
+      const s = RR; if (s.done) return;
+      for (let i = 0; i < n; i++) {
+        const tx = s.rnd() < 0.12 ? s.gp.x : s.rnd() * CW;
+        const ty = s.rnd() < 0.12 ? s.gp.y : s.rnd() * CH;
+        let ni = 0, nd = Infinity;
+        for (let j = 0; j < s.tree.length; j++) {
+          const d = Math.hypot(s.tree[j].x - tx, s.tree[j].y - ty);
+          if (d < nd) { nd = d; ni = j; }
+        }
+        const near = s.tree[ni];
+        const ang  = Math.atan2(ty - near.y, tx - near.x);
+        const sl   = Math.min(s.STEP, nd);
+        const nx   = near.x + Math.cos(ang) * sl, ny = near.y + Math.sin(ang) * sl;
+        if (nx < 0 || nx > CW || ny < 0 || ny > CH) continue;
+        if (lineHits(near.x, near.y, nx, ny)) continue;
+        s.lastSamp = { x: tx, y: ty };
+        const idx = s.tree.length;
+        s.tree.push({ x: nx, y: ny, parent: ni });
+        if (Math.hypot(nx - s.gp.x, ny - s.gp.y) < s.THRESH && !lineHits(nx, ny, s.gp.x, s.gp.y)) {
+          const gi = s.tree.length;
+          s.tree.push({ x: s.gp.x, y: s.gp.y, parent: idx });
+          const path = []; let cur = gi;
+          while (cur >= 0) { path.unshift(cur); cur = s.tree[cur].parent; }
+          s.path = path; s.done = true; s.found = true; return;
+        }
+      }
+    }
+
+    // ── Informed RRT* algorithm ───────────────────────────────────────────────
+
+    function initIR() {
+      const sp = cellPx(SC.c, SC.r), gp = cellPx(GC.c, GC.r);
+      const cMin = Math.hypot(gp.x - sp.x, gp.y - sp.y);
+      IR = { tree: [{ x: sp.x, y: sp.y, parent: -1, cost: 0 }],
+             path: [], done: false, found: false,
+             sp, gp, cMin, bestCost: Infinity, goalIdx: -1,
+             iter: 0, rnd: makeRnd(2), STEP: 20, THRESH: 15, RR: 50 };
+    }
+
+    function sampleIR(s) {
+      if (s.bestCost === Infinity) {
+        if (s.rnd() < 0.10) return { x: s.gp.x, y: s.gp.y };
+        return { x: s.rnd() * CW, y: s.rnd() * CH };
+      }
+      // Sample uniformly within the informed ellipse
+      const a  = s.bestCost / 2;
+      const b  = Math.sqrt(Math.max(0, s.bestCost * s.bestCost - s.cMin * s.cMin)) / 2;
+      const cx = (s.sp.x + s.gp.x) / 2, cy = (s.sp.y + s.gp.y) / 2;
+      const th = Math.atan2(s.gp.y - s.sp.y, s.gp.x - s.sp.x);
+      for (let t = 0; t < 30; t++) {
+        const r   = Math.sqrt(s.rnd()), ang = s.rnd() * Math.PI * 2;
+        const lx  = a * r * Math.cos(ang), ly = b * r * Math.sin(ang);
+        const tx  = cx + lx * Math.cos(th) - ly * Math.sin(th);
+        const ty  = cy + lx * Math.sin(th) + ly * Math.cos(th);
+        if (tx >= 0 && tx <= CW && ty >= 0 && ty <= CH) return { x: tx, y: ty };
+      }
+      return { x: s.rnd() * CW, y: s.rnd() * CH };
+    }
+
+    function stepIR(n) {
+      const s = IR; if (s.done) return;
+      for (let i = 0; i < n; i++) {
+        if (s.iter >= IRRT_MAX) { s.done = true; return; }
+        s.iter++;
+
+        const samp = sampleIR(s);
+        let ni = 0, nd = Infinity;
+        for (let j = 0; j < s.tree.length; j++) {
+          const d = Math.hypot(s.tree[j].x - samp.x, s.tree[j].y - samp.y);
+          if (d < nd) { nd = d; ni = j; }
+        }
+        const near = s.tree[ni];
+        const ang  = Math.atan2(samp.y - near.y, samp.x - near.x);
+        const sl   = Math.min(s.STEP, nd);
+        const nx   = near.x + Math.cos(ang) * sl, ny = near.y + Math.sin(ang) * sl;
+        if (nx < 0 || nx > CW || ny < 0 || ny > CH) continue;
+        if (lineHits(near.x, near.y, nx, ny)) continue;
+
+        // Choose cheapest parent within rewire radius
+        let bPar = ni, bCost = near.cost + sl;
+        for (let j = 0; j < s.tree.length; j++) {
+          const d2 = Math.hypot(s.tree[j].x - nx, s.tree[j].y - ny);
+          if (d2 < s.RR && !lineHits(s.tree[j].x, s.tree[j].y, nx, ny)) {
+            const c = s.tree[j].cost + d2;
+            if (c < bCost) { bCost = c; bPar = j; }
+          }
+        }
+
+        const newIdx = s.tree.length;
+        s.tree.push({ x: nx, y: ny, parent: bPar, cost: bCost });
+
+        // Rewire neighbours through new node if it offers a cheaper route
+        for (let j = 0; j < newIdx; j++) {
+          const d2 = Math.hypot(s.tree[j].x - nx, s.tree[j].y - ny);
+          if (d2 < s.RR && !lineHits(nx, ny, s.tree[j].x, s.tree[j].y)) {
+            const nc = bCost + d2;
+            if (nc < s.tree[j].cost) { s.tree[j].parent = newIdx; s.tree[j].cost = nc; }
+          }
+        }
+
+        // Check goal connection
+        const dg = Math.hypot(nx - s.gp.x, ny - s.gp.y);
+        if (dg < s.THRESH && !lineHits(nx, ny, s.gp.x, s.gp.y)) {
+          const gc = bCost + dg;
+          if (gc < s.bestCost) {
+            s.bestCost = gc; s.found = true;
+            if (s.goalIdx < 0) {
+              s.goalIdx = s.tree.length;
+              s.tree.push({ x: s.gp.x, y: s.gp.y, parent: newIdx, cost: gc });
+            } else {
+              s.tree[s.goalIdx].parent = newIdx;
+              s.tree[s.goalIdx].cost   = gc;
+            }
+            const path = []; let cur = s.goalIdx;
+            while (cur >= 0) { path.unshift(cur); cur = s.tree[cur].parent; }
+            s.path = path;
+          }
+        }
+      }
+    }
+
+    // ── Stats & status ────────────────────────────────────────────────────────
+
+    function setStatus(id, txt, cls) {
+      const el = document.getElementById(id);
+      el.textContent = txt; el.className = 'status' + (cls ? ' ' + cls : '');
+    }
+
+    function updateStats() {
+      if (AS) {
+        document.getElementById('as-exp').textContent  = AS.exp.toLocaleString();
+        document.getElementById('as-plen').textContent = AS.path.length || '—';
+        document.getElementById('as-res').textContent  = AS.done ? (AS.found ? 'Path found' : 'No path found') : 'Searching…';
+      }
+      if (RR) {
+        document.getElementById('rr-nodes').textContent = RR.tree.length.toLocaleString();
+        document.getElementById('rr-plen').textContent  = RR.path.length || '—';
+        document.getElementById('rr-res').textContent   = RR.done ? (RR.found ? 'Path found' : 'Stopped') : 'Growing…';
+      }
+      if (IR) {
+        document.getElementById('ir-nodes').textContent = IR.tree.length.toLocaleString();
+        document.getElementById('ir-cost').textContent  = IR.found ? Math.round(IR.bestCost) + 'px' : '—';
+        document.getElementById('ir-iter').textContent  = IR.iter.toLocaleString();
+      }
+    }
+
+    // ── Animation loop ────────────────────────────────────────────────────────
+
+    function animate() {
+      const spd   = parseInt(document.getElementById('spd').value);
+      const aPrev = AS && AS.done, rPrev = RR && RR.done, iPrev = IR && IR.done;
+
+      if (AS && !AS.done) stepAS(spd * 4);
+      if (RR && !RR.done) stepRR(spd);
+      if (IR && !IR.done) stepIR(spd);
+
+      drawAstar(); drawRRT(); drawIRRT(); updateStats();
+
+      if (AS && AS.done && !aPrev)
+        setStatus('as-status', AS.found ? 'path found' : 'no path', AS.found ? 'found' : '');
+      if (RR && RR.done && !rPrev)
+        setStatus('rr-status', RR.found ? 'path found' : 'stopped', RR.found ? 'found' : '');
+      if (IR && !IR.done)
+        setStatus('ir-status', IR.found ? 'optimising…' : 'running…', IR.found ? 'opt' : 'running');
+      if (IR && IR.done && !iPrev)
+        setStatus('ir-status', IR.found ? `done (${Math.round(IR.bestCost)}px)` : 'no path', IR.found ? 'found' : '');
+
+      if ((!AS || AS.done) && (!RR || RR.done) && (!IR || IR.done)) {
+        running = false;
+        document.getElementById('btn-run').disabled = false;
+        return;
+      }
+      raf = requestAnimationFrame(animate);
+    }
+
+    function runAll() {
+      if (running) { cancelAnimationFrame(raf); running = false; }
+      initAS(); initRR(); initIR();
+      setStatus('as-status', 'running…', 'running');
+      setStatus('rr-status', 'running…', 'running');
+      setStatus('ir-status', 'running…', 'running');
+      document.getElementById('btn-run').disabled = true;
+      running = true; animate();
+    }
+
+    function resetPaths() {
+      if (running) { cancelAnimationFrame(raf); running = false; }
+      AS = null; RR = null; IR = null;
+      ['as-status', 'rr-status', 'ir-status'].forEach(id => setStatus(id, 'ready', ''));
+      ['as-exp','as-plen','as-res','rr-nodes','rr-plen','rr-res','ir-nodes','ir-cost','ir-iter']
+        .forEach(id => document.getElementById(id).textContent = '—');
+      document.getElementById('btn-run').disabled = false;
+      drawAstar(); drawRRT(); drawIRRT();
+    }
+
+    function resetAll() {
+      resetPaths();
+      obs = Array.from({ length: ROWS }, () => new Array(COLS).fill(false));
+      SC = { c: 3, r: 13 }; GC = { c: 37, r: 13 };
+      presetObs(); drawAstar(); drawRRT(); drawIRRT();
+    }
+
+    function setMode(m) {
+      mode = m;
+      ['btn-s','btn-g','btn-draw','btn-erase'].forEach(id => document.getElementById(id).classList.remove('active'));
+      const map = { start: 'btn-s', goal: 'btn-g', draw: 'btn-draw', erase: 'btn-erase' };
+      if (map[m]) document.getElementById(map[m]).classList.add('active');
+      const hints = {
+        start: 'Click any canvas to place start (S).',
+        goal:  'Click any canvas to place goal (G).',
+        draw:  'Click and drag to paint walls on any canvas.',
+        erase: 'Click and drag to erase walls.',
+        idle:  'Click Run all to animate. The ellipse on Informed RRT* shrinks as better paths are found.',
+      };
+      document.getElementById('hint').textContent = hints[m] || hints.idle;
+    }
+
+    // ── Mouse / touch input ───────────────────────────────────────────────────
+
+    let mouseDown = false;
+
+    function getPos(e, cv) {
+      const r = cv.getBoundingClientRect(), src = e.touches ? e.touches[0] : e;
+      return { x: (src.clientX - r.left) / r.width * CW, y: (src.clientY - r.top) / r.height * CH };
+    }
+
+    function redrawAll() { drawAstar(); drawRRT(); drawIRRT(); }
+
+    function onDown(e) {
+      if (running) return;
+      mouseDown = true;
+      const { x, y } = getPos(e, e.currentTarget), { c, r } = pxCell(x, y);
+      if      (mode === 'start') { SC = { c, r }; setMode('idle'); redrawAll(); }
+      else if (mode === 'goal')  { GC = { c, r }; setMode('idle'); redrawAll(); }
+      else if (mode === 'draw')  { obs[r][c] = true;  redrawAll(); }
+      else if (mode === 'erase') { obs[r][c] = false; redrawAll(); }
+    }
+
+    function onMove(e) {
+      if (!mouseDown || running) return;
+      const { x, y } = getPos(e, e.currentTarget), { c, r } = pxCell(x, y);
+      if      (mode === 'draw')  { obs[r][c] = true;  redrawAll(); }
+      else if (mode === 'erase') { obs[r][c] = false; redrawAll(); }
+    }
+
+    function onUp() { mouseDown = false; }
+
+    [ac, rc, ic].forEach(cv => {
+      cv.addEventListener('mousedown',  onDown);
+      cv.addEventListener('mousemove',  onMove);
+      cv.addEventListener('mouseup',    onUp);
+      cv.addEventListener('mouseleave', onUp);
+      cv.addEventListener('touchstart', e => { e.preventDefault(); onDown(e); }, { passive: false });
+      cv.addEventListener('touchmove',  e => { e.preventDefault(); onMove(e); }, { passive: false });
+      cv.addEventListener('touchend',   onUp, { passive: false });
+    });
+
+    drawAstar(); drawRRT(); drawIRRT();
+  </script>
+</body>
+</html>

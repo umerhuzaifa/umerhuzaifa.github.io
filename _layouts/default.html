@@ -250,19 +250,12 @@
         {% elsif site.logo %}
           <img src="{{ site.logo | relative_url }}" alt="Logo" style="max-width: 200px; margin: 20px auto; display: block;" />
         {% endif %}
-        <!-- {% if site.logo %}
-          <img src="{{site.logo | relative_url}}" alt="Logo" />
-        {% endif %} -->
 
         <p>{{ site.description | default: site.github.project_tagline }}</p>
 
         {% if site.github.is_project_page %}
         <p class="view"><a href="{{ site.github.repository_url }}">View the Project on GitHub <small>{{ site.github.repository_nwo }}</small></a></p>
         {% endif %}
-
-        {{/*  {% if site.github.is_user_page %}
-        <p class="view"><a href="{{ site.github.owner_url }}">View My GitHub Profile</a></p>
-        {% endif %}  */}}
 
         {% if site.show_downloads %}
         <ul class="downloads">
@@ -272,38 +265,37 @@
         </ul>
         {% endif %}
       </header>
+
       <section>
+        {{ content }}
 
-      {{ content }}
+        <!-- News Section -->
+        <div class="news-container">
+          <!-- Recent News Section -->
+          <div class="recent-news">
+            <h2>Recent News</h2>
+            <ul>
+              {% for post in site.posts limit:10 %}
+                <li>
+                  <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+                  <span class="item-date">{{ post.date | date: "%b %d, %Y" }}</span>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div> <!-- close news-container -->
+      </section> <!-- close section -->
 
-      <!-- News Section -->
-      <div class="news-container">
-        <!-- Recent News Section -->
-        <div class="recent-news">
-          <h2>Recent News</h2>
-          <ul>
-            {% for post in site.posts limit:10 %}
-              <li>
-                <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-                <span class="item-date">{{ post.date | date: "%b %d, %Y" }}</span>
-              </li>
-            {% endfor %}
-          </ul>
-        </div>
-
-
-      </section>
       <footer>
         {% if site.github.is_project_page %}
-        {{/*  <p>This project is maintained by <a href="{{ site.github.owner_url }}">{{ site.github.owner_name }}</a></p>  */}}
+          <p>This project is maintained by <a href="{{ site.github.owner_url }}">{{ site.github.owner_name }}</a></p>
         {% endif %}
-        {{/*  <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>  */}}
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
       </footer>
     </div>
 
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
     <script>
-      // Mobile menu toggle
       const navToggle = document.querySelector('.nav-toggle');
       const navMenu = document.getElementById('navMenu');
 
@@ -312,7 +304,6 @@
           navMenu.classList.toggle('active');
         });
 
-        // Close menu when clicking outside
         document.addEventListener('click', function(event) {
           const isClickInside = navToggle.contains(event.target) || navMenu.contains(event.target);
           if (!isClickInside && navMenu.classList.contains('active')) {
