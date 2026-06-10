@@ -3,7 +3,7 @@ layout: default
 title: Research
 ---
 
-My research focuses on the modeling and control of robotic systems, AI-driven decision-making in hardware, and the underlying principles of human movement and activity. Across these areas, the unifying goal is to develop technologies that support human life — whether by restoring mobility or optimizing health. I lead the **Robotics and Assisted Locomotion (RAL) Lab**, and my work is supported by over $240,000 in intramural funding across five grants. We are working in the following areas:
+My research focuses on the modeling and control of robotic systems, AI-driven decision-making in hardware, and the underlying principles of human movement and activity. Across these areas, the unifying goal is to develop technologies that support human life — whether by restoring mobility or optimizing health. I lead the **Robotics and Assisted Locomotion (RAL) Lab**, and my work is supported by over $240,000 in support across five grants. We are working in the following areas:
 
 - **Variability and Expressiveness in Bipedal Robot Walking** — developing novel mechanisms for introducing stylistic variability in two-legged robot locomotion, including a wearable pelvic actuator and a rolling ball-tray mechanism that produced the first-ever framework for stylistic movement generation in bipedal robots.
 - **Prototyping of Human-Assistive Devices** — designing and building cable-driven exoskeletons and wearable actuators for stroke rehabilitation and mobility assistance, with a focus on minimizing user burden while maximizing assistive effect.
@@ -14,6 +14,7 @@ My research focuses on the modeling and control of robotic systems, AI-driven de
 
 - Yi Jin
 - Ismail Hasan
+- Muzammil Shaikh
 
 ## Lab Alumni
 
