@@ -5,7 +5,7 @@ layout: default
 <!-- [Link to another page](./news.html). -->
 
 
-I am an Assistant Professor and Program Chair of Intelligent Systems Engineering at Jarvis College of Computing and Digital Media, DePaul University.
+I am an Assistant Professor and Program Chair of Intelligent Systems Engineering, and Robotics at Jarvis College of Computing and Digital Media, DePaul University.
 
 
 ## For Research Opportunity: 
