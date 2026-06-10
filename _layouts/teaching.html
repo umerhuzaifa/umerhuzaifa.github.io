@@ -248,7 +248,7 @@
         {% if page.logo %}
           <img src="{{ page.logo | relative_url }}" alt="Logo" style="max-width: 200px; margin: 20px auto; display: block;" />
         {% elsif site.logo %}
-          <img src="{{ site.logo | relative_url }}" alt="Logo" style="max-width: 200px; margin: 20px auto; display: block;" />
+          <img src="{{ site.logo | relative_url }}" alt="Logo" style="max-width: 400px; margin: 20px auto; display: block;" />
         {% endif %}
 
         <p>{{ site.description | default: site.github.project_tagline }}</p>
