@@ -8,12 +8,13 @@ My goal for teaching is to lower the barrier of entry into the disciplines of em
 
 The courses I have developed from span both the fundamentals engineering and computer science, and advanced topics in control systems, robotics and embedded systems.
 
-### Current Schedule: Winter 2025
+<!-- ### Upcoming Schedule: Fall 2026/27 -->
 
-CSE 362 - Logical Foundations of Cyberphysical Computing
-CSE 394 - Cyberphysical Systems Engineering Practicum II
-<!-- CSE 351 Embedded Systems I
-CSE 362 Mathematical Foundations of Autonomous Systems -->
+<!-- CSC 241 - Introduction to Computer Science I -->
+<!-- CSE 362 - Logical Foundations of Cyberphysical Computing
+CSE 394 - Cyberphysical Systems Engineering Practicum II -->
+<!-- CSE 351 Embedded Systems I -->
+<!-- CSE 362 Mathematical Foundations of Autonomous Systems -->
 
 ### Other courses taught
 
@@ -33,7 +34,7 @@ CSE 362 Mathematical Foundations of Autonomous Systems -->
 
 | Course Title | Institute |
 |-------------|-----------|
-| CSC 241 - Introduction to Computing | DePaul |
+| CSC 241 - Introduction to Computer Science I | DePaul |
 | ECE 203 - Fundaments of Electric Circuits | RHIT |
 | ECE 206 - Elements of Electrical Engineering | RHIT |
 | EE 221 - Digital Logic Design Lab | NUST |
