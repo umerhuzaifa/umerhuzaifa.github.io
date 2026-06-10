@@ -1,84 +1,28 @@
 
 # Journals
 
-1. C. Fuller, **U. Huzaifa**, and J. Schultz, “Toward Varying Bipedal Walking
-Gaits Using Rolling Ball-Tray Dynamics at the Walker’s Core,” in IEEE Access, vol. 13, pp. 143070-143084, 2025, doi: 10.1109/ACCESS.2025.3598692.
-(Impact Factor: 3.6, Acceptance Rate: 30%)
-2. D. D. K. Arachchige, T. Sheehan, D. M. Perera, S. Mallikarachchi, **U. Huzaifa**, I. Kanj, “Efficient Trotting of Soft Robotic Quadrupeds,” in IEEE Transactions on Automation Science and Engineering, vol. 22, pp. 14562-14576,
-2025, doi: 10.1109/TASE.2025.3553082. (Impact Factor: 5.9, Acceptance
-Rate: 18%)
-3. D. D. K. Arachchige, D. M. Perera, **U. Huzaifa**, I. Kanj, I. S. Godage,
-“Tumbling Locomotion of Tetrahedral Soft-limbed Robots,” in IEEE Robotics
-and Automation Letters, doi: 10.1109/LRA.2024.3375627.
-4. D. D. K. Arachchige, D. M. Perera, S. Mallikarachchi, **U. Huzaifa**, I. Kanj
-and I. S. Godage, “Soft Steps: Exploring Quadrupedal Locomotion With
-Modular Soft Robots,”in IEEE Access, vol. 11, pp. 63136-63148, 2023, doi:
-10.1109/ACCESS.2023.3289156.
-5. R. Prasad†, M. El-Rich, M. I. Awad, I. Hussain, H. F. Jelinek, **U. Huzaifa**, and K. Khalaf, “A Framework for Determining the Performance and
-Requirements of Cable-Driven Mobile Lower Limb Rehabilitation Exoskeletons,” in Frontiers in Bioengineering and Biotechnology, 10, 2022.
-6. **U. Huzaifa**, C. Maguire, and A. LaViers, “Toward an Expressive Bipedal
-Robot: Variable Gait Synthesis and Validation in a Planar Model,” International Journal of Social Robotics, vol. 12, pg. 129-141, 2020.
-7. A. Jang Sher, **U. Huzaifa**, J. Li, V. Jain, and A. LaViers,“An Embodied, Platform-invariant Architecture for Connecting High-level Spatial Commands to Platform Articulation,” in Robotics and Autonomous Systems,
-vol. 119, pg. 263-277, 2019.
-8. A. LaViers, C. Cuan, M. Heimerdinger, **U. Huzaifa**, C. Maguire, R. McNish, A. Nilles, I. Pakrasi, K. Bradley, K. Brooks Mata, N. Chakraborty, I.
-Vidrin and A. Zurawski, “Choreographic and Somatic Approaches for the
-Development of Expressive Robotic Systems,” Arts, 7(2), 11. 2018.
-
+1. C. Fuller, **U. Huzaifa**, and J. Schultz, “Toward Varying Bipedal Walking Gaits Using Rolling Ball-Tray Dynamics at the Walker’s Core,” in IEEE Access, vol. 13, pp. 143070-143084, 2025, doi: 10.1109/ACCESS.2025.3598692. (Impact Factor: 3.6, Acceptance Rate: 30%)
+2. D. D. K. Arachchige, T. Sheehan, D. M. Perera, S. Mallikarachchi, **U. Huzaifa**, I. Kanj, “Efficient Trotting of Soft Robotic Quadrupeds,” in IEEE Transactions on Automation Science and Engineering, vol. 22, pp. 14562-14576, 2025, doi: 10.1109/TASE.2025.3553082. (Impact Factor: 5.9, Acceptance Rate: 18%)
+3. D. D. K. Arachchige, D. M. Perera, **U. Huzaifa**, I. Kanj, I. S. Godage, “Tumbling Locomotion of Tetrahedral Soft-limbed Robots,” in IEEE Robotics and Automation Letters, doi: 10.1109/LRA.2024.3375627.
+4. D. D. K. Arachchige, D. M. Perera, S. Mallikarachchi, **U. Huzaifa**, I. Kanj and I. S. Godage, “Soft Steps: Exploring Quadrupedal Locomotion With Modular Soft Robots,”in IEEE Access, vol. 11, pp. 63136-63148, 2023, doi:10.1109/ACCESS.2023.3289156.
+5. R. Prasad†, M. El-Rich, M. I. Awad, I. Hussain, H. F. Jelinek, **U. Huzaifa**, and K. Khalaf, “A Framework for Determining the Performance and Requirements of Cable-Driven Mobile Lower Limb Rehabilitation Exoskeletons,” in Frontiers in Bioengineering and Biotechnology, 10, 2022.
+6. **U. Huzaifa**, C. Maguire, and A. LaViers, “Toward an Expressive Bipedal Robot: Variable Gait Synthesis and Validation in a Planar Model,” International Journal of Social Robotics, vol. 12, pg. 129-141, 2020.
+7. A. Jang Sher, **U. Huzaifa**, J. Li, V. Jain, and A. LaViers,“An Embodied, Platform-invariant Architecture for Connecting High-level Spatial Commands to Platform Articulation,” in Robotics and Autonomous Systems, vol. 119, pg. 263-277, 2019.
+8. A. LaViers, C. Cuan, M. Heimerdinger, **U. Huzaifa**, C. Maguire, R. McNish, A. Nilles, I. Pakrasi, K. Bradley, K. Brooks Mata, N. Chakraborty, I. Vidrin and A. Zurawski, “Choreographic and Somatic Approaches for the Development of Expressive Robotic Systems,” Arts, 7(2), 11. 2018.
 
 # Peer-reviewed Conference Presentations
 
-1. **U. Huzaifa**, L. Dettori, S. McGee, H. Nalwala and D. D. K. Arachchige,
-“Assessing the Impact of an Interdisciplinary Engineering Summer Camp on
-Student Engagement and Interest,” in ASEE 2025 Illinois-Indiana Section
-Conference, Rose-Hulman Institute of Technology, 2025.
-2. S. Hwang, K. Navghare, **U. Huzaifa**, I. Ustun, A. Dzewaltowski, C. Connaboy,
-(2024). “Detecting Outlier Segments in Uncertain Personal Trajectory Data,”
-In: Gervasi, O., Murgante, B., Garau, C., Taniar, D., C. Rocha, A.M.A.,
-Faginas Lago, M.N. (eds) Computational Science and Its Applications –
-ICCSA 2024. ICCSA 2024. Lecture Notes in Computer Science, vol 14814.
-Springer, Cham. doi: 10.1007/978-3-031-64608-9 28
-3. D. D. K. Arachchige et al., “Study on Soft Robotic Pinniped Locomotion,” in
-2023 IEEE/ASME International Conference on Advanced Intelligent Mechatronics (AIM), Seattle, WA, USA, 2023, pp. 65-71, doi: 10.1109/AIM46323.2023.10196209.
-4. **U. Huzaifa**, D. Arachchige, M. A. Zaman, U. Syed, “Simplified Modeling
-of Hybrid Soft Robots with Constant Stiffness Assumption,” 2023 IEEE International Conference on Robotics and Biomimetics (ROBIO), Koh Samui,
-Thailand, 2023, pp. 1-6, doi: 10.1109/ROBIO58561.2023.10355009.
-5. J. Knea, and **U. Huzaifa**. “Cost-Effective Electronic Framework for Lowerlimb Exoskeletons,” 2023 IEEE International Conference on Robotics and
-Biomimetics (ROBIO), Koh Samui, Thailand, 2023, pp. 1-7, doi: 10.1109/ROBIO58561.2023.10354728.
-6. R. Parasad†, K. Khalaf, M. I. Awad, I. Hussain, H. F. Jelinek, **U. Huzaifa**,
-and M. El Rich, “A Generalized Framework for the Assessment of Various
-Configurations of Cable-driven Mobile Lower limb Rehabilitation Exoskeletons,” in IEEE International Conference on Biomedical Engineering and
-Technology (ICBET), 2022, pp. 133-140, doi: 10. 1145/ 3535694. 3535716.
-7. C. Fuller, **U. Huzaifa**, A. LaViers, and J. Scultz, “Core-centered actuation for Biped Locomotion of Humanoid Robots,” IEEE/RSJ International
-Conference on Intelligent Robots and Systems (IROS), 2020, pp. 3481-3487,
-doi: 10. 1109/ IROS45743. 2020. 9341364. 
-8. **U. Huzaifa**, C. Fuller, J. Schultz, and A. LaViers, “Toward a Bipedal Robot
-with Variable Gait Styles: Sagittal Forces Analysis in a Planar Simulation
-and a Prototype Ball-Tray Mechanism,” IEEE/RSJ International Conference
-on Intelligent Robots and Systems (IROS), 2019, pp. 2266-2272, doi: 10.
-1109/ IROS40897. 2019. 8968025. (2nd in robotics category MSAR ratings)1
-9. J. Lambert, **U. Huzaifa**, W. Rizvi, and A. LaViers, “A Comparison of
-Descriptive and Emotive Labels to Explain Human Perception of Gait Styles
-on a Compass Walker in Variable Contexts,” IEEE International Conference
-on Robot & Human Interactive Communication (Ro-Man), 2019, pp. 1-
-8, doi: 10. 1109/ RO-MAN46459. 2019. 8956361. 
-10. **U. Huzaifa**, and A. LaViers,“Coordination, Symmetry, and Grouping Pa-
-rameters for Redundant Movement Strategies for Articulated Platforms,”
-in IEEE International conference on Robotics and Biomimetics (ROBIO),
-2017, pp. 1460-1467, doi: 10. 1109/ ROBIO. 2017. 8324623 .
-11. **U. Huzaifa**, C. Bernier, Z. Calhoun, G. Heddy, C. Kolhout, B. Libowitz, A.
-Moenning, J. Ye, C. Maguire, and A. LaViers, “Embodied Movement Strate-
-gies for Development of a Core-located Actuation Walker,” in IEEE Interna-
-tional Conference on Biomedical Robotics and Biomechatronics (BioRob),
-2016, pp. 176-181, doi: 10. 1109/ BIOROB. 2016. 7523618 . (Best Poster
-Finalist)
-12. **U. Huzaifa**, and A. LaViers, “Control design for planar model of a core-
-located actuation walker,” in IEEE International Conference on Biomedical
-Robotics and Biomechatronics (BioRob), 2016, pp. 170-175, doi: 10. 1109/
-BIOROB. 2016. 7523617 .
-13. G. Heddy, **U. Huzaifa**, P. Beling, Y. Haimes, J. Marvel, B. Weiss, and A.
-Laviers,“LTL-Based Monitoring of Smart Manufacturing Systems,” in PHM
-Society Conference, 2015;6:039.
-14. L. Bobadilla, T. T. Johnson, A. LaViers., and **U. Huzaifa**, “Verified Pla-
-nar Formation Control Algorithms by Composition of Primitives,” AIAA
-Guidance, Navigation, and Control (GNC) Conference, AIAA Science and
-Technology Forum (SciTech), p. 1541, 2015
+1. **U. Huzaifa**, L. Dettori, S. McGee, H. Nalwala and D. D. K. Arachchige, “Assessing the Impact of an Interdisciplinary Engineering Summer Camp on Student Engagement and Interest,” in ASEE 2025 Illinois-Indiana Section Conference, Rose-Hulman Institute of Technology, 2025.
+2. S. Hwang, K. Navghare, **U. Huzaifa**, I. Ustun, A. Dzewaltowski, C. Connaboy, (2024). “Detecting Outlier Segments in Uncertain Personal Trajectory Data,” In: Gervasi, O., Murgante, B., Garau, C., Taniar, D., C. Rocha, A.M.A., Faginas Lago, M.N. (eds) Computational Science and Its Applications – ICCSA 2024. ICCSA 2024. Lecture Notes in Computer Science, vol 14814. Springer, Cham. doi: 10.1007/978-3-031-64608-9 28
+3. D. D. K. Arachchige et al., “Study on Soft Robotic Pinniped Locomotion,” in 2023 IEEE/ASME International Conference on Advanced Intelligent Mechatronics (AIM), Seattle, WA, USA, 2023, pp. 65-71, doi: 10.1109/AIM46323.2023.10196209.
+4. **U. Huzaifa**, D. Arachchige, M. A. Zaman, U. Syed, “Simplified Modeling of Hybrid Soft Robots with Constant Stiffness Assumption,” 2023 IEEE International Conference on Robotics and Biomimetics (ROBIO), Koh Samui, Thailand, 2023, pp. 1-6, doi: 10.1109/ROBIO58561.2023.10355009.
+5. J. Knea, and **U. Huzaifa**. “Cost-Effective Electronic Framework for Lowerlimb Exoskeletons,” 2023 IEEE International Conference on Robotics and Biomimetics (ROBIO), Koh Samui, Thailand, 2023, pp. 1-7, doi: 10.1109/ROBIO58561.2023.10354728.
+6. R. Parasad†, K. Khalaf, M. I. Awad, I. Hussain, H. F. Jelinek, **U. Huzaifa**, and M. El Rich, “A Generalized Framework for the Assessment of Various Configurations of Cable-driven Mobile Lower limb Rehabilitation Exoskeletons,” in IEEE International Conference on Biomedical Engineering and Technology (ICBET), 2022, pp. 133-140, doi: 10. 1145/ 3535694. 3535716.
+7. C. Fuller, **U. Huzaifa**, A. LaViers, and J. Scultz, “Core-centered actuation for Biped Locomotion of Humanoid Robots,” IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS), 2020, pp. 3481-3487, doi: 10. 1109/ IROS45743. 2020. 9341364. 
+8. **U. Huzaifa**, C. Fuller, J. Schultz, and A. LaViers, “Toward a Bipedal Robot with Variable Gait Styles: Sagittal Forces Analysis in a Planar Simulation and a Prototype Ball-Tray Mechanism,” IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS), 2019, pp. 2266-2272, doi: 10.1109/IROS40897.2019.8968025.
+9. J. Lambert, **U. Huzaifa**, W. Rizvi, and A. LaViers, “A Comparison of Descriptive and Emotive Labels to Explain Human Perception of Gait Styles on a Compass Walker in Variable Contexts,” IEEE International Conference on Robot & Human Interactive Communication (Ro-Man), 2019, pp. 1-8, doi: 10.1109/RO-MAN46459.2019.8956361. 
+10. **U. Huzaifa**, and A. LaViers,“Coordination, Symmetry, and Grouping Parameters for Redundant Movement Strategies for Articulated Platforms,” in IEEE International conference on Robotics and Biomimetics (ROBIO), 2017, pp. 1460-1467, doi: 10.1109/ROBIO.2017.8324623.
+11. **U. Huzaifa**, C. Bernier, Z. Calhoun, G. Heddy, C. Kolhout, B. Libowitz, A. Moenning, J. Ye, C. Maguire, and A. LaViers, “Embodied Movement Strategies for Development of a Core-located Actuation Walker,” in IEEE International Conference on Biomedical Robotics and Biomechatronics (BioRob), 2016, pp. 176-181, doi: 10. 1109/ BIOROB. 2016. 7523618 . (Best Poster Finalist)
+12. **U. Huzaifa**, and A. LaViers, “Control design for planar model of a core-located actuation walker,” in IEEE International Conference on Biomedical Robotics and Biomechatronics (BioRob), 2016, pp. 170-175, doi: 10. 1109/BIOROB.2016.7523617.
+13. G. Heddy, **U. Huzaifa**, P. Beling, Y. Haimes, J. Marvel, B. Weiss, and A. Laviers,“LTL-Based Monitoring of Smart Manufacturing Systems,” in PHM Society Conference, 2015;6:039.
+14. L. Bobadilla, T. T. Johnson, A. LaViers., and **U. Huzaifa**, “Verified Planar Formation Control Algorithms by Composition of Primitives,” AIAA Guidance, Navigation, and Control (GNC) Conference, AIAA Science and Technology Forum (SciTech), p. 1541, 2015

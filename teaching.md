@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: teaching
 title: My Page
 logo: /assets/images/math_collage.png
 ---
@@ -16,9 +16,9 @@ CSE 394 - Cyberphysical Systems Engineering Practicum II -->
 <!-- CSE 351 Embedded Systems I -->
 <!-- CSE 362 Mathematical Foundations of Autonomous Systems -->
 
-### Other courses taught
+## Courses taught
 
-## Senior Undergraduate / Graduate Courses
+### Senior Undergraduate / Graduate Courses
 
 | Course Title | Institute |
 |-------------|-----------|
@@ -30,7 +30,7 @@ CSE 394 - Cyberphysical Systems Engineering Practicum II -->
 | ME 340 - Dynamics of Mechanical Systems | UIUC |
 | EE 371 - Linear Control Systems Lab | NUST |
 
-## Fundamental Courses
+### Foundational Courses
 
 | Course Title | Institute |
 |-------------|-----------|

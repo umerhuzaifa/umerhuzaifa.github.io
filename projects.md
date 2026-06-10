@@ -12,14 +12,14 @@ title: Portfolio
     </a>
   </div>
 
-<!-- ## Power Measurement in an ESP32 Blinking an LED -->
+<!-- ## Power Measurement in an ESP32 Blinking an LED
 <div class="portfolio-grid">
     <div class="project-item">
       <a href="./projects/powermeasure_esp32.html" target="_blank">
         <img src="/assets/images/violet_ON.png" alt="LED and ESP32" style="max-width: 400px; margin: 20px auto; display: block;" />
         <h3>Power Measurement in an ESP32 Blinking an LED</h3>
       </a>
-    </div>
+    </div> -->
 
 <!-- <div class="portfolio-grid"> -->
   <div class="project-item">
