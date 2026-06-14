@@ -55,8 +55,8 @@
 #   - vendor/ruby/
 title: Umer Huzaifa, PhD
 logo: /assets/images/profile_huzaifa.png
-description: >-
-  Umer Huzaifa's personal website
+# description: >-
+#   Umer Huzaifa's personal website
 show_downloads: false
 # google_analytics: 
 theme: jekyll-theme-minimal
