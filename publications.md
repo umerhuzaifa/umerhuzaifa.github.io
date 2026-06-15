@@ -3,7 +3,7 @@
 
 1. D. D. K. Arachchige, D. M. Perera, U. Huzaifa, I. Kanj, I. Godage, “Soft Robotic Snake Loco-
 motion on Curved Surfaces,” in Soft Robotics, 2025.
-2. C. Fuller, **U. Huzaifa**, and J. Schultz, “Toward Varying Bipedal Walking Gaits Using Rolling Ball-Tray Dynamics at the Walker’s Core,” in IEEE Access, vol. 13, pp. 143070-143084, 2025, doi: 10.1109/ACCESS.2025.3598692. (Impact Factor: 3.6, Acceptance Rate: 30%)
+2. C. Fuller, **U. Huzaifa**, and J. Schultz, “Toward Varying Bipedal Walking Gaits Using Rolling Ball-Tray Dynamics at the Walker’s Core,” in IEEE Access, vol. 13, pp. 143070-143084, 2025, doi: 10.1109/ACCESS.2025.3598692. (Impact Factor: 3.6)
 3. D. D. K. Arachchige, T. Sheehan, D. M. Perera, S. Mallikarachchi, **U. Huzaifa**, I. Kanj, “Efficient Trotting of Soft Robotic Quadrupeds,” in IEEE Transactions on Automation Science and Engineering, vol. 22, pp. 14562-14576, 2025, doi: 10.1109/TASE.2025.3553082. (Impact Factor: 5.9, Acceptance Rate: 18%)
 4. D. D. K. Arachchige, D. M. Perera, **U. Huzaifa**, I. Kanj, I. S. Godage, “Tumbling Locomotion of Tetrahedral Soft-limbed Robots,” in IEEE Robotics and Automation Letters, doi: 10.1109/LRA.2024.3375627.
 5. D. D. K. Arachchige, D. M. Perera, S. Mallikarachchi, **U. Huzaifa**, I. Kanj and I. S. Godage, “Soft Steps: Exploring Quadrupedal Locomotion With Modular Soft Robots,”in IEEE Access, vol. 11, pp. 63136-63148, 2023, doi:10.1109/ACCESS.2023.3289156.
