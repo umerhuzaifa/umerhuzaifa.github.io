@@ -119,7 +119,7 @@
       }
 
       .year-section {
-        margin-bottom: 60px;
+        margin-bottom: 10px;
       }
 
       .year-header {
@@ -134,8 +134,8 @@
         display: flex;
         justify-content: space-between;
         align-items: baseline;
-        margin-bottom: 25px;
-        padding-bottom: 15px;
+        margin-bottom: 4px;
+        padding-bottom: 4px;
       }
 
       .news-title {
@@ -235,17 +235,18 @@
         {% for year in posts_by_year %}
           <div class="year-section">
             <!-- <h2 class="year-header">{{ year.name }}</h2> -->
-            
-            {% for post in year.items %}
-              <div class="news-item">
-                <div class="news-title">
-                  <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-                </div>
-                <!-- <div class="news-date">
-                  {{ post.date | date: "%B %-d, %Y" }}
-                </div> -->
-              </div>
-            {% endfor %}
+           <ul class="news-list">
+              {% for post in year.items %}
+                <li class="news-item">
+                  <div class="news-title">
+                    <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+                  </div>
+                  <!-- <div class="news-date">
+                    {{ post.date | date: "%B %-d, %Y" }}
+                  </div> -->
+                </li>
+              {% endfor %}
+            </ul>       
           </div>
         {% endfor %}
       </div>
