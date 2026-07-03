@@ -3,7 +3,7 @@ layout: projects
 title: Portfolio
 ---
 
-# Side Projects
+# Teaching/Research Artifacts
 
 This page provides a peak into the side projects I develop for aid in teaching and provide as tools for research and communication. Another purpose has been to test the theoretical concepts manually asa a source to report later on. Yet anothher one is to maketh is place asserver as the reference point for future checking in.  The development of these aides has involved the use of Large Language Models in varying degrees. 
 

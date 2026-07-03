@@ -247,7 +247,7 @@
           <li><a href="{{ "/research.html" | relative_url }}" {% if page.url contains "research.html" %}class="active"{% endif %}>Research</a></li>
           <li><a href="{{ "/publications.html" | relative_url }}" {% if page.url contains "publications.html" %}class="active"{% endif %}>Publications</a></li>
           <li><a href="{{ "/teaching.html" | relative_url }}" {% if page.url contains "teaching.html" %}class="active"{% endif %}>Teaching</a></li>
-          <li><a href="{{ "/sideprojects.html" | relative_url }}" {% if page.url contains "sideprojects.html" %}class="active"{% endif %}>Side Projects</a></li>
+          <li><a href="{{ "/sideprojects.html" | relative_url }}" {% if page.url contains "sideprojects.html" %}class="active"{% endif %}>Artifacts</a></li>
         </ul>
       </div>
     </nav>
@@ -280,27 +280,21 @@
 
       <section>
         {{ content }}
-
-        <!-- News Section -->
-        <div class="news-container">
-          <!-- Recent News Section -->
-          <div class="recent-news">
-            <h2>Recent News</h2>
-            <ul class="news-list">
-              {% for post in site.posts limit:10 %}
-                <li class="news-item">
-                  <div class="news-title">
-                    <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-                  </div>
-                  <div class="news-date">
-                    {{ post.date | date: "%b %d, %Y" }}
-                  </div>
-                </li>
-              {% endfor %}
-            </ul>
-          </div>
-        </div> <!-- close news-container -->
-      </section> <!-- close section -->
+       <!-- News Section -->
+      <div class="news-container">
+        <!-- Recent News Section -->
+        <div class="recent-news">
+          <h2>Recent News</h2>
+          <ul>
+            {% for post in site.posts limit:10 %}
+              <li>
+                <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+                <span class="item-date">{{ post.date | date: "%b %d, %Y" }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </section>
 
       <!-- <footer>
         {% if site.github.is_project_page %}
