@@ -174,6 +174,16 @@
         color: #222;
       }
 
+       .news-item::before {
+        /* content: "★"; */
+        /* content: "\2605"; */
+        content: "\25B8";
+        color: #0366d6;
+        display: inline-block;
+        width: 1.2em;
+        margin-left: -1.2em;
+      }
+
       .news-item {
         display: flex;
         justify-content: space-between;
@@ -252,10 +262,12 @@
         {% endif %}
 
         <p>{{ site.description | default: site.github.project_tagline }}</p>
-
-        {% if site.github.is_project_page %}
-        <p class="view"><a href="{{ site.github.repository_url }}">View the Project on GitHub <small>{{ site.github.repository_nwo }}</small></a></p>
-        {% endif %}
+        
+        Assistant Professor<br>
+        Program Chair, B.S. Intelligent Systems Engineering<br>
+        Program Chair, B.S. Robotics<br>
+        DePaul University, Chicago, IL
+        https://www.depaul.edu/faculty/muhammad-umer-huzaifa
 
         {% if site.show_downloads %}
         <ul class="downloads">
@@ -274,11 +286,15 @@
           <!-- Recent News Section -->
           <div class="recent-news">
             <h2>Recent News</h2>
-            <ul>
+            <ul class="news-list">
               {% for post in site.posts limit:10 %}
-                <li>
-                  <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-                  <span class="item-date">{{ post.date | date: "%b %d, %Y" }}</span>
+                <li class="news-item">
+                  <div class="news-title">
+                    <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+                  </div>
+                  <div class="news-date">
+                    {{ post.date | date: "%b %d, %Y" }}
+                  </div>
                 </li>
               {% endfor %}
             </ul>

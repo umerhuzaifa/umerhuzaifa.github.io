@@ -3,7 +3,10 @@ layout: projects
 title: Portfolio
 ---
 
-# Projects
+# Side Projects
+
+This page provides a peak into the side projects I develop for aid in teaching and provide as tools for research and communication. Another purpose has been to test the theoretical concepts manually asa a source to report later on. Yet anothher one is to maketh is place asserver as the reference point for future checking in.  The development of these aides has involved the use of Large Language Models in varying degrees. 
+
 <div class="portfolio-grid">
   <div class="project-item">
     <a href="./projects/adc_waveform_sampler.html" target="_blank">
@@ -12,14 +15,14 @@ title: Portfolio
     </a>
   </div>
 
-<!-- ## Power Measurement in an ESP32 Blinking an LED
+<!-- ## Power Measurement in an ESP32 Blinking an LED -->
 <div class="portfolio-grid">
     <div class="project-item">
       <a href="./projects/powermeasure_esp32.html" target="_blank">
         <img src="/assets/images/violet_ON.png" alt="LED and ESP32" style="max-width: 400px; margin: 20px auto; display: block;" />
         <h3>Power Measurement in an ESP32 Blinking an LED</h3>
       </a>
-    </div> -->
+    </div>
 
 <!-- <div class="portfolio-grid"> -->
   <div class="project-item">

@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: default
 title: "Summer Research Award"
 date: 2023-06-15
 ---

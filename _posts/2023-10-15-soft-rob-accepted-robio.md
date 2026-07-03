@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: default
 title: "Paper on Pseudo-rigid Modeling of Hybrid Soft Robots Accepted in ROBIO 2023"
 date: 2023-10-15
 ---

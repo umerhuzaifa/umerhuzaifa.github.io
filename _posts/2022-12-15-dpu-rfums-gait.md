@@ -1,6 +1,6 @@
 ---
-layout: post
-title: "AI in Healthcare Grant Awarded!"
+layout: default
+title: "2022 DPU-RFUMS AI in Healthcare Grant Awarded!"
 date: 2022-12-15
 ---
 

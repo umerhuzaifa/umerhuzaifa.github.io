@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: default
 title: "URC Grant Mindscapes Awarded!"
 date: 2025-06-15
 ---

@@ -117,9 +117,8 @@
         font-size: 0.9em;
         margin-left: 8px;
       }
-
       .year-section {
-        margin-bottom: 10px;
+        margin-bottom: 1px;
       }
 
       .year-header {
@@ -137,7 +136,13 @@
         margin-bottom: 4px;
         padding-bottom: 4px;
       }
-
+      .news-item::before {
+        /* content: "\2605"; */
+        content: "\25B8";
+        color: #0366d6;
+        margin-right: 8px;
+        flex-shrink: 0;
+      }
       .news-title {
         flex: 1;
         margin-right: 20px;
@@ -207,11 +212,12 @@
         {% endif %}
 
         <p>{{ site.description | default: site.github.project_tagline }}</p>
-
-        {% if site.github.is_project_page %}
-        <p class="view"><a href="{{ site.github.repository_url }}">View the Project on GitHub <small>{{ site.github.repository_nwo }}</small></a></p>
-        {% endif %}
-
+        Assistant Professor<br>
+        Program Chair, B.S. Intelligent Systems Engineering<br>
+        Program Chair, B.S. Robotics<br>
+        DePaul University, Chicago, IL
+        https://www.depaul.edu/faculty/muhammad-umer-huzaifa
+        
         <!-- {% if site.github.is_user_page %}
         <p class="view"><a href="{{ site.github.owner_url }}">View My GitHub Profile</a></p>
         {% endif %} -->

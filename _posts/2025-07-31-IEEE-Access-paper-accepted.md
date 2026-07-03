@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: default
 title: "Paper Accepted in IEEE Access"
 date: 2025-06-15
 ---
