@@ -150,7 +150,7 @@
 
       .news-title a {
         font-size: 1.1em;
-        font-weight: 600;
+        font-weight: 400;
         color: #222;
         text-decoration: none;
         transition: color 0.2s ease;
@@ -218,9 +218,7 @@
         DePaul University, Chicago, IL
         https://www.depaul.edu/faculty/muhammad-umer-huzaifa
         
-        <!-- {% if site.github.is_user_page %}
-        <p class="view"><a href="{{ site.github.owner_url }}">View My GitHub Profile</a></p>
-        {% endif %} -->
+       
 
         {% if site.show_downloads %}
         <ul class="downloads">
@@ -235,36 +233,40 @@
       <h1>{{ page.title }}</h1>
 
       <!-- Full News Archive by Year -->
-      <div class="news-container">
-        {% assign posts_by_year = site.posts | group_by_exp: "post", "post.date | date: '%Y'" %}
-        
-        {% for year in posts_by_year %}
-          <div class="year-section">
-            <!-- <h2 class="year-header">{{ year.name }}</h2> -->
-           <ul class="news-list">
-              {% for post in year.items %}
-                <li class="news-item">
-                  <div class="news-title">
-                    <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-                  </div>
-                  <!-- <div class="news-date">
-                    {{ post.date | date: "%B %-d, %Y" }}
-                  </div> -->
-                </li>
-              {% endfor %}
-            </ul>       
-          </div>
-        {% endfor %}
-      </div>
+        <div class="news-container">
+          {% assign posts_by_year = site.posts | group_by_exp: "post", "post.date | date: '%Y'" %}
 
-      </section>
+          {% for year in posts_by_year %}
+            <div class="year-section">
+              <div class="year-row">
+                <div class="year-label">{{ year.name }}</div>
+                <ul class="news-list">
+                  {% for post in year.items %}
+                    <li class="news-item">
+                      <div class="news-title">
+                        <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+                      </div>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      <!-- Only the news not the years they fall under -->
+      <!-- <div class="news-container">
+        <ul class="news-list">
+          {% for post in site.posts %}
+            <li class="news-item">
+              <div class="news-title">
+                <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      </div> -->
 
-      <!-- <footer>
-        {% if site.github.is_project_page %}
-          <p>This project is maintained by <a href="{{ site.github.owner_url }}">{{ site.github.owner_name }}</a></p>
-        {% endif %}
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
-      </footer> -->
+      </section>      
     </div>
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
   </body>
