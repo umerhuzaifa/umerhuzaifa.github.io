@@ -2,6 +2,9 @@
 	"folders": [
 		{
 			"path": "../../DePaulProjects/URC_GaitAnalysis"
+		},
+		{
+			"path": "../../../../../ConsultingWork/PatientPortal"
 		}
 	],
 	"settings": {}

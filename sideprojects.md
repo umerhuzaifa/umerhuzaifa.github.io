@@ -54,3 +54,10 @@ This page provides a peak into the side projects I develop for aid in teaching a
     <h3>Animation for Comparing the Performance of Robot Path Planners</h3>
     </a>
 </div>
+
+<div class="project-item">
+  <a href="./projects/investment_calculator_pkr.html" target="_blank">
+    <!-- <img src="/assets/images/robot_planner.webp" alt="Comparison of Robot Path Planners"> -->
+    <h3>Investment and Withdrawal Tool (NOT Financial Advice)</h3>
+    </a>
+</div>

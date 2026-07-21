@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Growth Ledger — Investment Projection (PKR)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #ece8dd;
+    --paper-raised: #f4f1e8;
+    --ink: #1f2a22;
+    --ink-soft: #55604f;
+    --rule: #c9c0a8;
+    --brass: #93712f;
+    --brass-soft: #c9a75c;
+    --teal: #2c4a4a;
+    --growth: #3c6e4a;
+    --principal: #a99a6b;
+    --shadow: rgba(31,42,34,0.12);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    padding:48px 20px 80px;
+    min-height:100vh;
+  }
+  .wrap{
+    max-width:1040px;
+    margin:0 auto;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--brass);
+    margin-bottom:10px;
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:clamp(32px, 5vw, 52px);
+    line-height:1.05;
+    margin:0 0 8px;
+    letter-spacing:-0.01em;
+  }
+  .sub{
+    color:var(--ink-soft);
+    font-size:15px;
+    max-width:520px;
+    line-height:1.5;
+    margin-bottom:36px;
+  }
+
+  .ledger-line{
+    border:none;
+    border-top:1px solid var(--rule);
+    margin:0 0 32px;
+  }
+
+  .layout{
+    display:grid;
+    grid-template-columns: 320px 1fr;
+    gap:32px;
+    align-items:start;
+  }
+  @media (max-width: 800px){
+    .layout{grid-template-columns:1fr;}
+  }
+
+  .panel{
+    background:var(--paper-raised);
+    border:1px solid var(--rule);
+    border-radius:2px;
+    padding:28px 26px;
+    box-shadow: 0 1px 0 var(--shadow);
+  }
+
+  .field{
+    margin-bottom:24px;
+  }
+  .field:last-child{margin-bottom:0;}
+  label{
+    display:block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-bottom:8px;
+  }
+  .input-row{
+    display:flex;
+    align-items:center;
+    border-bottom:1.5px solid var(--ink);
+    padding-bottom:4px;
+  }
+  .input-row .prefix, .input-row .suffix{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:16px;
+    color:var(--ink-soft);
+  }
+  .input-row .prefix{margin-right:4px;}
+  .input-row .suffix{margin-left:4px;}
+  input[type="number"]{
+    border:none;
+    background:transparent;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:18px;
+    color:var(--ink);
+    width:100%;
+    padding:2px 0;
+    outline:none;
+  }
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button{
+    -webkit-appearance:none;
+    margin:0;
+  }
+
+  .slider-row{
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+  input[type="range"]{
+    flex:1;
+    -webkit-appearance:none;
+    appearance:none;
+    height:2px;
+    background:var(--rule);
+    outline:none;
+    border-radius:2px;
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:16px;
+    height:16px;
+    border-radius:50%;
+    background:var(--brass);
+    border:2px solid var(--paper-raised);
+    box-shadow:0 0 0 1px var(--brass);
+    cursor:pointer;
+  }
+  input[type="range"]::-moz-range-thumb{
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    background:var(--brass);
+    border:2px solid var(--paper-raised);
+    box-shadow:0 0 0 1px var(--brass);
+    cursor:pointer;
+  }
+  .rate-display{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:18px;
+    color:var(--brass);
+    min-width:56px;
+    text-align:right;
+  }
+
+  .years-toggle{
+    display:flex;
+    gap:8px;
+    margin-top:8px;
+  }
+  .years-toggle button{
+    flex:1;
+    background:transparent;
+    border:1px solid var(--rule);
+    color:var(--ink-soft);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    padding:8px 4px;
+    cursor:pointer;
+    border-radius:2px;
+    transition:all .15s ease;
+  }
+  .years-toggle button.active{
+    background:var(--ink);
+    color:var(--paper-raised);
+    border-color:var(--ink);
+  }
+
+  /* Results */
+  .results{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:20px;
+  }
+  @media (max-width: 700px){
+    .results{grid-template-columns:1fr;}
+  }
+  .year-card{
+    background:var(--paper-raised);
+    border:1px solid var(--rule);
+    border-radius:2px;
+    padding:22px 20px 24px;
+    position:relative;
+  }
+  .year-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:14px;
+  }
+  .year-label span.n{color:var(--brass); font-weight:600;}
+  .total{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:30px;
+    letter-spacing:-0.01em;
+    margin-bottom:18px;
+    font-variant-numeric: tabular-nums;
+  }
+  .bar{
+    height:8px;
+    width:100%;
+    background:var(--principal);
+    border-radius:1px;
+    overflow:hidden;
+    margin-bottom:14px;
+  }
+  .bar-growth{
+    height:100%;
+    background:var(--growth);
+  }
+  .breakdown{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    line-height:2;
+  }
+  .breakdown .row{
+    display:flex;
+    justify-content:space-between;
+    color:var(--ink-soft);
+  }
+  .breakdown .dot{
+    display:inline-block;
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    margin-right:6px;
+  }
+  .dot.principal{background:var(--principal);}
+  .dot.growth{background:var(--growth);}
+  .breakdown .val{
+    color:var(--ink);
+    font-weight:500;
+  }
+
+  .footnote{
+    margin-top:28px;
+    font-size:12px;
+    color:var(--ink-soft);
+    line-height:1.6;
+    font-family:'IBM Plex Mono', monospace;
+  }
+
+  /* Section divider between calculators */
+  .section-break{
+    margin:56px 0 32px;
+  }
+  .section-break h2{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:clamp(26px, 4vw, 36px);
+    margin:0 0 8px;
+    letter-spacing:-0.01em;
+  }
+
+  .pull-row{
+    display:flex;
+    gap:8px;
+    margin-top:10px;
+    flex-wrap:wrap;
+  }
+  .pull-btn{
+    background:transparent;
+    border:1px dashed var(--rule);
+    color:var(--ink-soft);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    padding:6px 10px;
+    cursor:pointer;
+    border-radius:2px;
+    transition:all .15s ease;
+  }
+  .pull-btn:hover{
+    border-color:var(--brass);
+    color:var(--brass);
+  }
+
+  .withdrawal-summary{
+    background:var(--paper-raised);
+    border:1px solid var(--rule);
+    border-radius:2px;
+    padding:24px 26px;
+    margin-bottom:20px;
+  }
+  .withdrawal-summary .row{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    padding:6px 0;
+    border-bottom:1px dotted var(--rule);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+  .withdrawal-summary .row:last-child{border-bottom:none;}
+  .withdrawal-summary .row .val{
+    color:var(--ink);
+    font-weight:500;
+    font-size:15px;
+  }
+  .withdrawal-summary .row.result .val{
+    font-family:'Fraunces', serif;
+    font-size:26px;
+    color:var(--teal);
+  }
+  .warning-note{
+    color:#8a3b2b;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    margin-top:10px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Projection Tool · Amounts in PKR</div>
+  <h1>Growth Ledger</h1>
+  <p class="sub">Enter what you're starting with, what you'll add along the way, and a growth rate — see where the balance lands at 10, 20, and 30 years.</p>
+  <hr class="ledger-line">
+
+  <div class="layout">
+    <div class="panel">
+      <div class="field">
+        <label for="initial">Starting balance</label>
+        <div class="input-row">
+          <span class="prefix">Rs</span>
+          <input type="number" id="initial" value="500000" min="0" step="10000">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="contribution">Monthly contribution</label>
+        <div class="input-row">
+          <span class="prefix">Rs</span>
+          <input type="number" id="contribution" value="25000" min="0" step="1000">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Growth increases</label>
+        <div class="years-toggle" id="stepToggle">
+          <button data-step="0" class="active">At year-end</button>
+          <button data-step="1">Monthly</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="rate">Annual growth rate</label>
+        <div class="slider-row">
+          <input type="range" id="rate" min="0" max="25" step="0.1" value="12">
+          <span class="rate-display" id="rateDisplay">12.0%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="results" id="results">
+      <!-- year cards injected by JS -->
+    </div>
+  </div>
+
+  <p class="footnote">Assumes contributions are made monthly and growth compounds monthly (unless "At year-end" is selected, which compounds annually). Figures are illustrative projections, not guarantees — actual returns vary.</p>
+
+  <div class="section-break">
+    <div class="eyebrow">Drawdown Tool · FBR Tax Year 2026-27</div>
+    <h2>Retirement Withdrawal</h2>
+    <p class="sub">Enter the balance you expect at retirement and a monthly withdrawal rate — see how the balance holds up (or runs down) over 10, 20, and 30 years.</p>
+  </div>
+  <hr class="ledger-line">
+
+  <div class="layout">
+    <div class="panel">
+      <div class="field">
+        <label for="retireBalance">Balance at retirement</label>
+        <div class="input-row">
+          <span class="prefix">Rs</span>
+          <input type="number" id="retireBalance" value="20000000" min="0" step="100000">
+        </div>
+        <div class="pull-row" id="pullRow">
+          <button type="button" class="pull-btn" data-year="10">Use Year 10 total</button>
+          <button type="button" class="pull-btn" data-year="20">Use Year 20 total</button>
+          <button type="button" class="pull-btn" data-year="30">Use Year 30 total</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="withdrawalPct">Monthly withdrawal rate</label>
+        <div class="slider-row">
+          <input type="range" id="withdrawalPct" min="0" max="2" step="0.05" value="0.33">
+          <span class="rate-display" id="withdrawalPctDisplay">0.33%</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="retireRate">Growth rate after retirement</label>
+        <div class="slider-row">
+          <input type="range" id="retireRate" min="0" max="25" step="0.1" value="10">
+          <span class="rate-display" id="retireRateDisplay">10.0%</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="otherIncome">Other annual taxable income (PKR)</label>
+        <div class="input-row">
+          <span class="prefix">Rs</span>
+          <input type="number" id="otherIncome" value="0" min="0" step="10000">
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="withdrawal-summary">
+        <div class="row"><span>Balance at retirement</span><span class="val" id="sumBalance">Rs 0</span></div>
+        <div class="row"><span>First month's withdrawal (gross)</span><span class="val" id="sumFirstWithdrawal">Rs 0</span></div>
+        <div class="row"><span>Effective annual withdrawal rate</span><span class="val" id="sumAnnualRate">0%</span></div>
+        <div class="row"><span>Est. income tax (FBR), year 1</span><span class="val" id="sumYear1Tax">Rs 0</span></div>
+        <div class="row result"><span>Net (after-tax) income, year 1</span><span class="val" id="sumYear1Net">Rs 0</span></div>
+        <div class="row"><span>Net (after-tax), monthly avg.</span><span class="val" id="sumYear1NetMonthly">Rs 0</span></div>
+        <div class="warning-note" id="warningNote" style="display:none;">Balance is fully depleted before this point — remaining amount floored at Rs 0.</div>
+      </div>
+
+      <div class="results" id="retireResults">
+        <!-- year cards injected by JS -->
+      </div>
+    </div>
+  </div>
+
+  <p class="footnote">Each month, the withdrawal is calculated as the rate above times that month's balance (so the rupee amount withdrawn shrinks as the balance does), and growth compounds monthly on what's left. No further contributions are assumed after retirement. Income tax is estimated using FBR's salaried-individual slab rates for tax year 2026-27 (Finance Act 2026), treating the withdrawal as taxable income stacked on top of any other income entered. This is federal income tax only — it ignores Zakat, provident fund exemptions, WHT already deducted elsewhere, and other real-world factors, so treat it as a rough estimate, not tax advice.</p>
+</div>
+
+<script>
+  const initialEl = document.getElementById('initial');
+  const contributionEl = document.getElementById('contribution');
+  const rateEl = document.getElementById('rate');
+  const rateDisplay = document.getElementById('rateDisplay');
+  const resultsEl = document.getElementById('results');
+  const stepToggle = document.getElementById('stepToggle');
+
+  let compounding = 'monthly'; // or 'annual'
+
+  stepToggle.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if(!btn) return;
+    [...stepToggle.children].forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    compounding = btn.dataset.step === '1' ? 'monthly' : 'annual';
+    calculate();
+  });
+
+  function fmt(n){
+    const rounded = Math.round(n);
+    return 'Rs ' + rounded.toLocaleString('en-IN', {maximumFractionDigits:0});
+  }
+
+  function projectMonthly(P, monthlyContribution, annualRate, years){
+    const r = annualRate / 100 / 12;
+    const n = years * 12;
+    let balance = P;
+    let contributed = P;
+    for(let i=0; i<n; i++){
+      balance = balance * (1+r) + monthlyContribution;
+      contributed += monthlyContribution;
+    }
+    return {balance, contributed};
+  }
+
+  function projectAnnual(P, monthlyContribution, annualRate, years){
+    // contributions still made monthly (no growth within the year), balance grows once per year
+    const r = annualRate / 100;
+    let balance = P;
+    let contributed = P;
+    const annualContribution = monthlyContribution * 12;
+    for(let y=0; y<years; y++){
+      balance += annualContribution;
+      contributed += annualContribution;
+      balance = balance * (1+r);
+    }
+    return {balance, contributed};
+  }
+
+  function calculate(){
+    const P = parseFloat(initialEl.value) || 0;
+    const C = parseFloat(contributionEl.value) || 0;
+    const rate = parseFloat(rateEl.value) || 0;
+    rateDisplay.textContent = rate.toFixed(1) + '%';
+
+    const years = [10, 20, 30];
+    resultsEl.innerHTML = '';
+
+    years.forEach(y => {
+      const result = compounding === 'monthly'
+        ? projectMonthly(P, C, rate, y)
+        : projectAnnual(P, C, rate, y);
+
+      const growth = result.balance - result.contributed;
+      const growthPct = result.balance > 0 ? (growth / result.balance) * 100 : 0;
+
+      const card = document.createElement('div');
+      card.className = 'year-card';
+      card.innerHTML = `
+        <div class="year-label"><span>Year</span><span class="n">${y}</span></div>
+        <div class="total">${fmt(result.balance)}</div>
+        <div class="bar"><div class="bar-growth" style="width:${growthPct.toFixed(1)}%"></div></div>
+        <div class="breakdown">
+          <div class="row"><span><span class="dot principal"></span>Contributed</span><span class="val">${fmt(result.contributed)}</span></div>
+          <div class="row"><span><span class="dot growth"></span>Growth</span><span class="val">${fmt(growth)}</span></div>
+        </div>
+      `;
+      resultsEl.appendChild(card);
+    });
+  }
+
+  [initialEl, contributionEl, rateEl].forEach(el => {
+    el.addEventListener('input', calculate);
+  });
+
+  calculate();
+
+  // ---- Retirement Withdrawal Calculator ----
+  const retireBalanceEl = document.getElementById('retireBalance');
+  const withdrawalPctEl = document.getElementById('withdrawalPct');
+  const withdrawalPctDisplay = document.getElementById('withdrawalPctDisplay');
+  const retireRateEl = document.getElementById('retireRate');
+  const retireRateDisplay = document.getElementById('retireRateDisplay');
+  const retireResultsEl = document.getElementById('retireResults');
+  const sumBalance = document.getElementById('sumBalance');
+  const sumFirstWithdrawal = document.getElementById('sumFirstWithdrawal');
+  const sumAnnualRate = document.getElementById('sumAnnualRate');
+  const sumYear1Tax = document.getElementById('sumYear1Tax');
+  const sumYear1Net = document.getElementById('sumYear1Net');
+  const warningNote = document.getElementById('warningNote');
+  const pullRow = document.getElementById('pullRow');
+  const otherIncomeEl = document.getElementById('otherIncome');
+
+  // FBR salaried-individual tax slabs, Tax Year 2026-27 (Finance Act 2026).
+  // Each entry is the upper bound of taxable income taxed at that rate.
+  // Pakistan taxes individuals separately — there is no joint-filing status.
+  const TAX_BRACKETS_PKR_2026_27 = [
+    { upTo: 600000,   rate: 0.00 },
+    { upTo: 1200000,  rate: 0.01 },
+    { upTo: 2200000,  rate: 0.11 },
+    { upTo: 3200000,  rate: 0.20 },
+    { upTo: 4100000,  rate: 0.25 },
+    { upTo: 5600000,  rate: 0.29 },
+    { upTo: 7000000,  rate: 0.32 },
+    { upTo: Infinity, rate: 0.35 }
+  ];
+
+  function progressiveTax(taxableIncome){
+    let tax = 0;
+    let prevLimit = 0;
+    for(const b of TAX_BRACKETS_PKR_2026_27){
+      if(taxableIncome <= prevLimit) break;
+      const amountInBracket = Math.min(taxableIncome, b.upTo) - prevLimit;
+      tax += amountInBracket * b.rate;
+      prevLimit = b.upTo;
+    }
+    return tax;
+  }
+
+  // Estimates income tax owed on a withdrawal, treating it as taxable
+  // income stacked on top of any other taxable income for the year.
+  // The first Rs 600,000 slab is 0%, so no separate standard deduction applies.
+  function taxOnWithdrawal(grossWithdrawal, otherIncome){
+    const combinedTaxable = otherIncome + grossWithdrawal;
+    const totalTax = progressiveTax(combinedTaxable);
+    const taxOnOtherAlone = progressiveTax(otherIncome);
+    return Math.max(0, totalTax - taxOnOtherAlone);
+  }
+
+  function projectFlat(P, annualRate, years){
+    // no contributions, monthly compounding, single lump sum growing
+    const r = annualRate / 100 / 12;
+    const n = years * 12;
+    return P * Math.pow(1 + r, n);
+  }
+
+  // Simulates monthly: balance grows for the month, then a withdrawal of
+  // (withdrawalPct% of that month's balance) is taken out.
+  // Returns a snapshot {remaining, totalWithdrawn, annualWithdrawn, depletedMonth}
+  // at each requested month mark, where annualWithdrawn is the gross amount
+  // withdrawn in the 12 months leading up to that mark.
+  function simulateDrawdown(P, annualGrowthRate, monthlyWithdrawalPct, monthMarks){
+    const r = annualGrowthRate / 100 / 12;
+    const w = monthlyWithdrawalPct / 100;
+    const maxMonths = Math.max(...monthMarks);
+    let balance = P;
+    let totalWithdrawn = 0;
+    let depletedMonth = null;
+    const withdrawalsByMonth = [];
+    const snapshots = {};
+
+    for(let m = 1; m <= maxMonths; m++){
+      balance = balance * (1 + r);
+      const withdrawal = balance * w;
+      balance = Math.max(balance - withdrawal, 0);
+      totalWithdrawn += withdrawal;
+      withdrawalsByMonth.push(withdrawal);
+      if(balance <= 0 && depletedMonth === null){
+        depletedMonth = m;
+      }
+      if(monthMarks.includes(m)){
+        const start = Math.max(0, m - 12);
+        const annualWithdrawn = withdrawalsByMonth.slice(start, m).reduce((a,b) => a+b, 0);
+        snapshots[m] = { remaining: balance, totalWithdrawn, annualWithdrawn, depletedMonth };
+      }
+    }
+    return snapshots;
+  }
+
+  function calculateRetirement(){
+    const balance = parseFloat(retireBalanceEl.value) || 0;
+    const withdrawalPct = parseFloat(withdrawalPctEl.value) || 0;
+    const rate = parseFloat(retireRateEl.value) || 0;
+    const otherIncome = parseFloat(otherIncomeEl.value) || 0;
+    withdrawalPctDisplay.textContent = withdrawalPct.toFixed(2) + '%';
+    retireRateDisplay.textContent = rate.toFixed(1) + '%';
+
+    const firstMonthWithdrawal = balance * (1 + rate/100/12) * (withdrawalPct/100);
+    const annualEquivalent = 1 - Math.pow(1 - withdrawalPct/100, 12);
+    const year1GrossEstimate = firstMonthWithdrawal * 12;
+    const year1Tax = taxOnWithdrawal(year1GrossEstimate, otherIncome);
+    const year1Net = year1GrossEstimate - year1Tax;
+
+    const sumYear1NetMonthlyEl = document.getElementById('sumYear1NetMonthly');
+    sumBalance.textContent = fmt(balance);
+    sumFirstWithdrawal.textContent = fmt(firstMonthWithdrawal);
+    sumAnnualRate.textContent = (annualEquivalent * 100).toFixed(1) + '%';
+    sumYear1Tax.textContent = fmt(year1Tax);
+    sumYear1Net.textContent = fmt(year1Net);
+    sumYear1NetMonthlyEl.textContent = fmt(year1Net / 12);
+
+    const monthMarks = [120, 240, 360];
+    const snapshots = simulateDrawdown(balance, rate, withdrawalPct, monthMarks);
+
+    let anyDepleted = false;
+    retireResultsEl.innerHTML = '';
+
+    [10, 20, 30].forEach((y, i) => {
+      const m = monthMarks[i];
+      const snap = snapshots[m];
+      const remaining = snap.remaining;
+      const withdrawnSoFar = snap.totalWithdrawn;
+      const grossThisYear = snap.annualWithdrawn;
+      const taxThisYear = taxOnWithdrawal(grossThisYear, otherIncome);
+      const netThisYear = grossThisYear - taxThisYear;
+      if(snap.depletedMonth !== null) anyDepleted = true;
+
+      const pool = remaining + withdrawnSoFar;
+      const remainingPct = pool > 0 ? (remaining / pool) * 100 : 0;
+
+      const card = document.createElement('div');
+      card.className = 'year-card';
+      let depletedTag = '';
+      if(snap.depletedMonth !== null){
+        const depletedYears = (snap.depletedMonth / 12).toFixed(1);
+        depletedTag = `<div class="warning-note" style="margin:-8px 0 12px;">Depleted at year ${depletedYears}</div>`;
+      }
+      card.innerHTML = `
+        <div class="year-label"><span>Year</span><span class="n">${y}</span></div>
+        <div class="total">${fmt(remaining)}</div>
+        ${depletedTag}
+        <div class="bar"><div class="bar-growth" style="width:${remainingPct.toFixed(1)}%"></div></div>
+        <div class="breakdown">
+          <div class="row"><span><span class="dot growth"></span>Remaining balance</span><span class="val">${fmt(remaining)}</span></div>
+          <div class="row"><span><span class="dot principal"></span>Withdrawn to date</span><span class="val">${fmt(withdrawnSoFar)}</span></div>
+          <div class="row"><span>Gross withdrawal, this year</span><span class="val">${fmt(grossThisYear)}</span></div>
+          <div class="row"><span>Est. income tax (FBR)</span><span class="val">${fmt(taxThisYear)}</span></div>
+          <div class="row"><span>Net (after-tax), annual</span><span class="val">${fmt(netThisYear)}</span></div>
+          <div class="row"><span>Net (after-tax), monthly avg.</span><span class="val">${fmt(netThisYear/12)}</span></div>
+        </div>
+      `;
+      retireResultsEl.appendChild(card);
+    });
+
+    warningNote.style.display = anyDepleted ? 'block' : 'none';
+  }
+
+  // Pull a projected year-10/20/30 total from the first calculator into the retirement balance field
+  pullRow.addEventListener('click', (e) => {
+    const btn = e.target.closest('.pull-btn');
+    if(!btn) return;
+    const y = parseInt(btn.dataset.year, 10);
+    const P = parseFloat(initialEl.value) || 0;
+    const C = parseFloat(contributionEl.value) || 0;
+    const rate = parseFloat(rateEl.value) || 0;
+    const result = compounding === 'monthly'
+      ? projectMonthly(P, C, rate, y)
+      : projectAnnual(P, C, rate, y);
+    retireBalanceEl.value = Math.round(result.balance);
+    calculateRetirement();
+  });
+
+  [retireBalanceEl, withdrawalPctEl, retireRateEl, otherIncomeEl].forEach(el => {
+    el.addEventListener('input', calculateRetirement);
+  });
+
+  calculateRetirement();
+</script>
+</body>
+</html>
