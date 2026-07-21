@@ -57,7 +57,7 @@ This page provides a peak into the side projects I develop for aid in teaching a
 
 <div class="project-item">
   <a href="./projects/investment_calculator_pkr.html" target="_blank">
-    <!-- <img src="/assets/images/robot_planner.webp" alt="Comparison of Robot Path Planners"> -->
+    <img src="/assets/images/invest.jpg" alt="Investment Tool">
     <h3>Investment and Withdrawal Tool (NOT Financial Advice)</h3>
     </a>
 </div>
