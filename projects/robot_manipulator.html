@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mobile Manipulator Narrow-Passage Reach — PRM vs RRT vs RRT*</title>
+<style>
+  :root{
+    --bg:#f6f4ed;
+    --bg-alt:#efebe0;
+    --card:#fbfaf5;
+    --border:rgba(26,26,24,0.12);
+    --border-strong:rgba(26,26,24,0.22);
+    --text:#1f221d;
+    --text-dim:#5c6058;
+    --text-faint:#8a8d83;
+    --accent:#2c4a4a;
+    --accent-2:#93712f;
+    --accent-3:#375c78;
+    --danger:#8a3b2b;
+    --ok:#2f6b4f;
+    --mono:ui-monospace, 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    line-height:1.6;
+  }
+  .wrap{max-width:900px;margin:0 auto;padding:56px 24px 100px;}
+
+  header.hero{
+    padding-bottom:32px;
+    border-bottom:1px solid var(--border);
+    margin-bottom:44px;
+  }
+  .eyebrow{
+    display:block;
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent-2);
+    margin-bottom:14px;
+  }
+  h1{
+    font-size:2.05rem;
+    font-weight:600;
+    margin:0 0 14px;
+    letter-spacing:-0.01em;
+    color:var(--text);
+  }
+  .lede{
+    color:var(--text-dim);
+    font-size:1.02rem;
+    max-width:680px;
+    margin:0;
+  }
+  .meta-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:22px;
+  }
+  .chip{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--text-dim);
+    background:var(--card);
+    border:1px solid var(--border);
+    padding:5px 11px;
+    border-radius:3px;
+  }
+
+  section{margin-bottom:52px;}
+  h2{
+    font-size:1.25rem;
+    font-weight:600;
+    margin:0 0 8px;
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    color:var(--text);
+  }
+  h2 .num{
+    font-family:var(--mono);
+    font-size:.85rem;
+    font-weight:600;
+    color:var(--accent-2);
+  }
+  .section-intro{color:var(--text-dim);margin:0 0 22px;max-width:680px;font-size:.95rem;}
+
+  /* Stack grid */
+  .stack-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:1px;
+    background:var(--border);
+    border:1px solid var(--border);
+  }
+  .stack-card{
+    background:var(--card);
+    padding:16px 18px;
+  }
+  .stack-card .label{
+    font-family:var(--mono);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--accent-3);
+    margin-bottom:6px;
+  }
+  .stack-card .value{font-size:15px;font-weight:600;color:var(--text);}
+  .stack-card .sub{font-size:13px;color:var(--text-dim);margin-top:4px;}
+
+  /* Timeline */
+  .timeline{position:relative;padding-left:26px;}
+  .timeline::before{
+    content:'';
+    position:absolute;
+    left:5px;top:6px;bottom:6px;
+    width:1px;
+    background:var(--border-strong);
+  }
+  .t-item{position:relative;padding-bottom:26px;}
+  .t-item:last-child{padding-bottom:0;}
+  .t-dot{
+    position:absolute;
+    left:-26px;top:5px;
+    width:11px;height:11px;
+    border-radius:50%;
+    background:var(--bg);
+    border:1.5px solid var(--accent-2);
+  }
+  .t-card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:3px;
+    padding:16px 18px;
+  }
+  .t-card h3{margin:0 0 4px;font-size:1rem;font-weight:600;color:var(--text);}
+  .t-card .dur{font-family:var(--mono);font-size:11.5px;color:var(--accent-2);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;display:inline-block;}
+  .t-card p{margin:0;color:var(--text-dim);font-size:14px;}
+  .milestone-tag{
+    display:inline-block;
+    margin-top:10px;
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--accent);
+    border:1px solid var(--border-strong);
+    padding:2px 8px;
+    border-radius:3px;
+  }
+
+  /* Screenshot placeholders */
+  .shot-slot{
+    margin-top:14px;
+    border:1px dashed var(--border-strong);
+    border-radius:3px;
+    background:var(--bg-alt);
+    padding:26px 16px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    text-align:center;
+  }
+  .shot-slot svg{width:24px;height:24px;opacity:.5;}
+  .shot-slot svg *{stroke:var(--text-faint);}
+  .shot-slot .shot-caption{font-family:var(--mono);font-size:11.5px;font-weight:500;color:var(--text-dim);}
+  .shot-slot .shot-hint{font-size:11px;color:var(--text-faint);}
+  .shot-slot.hero-shot{padding:40px 16px;margin-top:26px;}
+
+  /* Milestone states */
+  .state-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+    gap:1px;
+    background:var(--border);
+    border:1px solid var(--border);
+  }
+  .state-card{
+    background:var(--card);
+    padding:16px 18px;
+  }
+  .state-card .status{
+    display:inline-block;
+    font-family:var(--mono);
+    font-size:10.5px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    padding:2px 8px;
+    border-radius:3px;
+    margin-bottom:10px;
+  }
+  .status.fail{color:var(--danger);border:1px solid var(--danger);}
+  .status.ok{color:var(--ok);border:1px solid var(--ok);}
+  .state-card .title{font-weight:600;font-size:14.5px;margin-bottom:4px;color:var(--text);}
+  .state-card .desc{color:var(--text-dim);font-size:13.5px;}
+
+  /* Planner comparison table */
+  .cmp-table{
+    width:100%;
+    border-collapse:collapse;
+    background:var(--card);
+    border:1px solid var(--border);
+    font-size:13.5px;
+  }
+  .cmp-table th, .cmp-table td{
+    padding:12px 14px;
+    border-bottom:1px solid var(--border);
+    text-align:left;
+    vertical-align:top;
+  }
+  .cmp-table thead th{
+    font-family:var(--mono);
+    font-size:11.5px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--accent-3);
+    border-bottom:1px solid var(--border-strong);
+  }
+  .cmp-table tbody th{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--text-dim);
+    white-space:nowrap;
+    width:150px;
+  }
+  .cmp-table tr:last-child td, .cmp-table tr:last-child th{border-bottom:none;}
+  .cmp-table td{color:var(--text-dim);}
+  .algo-name{color:var(--text);font-weight:600;}
+
+  .metrics-note{
+    margin-top:12px;
+    font-size:13px;
+    color:var(--text-faint);
+    font-family:var(--mono);
+  }
+
+  /* Wrinkles / substitution list */
+  .wrinkle-list{display:flex;flex-direction:column;gap:10px;}
+  .wrinkle{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-left:2px solid var(--accent-3);
+    border-radius:3px;
+    padding:14px 18px;
+  }
+  .wrinkle .title{font-weight:600;font-size:14.5px;margin-bottom:4px;color:var(--text);}
+  .wrinkle .desc{color:var(--text-dim);font-size:13.5px;}
+  code{
+    background:var(--bg-alt);
+    border:1px solid var(--border);
+    padding:1px 6px;
+    border-radius:3px;
+    font-family:var(--mono);
+    font-size:.88em;
+    color:var(--accent-2);
+  }
+
+  /* Future work */
+  .future-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+    gap:10px;
+  }
+  .future-card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-left:2px solid var(--accent-3);
+    border-radius:3px;
+    padding:14px 18px;
+  }
+  .future-card .title{font-weight:600;font-size:14.5px;margin-bottom:4px;color:var(--text);}
+  .future-card .desc{color:var(--text-dim);font-size:13.5px;}
+
+  .callout{
+    background:var(--bg-alt);
+    border:1px solid var(--border);
+    border-radius:3px;
+    padding:18px 20px;
+    color:var(--text-dim);
+    font-size:14.5px;
+  }
+  .callout strong{color:var(--text);}
+
+  footer{
+    border-top:1px solid var(--border);
+    padding-top:20px;
+    color:var(--text-faint);
+    font-family:var(--mono);
+    font-size:12px;
+  }
+
+  @media (max-width:600px){
+    .wrap{padding:36px 16px 80px;}
+    h1{font-size:1.6rem;}
+    .cmp-table{font-size:12.5px;}
+    .cmp-table th, .cmp-table td{padding:9px 8px;}
+    .cmp-table tbody th{width:auto;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <span class="eyebrow">ROS2 · Personal Robotics Project</span>
+    <h1>Mobile Manipulator: Reaching Through a Panel</h1>
+    <p class="lede">A narrow-passage motion planning task — dock a mobile base at a target panel, then thread the arm's end effector through a hole in that panel to a pose on the far side — used as a head-to-head test of PRM, RRT, and RRT*.</p>
+    <div class="meta-row">
+      <span class="chip">Duration: ~1 month</span>
+      <span class="chip">5 sessions × 2–3 hrs</span>
+      <span class="chip">No physical hardware</span>
+      <span class="chip">100% simulation (Gazebo)</span>
+    </div>
+    <div class="shot-slot hero-shot">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 7h3l2-2h6l2 2h3v12H4V7z" stroke-width="1.5" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.2" stroke-width="1.5"/></svg>
+      <span class="shot-caption">Screenshot — mobile manipulator docked at the panel</span>
+      <span class="shot-hint">Paste an image here</span>
+    </div>
+  </header>
+
+  <section>
+    <h2><span class="num">01</span>Tech Stack</h2>
+    <p class="section-intro">A ROS2-native stand-in for the KUKA youBot, with the same architecture: an independent mobile base and arm, planned through MoveIt2.</p>
+    <div class="stack-grid">
+      <div class="stack-card">
+        <div class="label">OS</div>
+        <div class="value">Ubuntu 24.04</div>
+        <div class="sub">Host platform</div>
+      </div>
+      <div class="stack-card">
+        <div class="label">ROS Distribution</div>
+        <div class="value">ROS2 Jazzy Jalisco</div>
+        <div class="sub">Latest, not yet LTS-mature</div>
+      </div>
+      <div class="stack-card">
+        <div class="label">Simulator</div>
+        <div class="value">Gazebo</div>
+        <div class="sub">Base, arm, and panel in one scene</div>
+      </div>
+      <div class="stack-card">
+        <div class="label">Robot Platform</div>
+        <div class="value">TurtleBot3 Waffle + OpenMANIPULATOR-X</div>
+        <div class="sub">Mobile base + independently-actuated arm</div>
+      </div>
+      <div class="stack-card">
+        <div class="label">Motion Planning</div>
+        <div class="value">MoveIt2 (OMPL plugin)</div>
+        <div class="sub">PRM, RRT, RRT* via one-line config swap</div>
+      </div>
+      <div class="stack-card">
+        <div class="label">Navigation</div>
+        <div class="value">Nav2</div>
+        <div class="sub">Docks the base in front of the panel</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">02</span>Five-Session Implementation Plan</h2>
+    <p class="section-intro">Each session is capped at two to three hours, ending with a head-to-head comparison rather than a single working demo.</p>
+    <div class="timeline">
+      <div class="t-item">
+        <div class="t-dot"></div>
+        <div class="t-card">
+          <span class="dur">Session 1</span>
+          <h3>Combined Base + Arm Setup</h3>
+          <p>Assemble the TurtleBot3 Waffle base and OpenMANIPULATOR-X arm into a single robot description, spawn it in Gazebo, and verify joint control plus MoveIt2 integration.</p>
+        </div>
+      </div>
+      <div class="t-item">
+        <div class="t-dot"></div>
+        <div class="t-card">
+          <span class="dur">Session 2</span>
+          <h3>Panel Geometry &amp; Docking</h3>
+          <p>Model the target panel and its hole as a collision object in the planning scene; use Nav2 to dock the base at a fixed pose in front of it.</p>
+          <div class="shot-slot">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 7h3l2-2h6l2 2h3v12H4V7z" stroke-width="1.5" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.2" stroke-width="1.5"/></svg>
+            <span class="shot-caption">Screenshot — panel with hole in the planning scene</span>
+            <span class="shot-hint">Paste an image here</span>
+          </div>
+        </div>
+      </div>
+      <div class="t-item">
+        <div class="t-dot"></div>
+        <div class="t-card">
+          <span class="dur">Session 3</span>
+          <h3>First End-to-End Reach</h3>
+          <p>Prove out one planner guiding the end effector through the hole to a pose on the far side — the point at which the panel's collision geometry gets validated for real.</p>
+          <span class="milestone-tag">Load-bearing milestone</span>
+          <div class="shot-slot">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 7h3l2-2h6l2 2h3v12H4V7z" stroke-width="1.5" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.2" stroke-width="1.5"/></svg>
+            <span class="shot-caption">Screenshot — end effector threading the hole</span>
+            <span class="shot-hint">Paste an image here</span>
+          </div>
+        </div>
+      </div>
+      <div class="t-item">
+        <div class="t-dot"></div>
+        <div class="t-card">
+          <span class="dur">Session 4</span>
+          <h3>Head-to-Head Planner Runs</h3>
+          <p>Run PRM, RRT, and RRT* multiple times each through the same hole, recording planning time, success rate, and path quality for every trial.</p>
+          <span class="milestone-tag">Core project milestone</span>
+          <div class="shot-slot">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 7h3l2-2h6l2 2h3v12H4V7z" stroke-width="1.5" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.2" stroke-width="1.5"/></svg>
+            <span class="shot-caption">Screenshot — RRT* path through the panel</span>
+            <span class="shot-hint">Paste an image here</span>
+          </div>
+        </div>
+      </div>
+      <div class="t-item">
+        <div class="t-dot"></div>
+        <div class="t-card">
+          <span class="dur">Session 5</span>
+          <h3>Analysis &amp; Write-Up</h3>
+          <p>Compare the three planners' actual measured behavior against what the theory predicts, and write up the results.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">03</span>The Load-Bearing Milestone: Panel Collision Geometry</h2>
+    <p class="section-intro">Everything downstream depends on the panel being modeled correctly in the planning scene. Get it wrong, and the planner either can't find a path that exists, or finds one that shouldn't.</p>
+    <div class="state-grid">
+      <div class="state-card">
+        <span class="status fail">Fails</span>
+        <div class="title">Panel ignored</div>
+        <div class="desc">The planner treats the space where the panel sits as free — paths are found, but they'd collide with the physical panel.</div>
+      </div>
+      <div class="state-card">
+        <span class="status fail">Fails</span>
+        <div class="title">Hole modeled as solid</div>
+        <div class="desc">The panel is a solid collision block with no opening — every planner reports no valid path exists, even though one does.</div>
+      </div>
+      <div class="state-card">
+        <span class="status ok">Succeeds</span>
+        <div class="title">Hole modeled correctly</div>
+        <div class="desc">The panel is solid except for a free-space opening sized to the end effector — the narrow-passage problem the planners are actually meant to solve.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">04</span>Head-to-Head: PRM vs RRT vs RRT*</h2>
+    <p class="section-intro">All three run through MoveIt2's OMPL plugin, so switching planners is a one-line configuration change — which is what makes a clean, controlled comparison possible.</p>
+    <table class="cmp-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th><span class="algo-name">PRM</span></th>
+          <th><span class="algo-name">RRT</span></th>
+          <th><span class="algo-name">RRT*</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>Approach</th>
+          <td>Builds a roadmap over the whole free space up front, then searches it for a path.</td>
+          <td>Grows a single tree outward from the start, biased toward the goal.</td>
+          <td>Grows a tree like RRT, but continually rewires it toward lower-cost paths.</td>
+        </tr>
+        <tr>
+          <th>Narrow-passage behavior</th>
+          <td>Tends to struggle — random sampling rarely places roadmap nodes inside a small opening.</td>
+          <td>Generally better — a directed, single-query search is more likely to find the one opening.</td>
+          <td>Same passage-finding behavior as RRT, plus ongoing refinement once a path is found.</td>
+        </tr>
+        <tr>
+          <th>Optimality</th>
+          <td>None — first valid roadmap path returned.</td>
+          <td>None — first valid path returned, not necessarily short.</td>
+          <td>Asymptotically optimal — path quality improves the longer it's given to plan.</td>
+        </tr>
+        <tr>
+          <th>Expected trade-off</th>
+          <td>Fast to reuse across queries, weak on this specific task.</td>
+          <td>Fast first success, no guarantee on path quality.</td>
+          <td>Best path quality, at the cost of planning time.</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="metrics-note">Recorded per trial: planning time · success rate · path quality</p>
+  </section>
+
+  <section>
+    <h2><span class="num">05</span>Standing In for the KUKA youBot</h2>
+    <p class="section-intro">The project is conceptually modeled on the youBot's mobile-base-plus-arm architecture, but built on hardware with active ROS2 support.</p>
+    <div class="wrinkle-list">
+      <div class="wrinkle">
+        <div class="title">No actively maintained ROS2 package for youBot</div>
+        <div class="desc">The original KUKA youBot driver stack targets ROS1 and isn't kept current for ROS2, ruling it out as the simulated platform.</div>
+      </div>
+      <div class="wrinkle">
+        <div class="title">TurtleBot3 Waffle + OpenMANIPULATOR-X as the substitute</div>
+        <div class="desc">Same architecture — an independently-actuated arm mounted on a mobile differential-drive base — with first-class ROS2 and MoveIt2 support.</div>
+      </div>
+      <div class="wrinkle">
+        <div class="title">Architecture matters more than the exact hardware</div>
+        <div class="desc">The planning problem (base navigation, then constrained arm reach) is what's being tested, not the specific robot — any ROS2-native mobile manipulator would surface the same narrow-passage behavior.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">06</span>Future Work — Extending the Project</h2>
+    <p class="section-intro">Natural directions once the base comparison and write-up are done.</p>
+    <div class="future-grid">
+      <div class="future-card">
+        <div class="title">Constrained planning (CBIRRT / TrajOpt)</div>
+        <div class="desc">Add a fourth planner family that handles the narrow passage via explicit constraints rather than pure sampling, and compare it against the sampling-based trio.</div>
+      </div>
+      <div class="future-card">
+        <div class="title">Base + arm joint planning</div>
+        <div class="desc">Plan base and arm motion together instead of docking first, letting small base adjustments open up easier reach geometry.</div>
+      </div>
+      <div class="future-card">
+        <div class="title">Variable hole sizes and offsets</div>
+        <div class="desc">Sweep the hole's size and position to find where each planner's success rate actually breaks down, rather than testing a single fixed geometry.</div>
+      </div>
+      <div class="future-card">
+        <div class="title">Sim-to-real transfer</div>
+        <div class="desc">Rebuild the panel physically and repeat the comparison on real TurtleBot3 + OpenMANIPULATOR-X hardware.</div>
+      </div>
+      <div class="future-card">
+        <div class="title">Vision-based hole localization</div>
+        <div class="desc">Replace the fixed, known panel pose with a camera-based detector so the base docks relative to a hole it has to find first.</div>
+      </div>
+      <div class="future-card">
+        <div class="title">Learned planner warm-starts</div>
+        <div class="desc">Train a model on the recorded trials to propose an initial path for RRT* to refine, and measure whether it shortens planning time.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="callout">
+    <strong>Takeaway:</strong> a narrow passage is a stress test, not a corner case — it's the cleanest way to see the actual difference between roadmap-based, tree-based, and optimization-based planning instead of just reading about it.
+  </div>
+
+  <footer>
+    ROS2 Jazzy Jalisco · Gazebo · TurtleBot3 Waffle + OpenMANIPULATOR-X · MoveIt2 (OMPL) — Project implementation overview
+  </footer>
+
+</div>
+</body>
+</html>
