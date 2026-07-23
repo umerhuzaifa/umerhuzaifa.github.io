@@ -334,6 +334,61 @@
     font-size:12px;
     margin-top:10px;
   }
+
+  /* Charts */
+  .chart-panel{
+    background:var(--paper-raised);
+    border:1px solid var(--rule);
+    border-radius:2px;
+    padding:24px 26px 12px;
+    margin-top:24px;
+  }
+  .chart-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:8px;
+  }
+  .chart-title{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+  }
+  .chart-legend{
+    display:flex;
+    gap:16px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+  }
+  .chart-legend .legend-item{
+    display:flex;
+    align-items:center;
+  }
+  .chart-legend .dot{
+    display:inline-block;
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    margin-right:6px;
+  }
+  .chart-legend .dash{
+    display:inline-block;
+    width:14px;
+    height:0;
+    border-top:2px dashed var(--principal);
+    margin-right:6px;
+  }
+  .chart-svg{
+    display:block;
+    width:100%;
+    height:auto;
+    cursor:crosshair;
+  }
 </style>
 </head>
 <body>
@@ -381,6 +436,17 @@
     <div class="results" id="results">
       <!-- year cards injected by JS -->
     </div>
+  </div>
+
+  <div class="chart-panel">
+    <div class="chart-header">
+      <span class="chart-title">Balance over time</span>
+      <div class="chart-legend">
+        <span class="legend-item"><span class="dot growth"></span>Total balance</span>
+        <span class="legend-item"><span class="dash"></span>Contributed</span>
+      </div>
+    </div>
+    <svg id="investChart" class="chart-svg" viewBox="0 0 900 320" preserveAspectRatio="xMidYMid meet"></svg>
   </div>
 
   <p class="footnote">Assumes contributions are made monthly and growth compounds monthly (unless "At year-end" is selected, which compounds annually). Figures are illustrative projections, not guarantees — actual returns vary.</p>
@@ -446,6 +512,17 @@
       <div class="results" id="retireResults">
         <!-- year cards injected by JS -->
       </div>
+
+      <div class="chart-panel">
+        <div class="chart-header">
+          <span class="chart-title">Balance over time</span>
+          <div class="chart-legend">
+            <span class="legend-item"><span class="dot growth"></span>Remaining balance</span>
+            <span class="legend-item"><span class="dash"></span>Withdrawn to date</span>
+          </div>
+        </div>
+        <svg id="drawdownChart" class="chart-svg" viewBox="0 0 900 320" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
     </div>
   </div>
 
@@ -474,6 +551,226 @@
   function fmt(n){
     const rounded = Math.round(n);
     return 'Rs ' + rounded.toLocaleString('en-IN', {maximumFractionDigits:0});
+  }
+
+  // ---- Chart utilities (shared by both calculators) ----
+  const CHART_COLORS = {
+    growth: '#3c6e4a',
+    principal: '#a99a6b',
+    depleted: '#8a3b2b',
+    ink: '#1f2a22',
+    inkSoft: '#55604f',
+    rule: '#c9c0a8',
+    paperRaised: '#f4f1e8'
+  };
+
+  // Compact rupee labels for axis ticks: Rs 1.2Cr, Rs 8.5L, Rs 500
+  function fmtCompact(n){
+    const sign = n < 0 ? '-' : '';
+    const abs = Math.abs(n);
+    if(abs >= 1e7) return sign + 'Rs ' + trimZero(abs/1e7) + 'Cr';
+    if(abs >= 1e5) return sign + 'Rs ' + trimZero(abs/1e5) + 'L';
+    if(abs >= 1e3) return sign + 'Rs ' + trimZero(abs/1e3) + 'K';
+    return sign + 'Rs ' + Math.round(abs);
+  }
+  function trimZero(n){
+    return n.toFixed(1).replace(/\.0$/, '');
+  }
+
+  // "Nice numbers for graph labels" (Heckbert). Produces round-looking
+  // axis bounds/steps regardless of the raw data range.
+  function niceNumber(range, round){
+    if(range === 0) return 0;
+    const exponent = Math.floor(Math.log10(range));
+    const fraction = range / Math.pow(10, exponent);
+    let niceFraction;
+    if(round){
+      if(fraction < 1.5) niceFraction = 1;
+      else if(fraction < 3) niceFraction = 2;
+      else if(fraction < 7) niceFraction = 5;
+      else niceFraction = 10;
+    } else {
+      if(fraction <= 1) niceFraction = 1;
+      else if(fraction <= 2) niceFraction = 2;
+      else if(fraction <= 5) niceFraction = 5;
+      else niceFraction = 10;
+    }
+    return niceFraction * Math.pow(10, exponent);
+  }
+
+  function niceScale(min, max, maxTicks){
+    if(min === max){ max = min + Math.max(1, Math.abs(min) * 0.1); }
+    const range = niceNumber(max - min, false);
+    const step = niceNumber(range / (maxTicks - 1), true) || 1;
+    const niceMin = Math.floor(min / step) * step;
+    const niceMax = Math.ceil(max / step) * step;
+    const ticks = [];
+    for(let v = niceMin; v <= niceMax + step * 1e-6; v += step){
+      ticks.push(Math.round(v * 100) / 100);
+    }
+    return { min: niceMin, max: niceMax, step, ticks };
+  }
+
+  function escAttr(v){ return String(v); }
+  function escXML(v){
+    return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  // Holds the current scales/series for each chart so the hover handler
+  // (attached once) can always read the latest render.
+  const chartRegistry = {};
+
+  // Renders a multi-series line/area chart into the <svg id="svgId">.
+  // years: array of x-axis year values (e.g. [0,1,2,...,30])
+  // series: [{ data:[...], color, dashed(bool), area(bool), label }]
+  // markerYears: years to draw an emphasis dot on (matches the year cards)
+  // eventMarker: optional { year, label } for a vertical annotation (e.g. depletion)
+  function renderChart(svgId, series, years, markerYears, eventMarker){
+    const svg = document.getElementById(svgId);
+    if(!svg) return;
+
+    const W = 900, H = 320;
+    const mL = 74, mR = 24, mT = 22, mB = 40;
+    const plotW = W - mL - mR, plotH = H - mT - mB;
+
+    const allValues = series.flatMap(s => s.data);
+    const rawMin = Math.min(0, ...allValues);
+    const rawMax = Math.max(...allValues, 1);
+    const scale = niceScale(rawMin, rawMax, 5);
+
+    const xMin = years[0], xMax = years[years.length - 1];
+    const xScale = x => mL + (xMax === xMin ? 0 : (x - xMin) / (xMax - xMin) * plotW);
+    const yScale = y => mT + plotH - (scale.max === scale.min ? 0 : (y - scale.min) / (scale.max - scale.min) * plotH);
+    const baseline = yScale(Math.min(Math.max(scale.min, 0), scale.max));
+
+    let gridSVG = '';
+    scale.ticks.forEach(t => {
+      const yy = yScale(t);
+      gridSVG += `<line x1="${mL}" y1="${yy.toFixed(1)}" x2="${W - mR}" y2="${yy.toFixed(1)}" stroke="${CHART_COLORS.rule}" stroke-width="1" stroke-dasharray="2,3"/>`;
+      gridSVG += `<text x="${mL - 10}" y="${(yy + 4).toFixed(1)}" text-anchor="end" font-family="'IBM Plex Mono', monospace" font-size="11" fill="${CHART_COLORS.inkSoft}">${fmtCompact(t)}</text>`;
+    });
+
+    // x-axis ticks: aim for ~6-8 labels across the range
+    const span = xMax - xMin;
+    let xStep = niceNumber(span / 6, true) || 1;
+    if(xStep < 1) xStep = 1;
+    let xSVG = '';
+    for(let x = xMin; x <= xMax + 1e-6; x += xStep){
+      const xx = xScale(x);
+      xSVG += `<line x1="${xx.toFixed(1)}" y1="${mT}" x2="${xx.toFixed(1)}" y2="${H - mB}" stroke="${CHART_COLORS.rule}" stroke-width="1" stroke-dasharray="2,3" opacity="0.5"/>`;
+      xSVG += `<text x="${xx.toFixed(1)}" y="${H - mB + 22}" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="11" fill="${CHART_COLORS.inkSoft}">${Math.round(x)}y</text>`;
+    }
+
+    const axisSVG = `<line x1="${mL}" y1="${(H - mB).toFixed(1)}" x2="${W - mR}" y2="${(H - mB).toFixed(1)}" stroke="${CHART_COLORS.ink}" stroke-width="1.5"/>
+      <line x1="${mL}" y1="${mT}" x2="${mL}" y2="${(H - mB).toFixed(1)}" stroke="${CHART_COLORS.ink}" stroke-width="1.5"/>`;
+
+    let seriesSVG = '';
+    series.forEach(s => {
+      const linePts = years.map((yr, i) => `${xScale(yr).toFixed(1)},${yScale(s.data[i]).toFixed(1)}`).join(' ');
+      if(s.area){
+        const areaPts = `${xScale(years[0]).toFixed(1)},${baseline.toFixed(1)} ${linePts} ${xScale(years[years.length - 1]).toFixed(1)},${baseline.toFixed(1)}`;
+        seriesSVG += `<polygon points="${areaPts}" fill="${s.color}" opacity="0.13"/>`;
+      }
+      seriesSVG += `<polyline points="${linePts}" fill="none" stroke="${s.color}" stroke-width="2.5" ${s.dashed ? 'stroke-dasharray="6,4"' : ''} stroke-linejoin="round" stroke-linecap="round"/>`;
+      (markerYears || []).forEach(my => {
+        const idx = years.indexOf(my);
+        if(idx >= 0){
+          seriesSVG += `<circle cx="${xScale(my).toFixed(1)}" cy="${yScale(s.data[idx]).toFixed(1)}" r="4" fill="${s.color}" stroke="${CHART_COLORS.paperRaised}" stroke-width="1.5"/>`;
+        }
+      });
+    });
+
+    let eventSVG = '';
+    if(eventMarker && eventMarker.year >= xMin && eventMarker.year <= xMax){
+      const ex = xScale(eventMarker.year);
+      eventSVG = `<line x1="${ex.toFixed(1)}" y1="${mT}" x2="${ex.toFixed(1)}" y2="${(H - mB).toFixed(1)}" stroke="${CHART_COLORS.depleted}" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <text x="${ex.toFixed(1)}" y="${mT - 8}" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="11" fill="${CHART_COLORS.depleted}">${eventMarker.label}</text>`;
+    }
+
+    svg.innerHTML = `<g class="chart-base">${gridSVG}${xSVG}${axisSVG}${seriesSVG}${eventSVG}</g><g class="chart-hover" style="display:none;"></g>`;
+
+    chartRegistry[svgId] = {
+      years, series, xMin, xMax, mL, mR, mT, mB, W, H, plotW, plotH,
+      xScale, yScale
+    };
+    attachHoverHandlers(svgId);
+  }
+
+  // ---- Chart hover interactivity ----
+  function attachHoverHandlers(svgId){
+    const svg = document.getElementById(svgId);
+    if(!svg || svg.dataset.hoverAttached) return;
+    svg.dataset.hoverAttached = '1';
+
+    function handleMove(clientX, clientY){
+      const reg = chartRegistry[svgId];
+      const ctm = svg.getScreenCTM();
+      if(!reg || !ctm) return;
+      const pt = svg.createSVGPoint();
+      pt.x = clientX;
+      pt.y = clientY;
+      const svgP = pt.matrixTransform(ctm.inverse());
+      if(svgP.x < reg.mL || svgP.x > reg.W - reg.mR || svgP.y < reg.mT || svgP.y > reg.H - reg.mB){
+        hideHover(svgId);
+        return;
+      }
+      const yearFloat = reg.xMin + (svgP.x - reg.mL) / reg.plotW * (reg.xMax - reg.xMin);
+      let idx = Math.round(yearFloat - reg.xMin);
+      idx = Math.max(0, Math.min(reg.years.length - 1, idx));
+      drawHover(svgId, idx);
+    }
+
+    svg.addEventListener('mousemove', e => handleMove(e.clientX, e.clientY));
+    svg.addEventListener('mouseleave', () => hideHover(svgId));
+    svg.addEventListener('touchstart', e => {
+      if(e.touches[0]) handleMove(e.touches[0].clientX, e.touches[0].clientY);
+    }, {passive:true});
+    svg.addEventListener('touchmove', e => {
+      if(e.touches[0]){ handleMove(e.touches[0].clientX, e.touches[0].clientY); e.preventDefault(); }
+    }, {passive:false});
+    svg.addEventListener('touchend', () => hideHover(svgId));
+  }
+
+  function drawHover(svgId, idx){
+    const svg = document.getElementById(svgId);
+    const reg = chartRegistry[svgId];
+    if(!svg || !reg) return;
+    const hoverG = svg.querySelector('.chart-hover');
+    if(!hoverG) return;
+
+    const year = reg.years[idx];
+    const x = reg.xScale(year);
+
+    let content = `<line x1="${x.toFixed(1)}" y1="${reg.mT}" x2="${x.toFixed(1)}" y2="${(reg.H - reg.mB).toFixed(1)}" stroke="${CHART_COLORS.ink}" stroke-width="1" stroke-dasharray="3,3" opacity="0.55"/>`;
+
+    reg.series.forEach(s => {
+      const val = s.data[idx];
+      const cy = reg.yScale(val);
+      content += `<circle cx="${x.toFixed(1)}" cy="${cy.toFixed(1)}" r="5" fill="${s.color}" stroke="${CHART_COLORS.paperRaised}" stroke-width="1.5"/>`;
+    });
+
+    const lines = [`Year ${year}`, ...reg.series.map(s => `${s.label}:  ${fmt(s.data[idx])}`)];
+    const boxW = 200, lineH = 18, padY = 10, padX = 12;
+    const boxH = padY * 2 + lineH * lines.length - 4;
+    let boxX = x + 14;
+    if(boxX + boxW > reg.W - reg.mR) boxX = x - boxW - 14;
+    const boxY = reg.mT + 6;
+
+    content += `<rect x="${boxX.toFixed(1)}" y="${boxY.toFixed(1)}" width="${boxW}" height="${boxH}" rx="3" fill="${CHART_COLORS.paperRaised}" stroke="${CHART_COLORS.rule}" stroke-width="1"/>`;
+    lines.forEach((line, i) => {
+      const isTitle = i === 0;
+      content += `<text x="${(boxX + padX).toFixed(1)}" y="${(boxY + padY + lineH * i + 10).toFixed(1)}" font-family="'IBM Plex Mono', monospace" font-size="12" font-weight="${isTitle ? 600 : 400}" fill="${isTitle ? CHART_COLORS.ink : CHART_COLORS.inkSoft}">${escXML(line)}</text>`;
+    });
+
+    hoverG.style.display = 'block';
+    hoverG.innerHTML = content;
+  }
+
+  function hideHover(svgId){
+    const svg = document.getElementById(svgId);
+    if(!svg) return;
+    const hoverG = svg.querySelector('.chart-hover');
+    if(hoverG){ hoverG.style.display = 'none'; hoverG.innerHTML = ''; }
   }
 
   function projectMonthly(P, monthlyContribution, annualRate, years){
@@ -532,6 +829,24 @@
       `;
       resultsEl.appendChild(card);
     });
+
+    // Build a full 0-30 year series for the chart (adaptive y-axis handled in renderChart)
+    const chartMaxYears = 30;
+    const chartYears = [];
+    const balanceSeries = [];
+    const contributedSeries = [];
+    for(let y = 0; y <= chartMaxYears; y++){
+      const r = compounding === 'monthly'
+        ? projectMonthly(P, C, rate, y)
+        : projectAnnual(P, C, rate, y);
+      chartYears.push(y);
+      balanceSeries.push(r.balance);
+      contributedSeries.push(r.contributed);
+    }
+    renderChart('investChart', [
+      { data: contributedSeries, color: CHART_COLORS.principal, dashed: true, area: false, label: 'Contributed' },
+      { data: balanceSeries, color: CHART_COLORS.growth, dashed: false, area: true, label: 'Total balance' }
+    ], chartYears, years);
   }
 
   [initialEl, contributionEl, rateEl].forEach(el => {
@@ -654,14 +969,18 @@
     sumYear1Net.textContent = fmt(year1Net);
     sumYear1NetMonthlyEl.textContent = fmt(year1Net / 12);
 
-    const monthMarks = [120, 240, 360];
+    // Simulate at every year mark (1..30) so the chart gets a full curve
+    // and the year cards can pull their snapshot from the same run.
+    const chartMaxYears = 30;
+    const monthMarks = [];
+    for(let y = 1; y <= chartMaxYears; y++) monthMarks.push(y * 12);
     const snapshots = simulateDrawdown(balance, rate, withdrawalPct, monthMarks);
 
     let anyDepleted = false;
     retireResultsEl.innerHTML = '';
 
-    [10, 20, 30].forEach((y, i) => {
-      const m = monthMarks[i];
+    [10, 20, 30].forEach((y) => {
+      const m = y * 12;
       const snap = snapshots[m];
       const remaining = snap.remaining;
       const withdrawnSoFar = snap.totalWithdrawn;
@@ -698,6 +1017,28 @@
     });
 
     warningNote.style.display = anyDepleted ? 'block' : 'none';
+
+    // Build the 0-30 year chart series (year 0 = balance at retirement, nothing withdrawn yet)
+    const chartYears = [0];
+    const remainingSeries = [balance];
+    const withdrawnSeries = [0];
+    let depletedYear = null;
+    for(let y = 1; y <= chartMaxYears; y++){
+      const snap = snapshots[y * 12];
+      chartYears.push(y);
+      remainingSeries.push(snap.remaining);
+      withdrawnSeries.push(snap.totalWithdrawn);
+      if(snap.depletedMonth !== null && depletedYear === null){
+        depletedYear = snap.depletedMonth / 12;
+      }
+    }
+    const eventMarker = depletedYear !== null
+      ? { year: Math.round(depletedYear * 10) / 10, label: 'Depleted' }
+      : null;
+    renderChart('drawdownChart', [
+      { data: withdrawnSeries, color: CHART_COLORS.principal, dashed: true, area: false, label: 'Withdrawn to date' },
+      { data: remainingSeries, color: CHART_COLORS.growth, dashed: false, area: true, label: 'Remaining balance' }
+    ], chartYears, [10, 20, 30], eventMarker);
   }
 
   // Pull a projected year-10/20/30 total from the first calculator into the retirement balance field
