@@ -13,10 +13,10 @@
     {% include head-custom.html %}
     {% include mathjax.html %}
     <style>
-         /* Navigation Bar Styles */
+      /* Navigation Bar Styles */
       .top-nav {
-        background-color: #3C3489;
-        border-bottom: 1px solid #D9D6CC;
+        background-color: #fff;
+        border-bottom: 1px solid #e1e4e8;
         padding: 0;
         position: fixed;
         top: 0;
@@ -49,7 +49,7 @@
       }
 
       .nav-menu a {
-        color: #EEEDFE;
+        color: #222;
         text-decoration: none;
         font-size: 1em;
         font-weight: 500;
@@ -60,12 +60,12 @@
       }
 
       .nav-menu a:hover {
-        color: #FFFFFF;
-        background-color: rgba(255,255,255,0.14);
+        color: #0366d6;
+        background-color: #f6f8fa;
       }
 
       .nav-menu a.active {
-        color: #F0997B;
+        color: #0366d6;
         font-weight: 600;
       }
 
@@ -76,20 +76,64 @@
         border: none;
         font-size: 1.5em;
         cursor: pointer;
-        color: #EEEDFE;
+        color: #222;
         padding: 5px;
       }
+
+      /* Adjust body to account for fixed nav */
+      body {
+        padding-top: 60px;
+      }
+
+      @media (max-width: 768px) {
+        .nav-toggle {
+          display: block;
+        }
+
+        .nav-menu {
+          position: fixed;
+          top: 60px;
+          left: 0;
+          right: 0;
+          background-color: #fff;
+          flex-direction: column;
+          gap: 0;
+          padding: 10px 0;
+          border-bottom: 1px solid #e1e4e8;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+          display: none;
+        }
+
+        .nav-menu.active {
+          display: flex;
+        }
+
+        .nav-menu li {
+          width: 100%;
+        }
+
+        .nav-menu a {
+          padding: 15px 20px;
+          border-radius: 0;
+        }
+
+        .nav-container {
+          justify-content: space-between;
+        }
+      }
+
+      /* Existing styles */
       .recent-news {
         margin-top: 50px;
         margin-bottom: 50px;
         padding-bottom: 30px;
-        border-bottom: 1px solid #D9D6CC;
+        border-bottom: 1px solid #e1e4e8;
       }
 
       .recent-news h2 {
         font-size: 1.5em;
         margin-bottom: 20px;
-        color: #2C2C2A;
+        color: #222;
       }
 
       .recent-news ul {
@@ -103,23 +147,23 @@
       }
 
       .recent-news li a {
-        color: #2C2C2A;
+        color: #222;
         text-decoration: none;
         font-weight: 500;
       }
 
       .recent-news li a:hover {
-        color: #3C3489;
+        color: #0366d6;
       }
 
       .recent-news .item-date {
-        color: #5F5E5A;
+        color: #586069;
         font-size: 0.9em;
         margin-left: 8px;
       }
 
       .year-section {
-        margin-bottom: 10px;
+        margin-bottom: 60px;
       }
 
       .year-header {
@@ -127,31 +171,15 @@
         font-weight: 300;
         margin-bottom: 30px;
         margin-top: 50px;
-        color: #2C2C2A;
-      }
-
-      .news-list {
-        list-style-type: none;
-        padding-left: 20px;
-        margin: 0;
+        color: #222;
       }
 
       .news-item {
-        display: list-item;
-        margin-bottom: 4px;
-        padding-bottom: 4px;
-      }
-
-      .news-item::before {
-        content: "★";
-        color: #D85A30;
-        display: inline-block;
-        width: 1.2em;
-        margin-left: -1.2em;
-      }
-
-      .news-item .news-title {
-        display: inline;
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
       }
 
       .news-title {
@@ -162,18 +190,18 @@
       .news-title a {
         font-size: 1.1em;
         font-weight: 600;
-        color: #2C2C2A;
+        color: #222;
         text-decoration: none;
         transition: color 0.2s ease;
       }
 
       .news-title a:hover {
-        color: #3C3489;
+        color: #0366d6;
       }
 
       .news-date {
         white-space: nowrap;
-        color: #5F5E5A;
+        color: #586069;
         font-size: 0.95em;
         min-width: 150px;
         text-align: right;
@@ -204,7 +232,7 @@
         <button class="nav-toggle" aria-label="Toggle navigation">
           ☰
         </button>
-          <ul class="nav-menu" id="navMenu">
+        <ul class="nav-menu" id="navMenu">
           <li><a href="{{ "/news.html" | relative_url }}" {% if page.url contains "news.html" %}class="active"{% endif %}>News</a></li>
           <li><a href="{{ "/research.html" | relative_url }}" {% if page.url contains "research.html" %}class="active"{% endif %}>Research</a></li>
           <li><a href="{{ "/publications.html" | relative_url }}" {% if page.url contains "publications.html" %}class="active"{% endif %}>Publications</a></li>
@@ -213,13 +241,14 @@
         </ul>
       </div>
     </nav>
+
     <div class="wrapper">
       <header>
-        <h1><a href="{{ "/" | absolute_url }}">{{ site.title | default: site.github.repository_name }}</a></h1>        
+        <h1><a href="{{ "/" | absolute_url }}">{{ site.title | default: site.github.repository_name }}</a></h1>
         {% if page.logo %}
-          <img src="{{ page.logo | relative_url }}" alt="Logo" style="max-width: 200px; margin: 20px auto; display: block;" />
+          <img src="{{ page.logo | relative_url }}" alt="Logo" style="max-width: 250px; margin: 20px auto; display: block;" />
         {% elsif site.logo %}
-          <img src="{{ site.logo | relative_url }}" alt="Logo" style="max-width: 200px; margin: 20px auto; display: block;" />
+          <img src="{{ site.logo | relative_url }}" alt="Logo" style="max-width: 400px; margin: 20px auto; display: block;" />
         {% endif %}
 
         <p>{{ site.description | default: site.github.project_tagline }}</p>
@@ -227,10 +256,6 @@
         {% if site.github.is_project_page %}
         <p class="view"><a href="{{ site.github.repository_url }}">View the Project on GitHub <small>{{ site.github.repository_nwo }}</small></a></p>
         {% endif %}
-
-        <!-- {% if site.github.is_user_page %}
-        <p class="view"><a href="{{ site.github.owner_url }}">View My GitHub Profile</a></p>
-        {% endif %} -->
 
         {% if site.show_downloads %}
         <ul class="downloads">
@@ -240,35 +265,26 @@
         </ul>
         {% endif %}
       </header>
+
       <section>
+        {{ content }}
 
-      <h1>{{ page.title }}</h1>
-
-      <!-- Full News Archive by Year -->
-      <div class="news-container">
-        {% assign posts_by_year = site.posts | group_by_exp: "post", "post.date | date: '%Y'" %}
-        
-        {% for year in posts_by_year %}
-          <div class="year-section">
-            <!-- <h2 class="year-header">{{ year.name }}</h2> -->
-
-            <ul class="news-list">
-              {% for post in year.items %}
-                <li class="news-item">
-                  <div class="news-title">
-                    <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-                  </div>
-                  <!-- <div class="news-date">
-                    {{ post.date | date: "%B %-d, %Y" }}
-                  </div> -->
+        <!-- News Section -->
+        <div class="news-container">
+          <!-- Recent News Section -->
+          <div class="recent-news">
+            <h2>Recent News</h2>
+            <ul>
+              {% for post in site.posts limit:10 %}
+                <li>
+                  <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+                  <span class="item-date">{{ post.date | date: "%b %d, %Y" }}</span>
                 </li>
               {% endfor %}
             </ul>
           </div>
-        {% endfor %}
-      </div>
-
-      </section>
+        </div> <!-- close news-container -->
+      </section> <!-- close section -->
 
       <!-- <footer>
         {% if site.github.is_project_page %}
@@ -277,6 +293,24 @@
         <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
       </footer> -->
     </div>
+
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
+    <script>
+      const navToggle = document.querySelector('.nav-toggle');
+      const navMenu = document.getElementById('navMenu');
+
+      if (navToggle) {
+        navToggle.addEventListener('click', function() {
+          navMenu.classList.toggle('active');
+        });
+
+        document.addEventListener('click', function(event) {
+          const isClickInside = navToggle.contains(event.target) || navMenu.contains(event.target);
+          if (!isClickInside && navMenu.classList.contains('active')) {
+            navMenu.classList.remove('active');
+          }
+        });
+      }
+    </script>
   </body>
 </html>

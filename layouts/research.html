@@ -15,8 +15,8 @@
     <style>
       /* Navigation Bar Styles */
       .top-nav {
-        background-color: #3C3489;
-        border-bottom: 1px solid #D9D6CC;
+        background-color: #fff;
+        border-bottom: 1px solid #e1e4e8;
         padding: 0;
         position: fixed;
         top: 0;
@@ -49,7 +49,7 @@
       }
 
       .nav-menu a {
-        color: #EEEDFE;
+        color: #222;
         text-decoration: none;
         font-size: 1em;
         font-weight: 500;
@@ -60,29 +60,187 @@
       }
 
       .nav-menu a:hover {
-        color: #FFFFFF;
-        background-color: rgba(255,255,255,0.14);
+        color: #0366d6;
+        background-color: #f6f8fa;
       }
 
       .nav-menu a.active {
-        color: #F0997B;
+        color: #0366d6;
         font-weight: 600;
       }
 
-      /* Mobile Menu Toggle */
       .nav-toggle {
         display: none;
         background: none;
         border: none;
         font-size: 1.5em;
         cursor: pointer;
-        color: #EEEDFE;
+        color: #222;
         padding: 5px;
       }
 
-      /* Adjust body to account for fixed nav */
       body {
         padding-top: 60px;
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      }
+
+      .wrapper {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 20px;
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 50px;
+      }
+
+      header h1 {
+        font-size: 2.5em;
+        font-weight: 300;
+        color: #222;
+        margin-bottom: 10px;
+      }
+
+      header h1 a {
+        color: #222;
+        text-decoration: none;
+      }
+
+      /* Tiles Grid */
+      .tiles-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+        margin-bottom: 60px;
+      }
+
+      .tile {
+        background: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        cursor: pointer;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .tile:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      }
+
+      .tile-image-container {
+        overflow: hidden;
+        height: 200px;
+      }
+
+      .tile-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+      }
+
+      .tile:hover .tile-image {
+        transform: scale(1.1);
+      }
+
+      .tile-content {
+        padding: 20px;
+        text-align: center;
+      }
+
+      .tile-title {
+        font-size: 1.3em;
+        font-weight: 600;
+        color: #222;
+        margin: 0;
+        transition: font-size 0.3s ease, color 0.3s ease;
+      }
+
+      .tile:hover .tile-title {
+        font-size: 1.5em;
+        color: #0366d6;
+      }
+
+      /* Expandable Details */
+      .tile-details {
+        max-height: 0;
+        overflow: hidden;
+        background: #f6f8fa;
+        border-top: 1px solid #e1e4e8;
+        transition: max-height 0.4s ease, padding 0.4s ease;
+        padding: 0 20px;
+      }
+
+      .tile-details.active {
+        max-height: 600px;
+        padding: 20px;
+      }
+
+      .details-content {
+        color: #586069;
+        line-height: 1.6;
+      }
+
+      .details-content p {
+        margin-bottom: 15px;
+        color: #222;
+      }
+
+      .publications-list {
+        margin-top: 15px;
+        padding-left: 20px;
+      }
+
+      .publications-list li {
+        margin-bottom: 8px;
+        color: #222;
+      }
+
+      .publications-list a {
+        color: #0366d6;
+        text-decoration: none;
+      }
+
+      .publications-list a:hover {
+        text-decoration: underline;
+      }
+
+      /* Content Section */
+      section {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      section h2 {
+        font-size: 1.8em;
+        font-weight: 600;
+        color: #222;
+        margin-top: 40px;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #e1e4e8;
+        padding-bottom: 10px;
+      }
+
+      section ul {
+        list-style-type: none;
+        padding-left: 0;
+      }
+
+      section li {
+        padding: 8px 0;
+        color: #222;
+        font-size: 1.05em;
+      }
+
+      footer {
+        text-align: center;
+        margin-top: 60px;
+        padding: 30px 0;
+        border-top: 1px solid #e1e4e8;
+        color: #586069;
       }
 
       @media (max-width: 768px) {
@@ -95,11 +253,11 @@
           top: 60px;
           left: 0;
           right: 0;
-          background-color: #3C3489;
+          background-color: #fff;
           flex-direction: column;
           gap: 0;
           padding: 10px 0;
-          border-bottom: 1px solid #D9D6CC;
+          border-bottom: 1px solid #e1e4e8;
           box-shadow: 0 4px 6px rgba(0,0,0,0.05);
           display: none;
         }
@@ -127,13 +285,13 @@
         margin-top: 50px;
         margin-bottom: 50px;
         padding-bottom: 30px;
-        border-bottom: 1px solid #D9D6CC;
+        border-bottom: 1px solid #e1e4e8;
       }
 
       .recent-news h2 {
         font-size: 1.5em;
         margin-bottom: 20px;
-        color: #2C2C2A;
+        color: #222;
       }
 
       .recent-news ul {
@@ -147,17 +305,17 @@
       }
 
       .recent-news li a {
-        color: #2C2C2A;
+        color: #222;
         text-decoration: none;
         font-weight: 500;
       }
 
       .recent-news li a:hover {
-        color: #3C3489;
+        color: #0366d6;
       }
 
       .recent-news .item-date {
-        color: #5F5E5A;
+        color: #586069;
         font-size: 0.9em;
         margin-left: 8px;
       }
@@ -171,17 +329,7 @@
         font-weight: 300;
         margin-bottom: 30px;
         margin-top: 50px;
-        color: #2C2C2A;
-      }
-
-       .news-item::before {
-        /* content: "★"; */
-        /* content: "\2605"; */
-        content: "\25B8";
-        color: #3C3489;
-        display: inline-block;
-        width: 1.2em;
-        margin-left: -1.2em;
+        color: #222;
       }
 
       .news-item {
@@ -200,18 +348,18 @@
       .news-title a {
         font-size: 1.1em;
         font-weight: 600;
-        color: #2C2C2A;
+        color: #222;
         text-decoration: none;
         transition: color 0.2s ease;
       }
 
       .news-title a:hover {
-        color: #3C3489;
+        color: #0366d6;
       }
 
       .news-date {
         white-space: nowrap;
-        color: #5F5E5A;
+        color: #586069;
         font-size: 0.95em;
         min-width: 150px;
         text-align: right;
@@ -247,26 +395,29 @@
           <li><a href="{{ "/research.html" | relative_url }}" {% if page.url contains "research.html" %}class="active"{% endif %}>Research</a></li>
           <li><a href="{{ "/publications.html" | relative_url }}" {% if page.url contains "publications.html" %}class="active"{% endif %}>Publications</a></li>
           <li><a href="{{ "/teaching.html" | relative_url }}" {% if page.url contains "teaching.html" %}class="active"{% endif %}>Teaching</a></li>
-          <li><a href="{{ "/sideprojects.html" | relative_url }}" {% if page.url contains "sideprojects.html" %}class="active"{% endif %}>Artifacts</a></li>
+          <li><a href="{{ "/sideprojects.html" | relative_url }}" {% if page.url contains "sideprojects.html" %}class="active"{% endif %}>Side Projects</a></li>
         </ul>
       </div>
     </nav>
 
     <div class="wrapper">
       <header>
-        <h1><a href="{{ "/" | absolute_url }}">{{ site.title | default: site.github.repository_name }}</a></h1>        
+        <h1><a href="{{ "/" | absolute_url }}">{{ site.title | default: site.github.repository_name }}</a></h1>
         {% if page.logo %}
-          <img src="{{ page.logo | relative_url }}" alt="Logo" style="max-width: 150px; margin: 20px auto; display: block;" />
+          <img src="{{ page.logo | relative_url }}" alt="Logo" style="max-width: 200px; margin: 20px auto; display: block;" />
         {% elsif site.logo %}
-          <img src="{{ site.logo | relative_url }}" alt="Logo" style="max-width: 150px; margin: 20px auto; display: block;" />
+          <img src="{{ site.logo | relative_url }}" alt="Logo" style="max-width: 200px; margin: 20px auto; display: block;" />
         {% endif %}
 
         <p>{{ site.description | default: site.github.project_tagline }}</p>
-        Assistant Professor<br>
-        Program Chair, B.S. Intelligent Systems Engineering<br>
-        Program Chair, B.S. Robotics<br>
-        DePaul University, Chicago, IL
-        https://www.depaul.edu/faculty/muhammad-umer-huzaifa
+
+        {% if site.github.is_project_page %}
+        <p class="view"><a href="{{ site.github.repository_url }}">View the Project on GitHub <small>{{ site.github.repository_nwo }}</small></a></p>
+        {% endif %}
+
+        <!-- {% if site.github.is_user_page %}
+        <p class="view"><a href="{{ site.github.owner_url }}">View My GitHub Profile</a></p>
+        {% endif %} -->
 
         {% if site.show_downloads %}
         <ul class="downloads">
@@ -278,21 +429,31 @@
       </header>
 
       <section>
-        {{ content }}
-       <!-- News Section -->
-      <div class="news-container">
-        <!-- Recent News Section -->
-        <div class="recent-news">
-          <h2>Recent News</h2>
-          <ul>
-            {% for post in site.posts limit:10 %}
-              <li>
-                <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-                <span class="item-date">{{ post.date | date: "%b %d, %Y" }}</span>
-              </li>
-            {% endfor %}
-          </ul>
+      <div class="tiles-container">
+        {% for area in page.research_areas %}
+        <div class="tile" data-tile="{{ forloop.index }}">
+          <div class="tile-image-container">
+            <img src="{{ area.image }}" alt="{{ area.title }}" class="tile-image">
+          </div>
+          <div class="tile-content">
+            <h2 class="tile-title">{{ area.title }}</h2>
+          </div>
+          <div class="tile-details" id="details-{{ forloop.index }}">
+            <div class="details-content">
+              <p>{{ area.description }}</p>
+              <h3>Related Publications:</h3>
+              <ul class="publications-list">
+                {% for pub in area.publications %}
+                <li><a href="{{ pub.url }}">{{ pub.title }}</a></li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
         </div>
+        {% endfor %}
+      </div>
+
+        {{ content }}
       </section>
 
       <!-- <footer>
@@ -305,6 +466,7 @@
 
     <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
     <script>
+      // Mobile menu toggle
       const navToggle = document.querySelector('.nav-toggle');
       const navMenu = document.getElementById('navMenu');
 
@@ -320,6 +482,26 @@
           }
         });
       }
+
+      // Tile click functionality
+      const tiles = document.querySelectorAll('.tile');
+      
+      tiles.forEach(tile => {
+        tile.addEventListener('click', function() {
+          const tileNum = this.getAttribute('data-tile');
+          const details = document.getElementById(`details-${tileNum}`);
+          
+          // Close all other details
+          document.querySelectorAll('.tile-details').forEach(detail => {
+            if (detail !== details) {
+              detail.classList.remove('active');
+            }
+          });
+          
+          // Toggle current details
+          details.classList.toggle('active');
+        });
+      });
     </script>
   </body>
 </html>
