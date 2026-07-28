@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Continuous Convolution Lab</title>
+<style>
+  :root{
+    --bg: #ffffff;
+    --panel: #ffffff;
+    --panel-2: #f3f6f8;
+    --grid: #dfe6ec;
+    --bezel: #ffffff;
+    --amber: #d9822b;
+    --cyan: #1489a8;
+    --green: #2f9e52;
+    --text: #16212b;
+    --muted: #5b6b76;
+    --mono: ui-monospace, "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: #ffffff;
+    color: var(--text);
+    font-family: var(--sans);
+    padding: 28px 16px 60px;
+    line-height: 1.55;
+  }
+  .wrap{ max-width: 900px; margin: 0 auto; }
+
+  header.title-block{ margin-bottom: 22px; }
+  .eyebrow{
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin: 0 0 8px;
+  }
+  h1{
+    font-family: var(--mono);
+    font-size: clamp(26px, 4vw, 34px);
+    margin: 0 0 12px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .lede{ color: var(--muted); max-width: 62ch; font-size: 15.5px; }
+
+  .explainer{
+    background: var(--panel);
+    border: 1px solid var(--grid);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin: 18px 0 26px;
+    font-size: 14.5px;
+    color: #33454f;
+  }
+  .explainer p{ margin: 0 0 10px; }
+  .explainer p:last-child{ margin-bottom: 0; }
+  .formula{
+    font-family: var(--mono);
+    background: var(--panel-2);
+    border: 1px solid var(--grid);
+    border-radius: 6px;
+    padding: 10px 14px;
+    display: inline-block;
+    margin: 4px 0 10px;
+    color: var(--green);
+    font-size: 14px;
+  }
+  .note{ font-size: 13px; color: var(--muted); }
+
+  .scope{
+    background: var(--bezel);
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: 0 0 0 1px #dfe6ec, 0 20px 50px -30px rgba(20,40,60,.18);
+  }
+
+  .controls{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+  @media (max-width: 620px){ .controls{ grid-template-columns: 1fr; } }
+
+  .signal-card{
+    background: var(--panel);
+    border: 1px solid var(--grid);
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .signal-card .swatch-label{
+    display:flex; align-items:center; gap:8px;
+    font-family: var(--mono); font-size: 12px; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
+  }
+  .dot{ width:10px; height:10px; border-radius:50%; flex:none; }
+  .dot.a{ background: var(--amber); box-shadow: 0 0 8px rgba(217,130,43,.4); }
+  .dot.b{ background: var(--cyan); box-shadow: 0 0 8px rgba(20,137,168,.4); }
+  .dot.g{ background: var(--green); box-shadow: 0 0 8px rgba(47,158,82,.4); }
+
+  select{
+    width: 100%;
+    background: var(--panel-2);
+    color: var(--text);
+    border: 1px solid var(--grid);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-family: var(--mono);
+    font-size: 14px;
+    appearance: none;
+    cursor: pointer;
+  }
+  select:focus-visible, button:focus-visible, input:focus-visible{
+    outline: 2px solid var(--cyan); outline-offset: 2px;
+  }
+  .desc{ margin-top: 8px; font-size: 12.5px; color: var(--muted); min-height: 32px; }
+
+  .transport{
+    background: var(--panel);
+    border: 1px solid var(--grid);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .transport .n-readout{
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .transport .n-readout b{
+    color: var(--green);
+    font-size: 18px;
+    background: var(--panel-2);
+    border: 1px solid var(--grid);
+    border-radius: 5px;
+    padding: 1px 8px;
+    margin-left: 4px;
+  }
+  .btn{
+    font-family: var(--mono);
+    background: var(--panel-2);
+    border: 1px solid #c7d2da;
+    color: var(--text);
+    border-radius: 6px;
+    padding: 7px 12px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: border-color .15s ease, color .15s ease;
+  }
+  .btn:hover{ border-color: var(--cyan); color: var(--cyan); }
+  .btn.play{ min-width: 68px; }
+  .slider-row{ flex: 1 1 220px; display:flex; align-items:center; gap:10px; min-width: 180px; }
+
+  input[type="range"]{
+    -webkit-appearance: none;
+    appearance: none;
+    flex: 1;
+    height: 6px;
+    border-radius: 4px;
+    background: var(--grid);
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance: none;
+    width: 18px; height: 22px;
+    border-radius: 4px;
+    background: linear-gradient(180deg, #f0b978, var(--amber));
+    border: 1px solid #a56a26;
+    box-shadow: 0 2px 4px rgba(0,0,0,.2);
+    cursor: pointer;
+    margin-top: -8px;
+  }
+  input[type="range"]::-moz-range-thumb{
+    width: 16px; height: 22px;
+    border-radius: 4px;
+    background: linear-gradient(180deg, #f0b978, var(--amber));
+    border: 1px solid #a56a26;
+    cursor: pointer;
+  }
+  input[type="range"]::-moz-range-track{
+    height: 6px; border-radius: 4px; background: var(--grid);
+  }
+
+  .graph-panel{
+    background: var(--panel);
+    border: 1px solid var(--grid);
+    border-radius: 10px;
+    padding: 12px 14px 14px;
+    margin-bottom: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .graph-title{
+    font-family: var(--mono); font-size: 12px; letter-spacing:.08em;
+    text-transform: uppercase; color: var(--muted);
+    display:flex; justify-content: space-between; margin-bottom: 6px;
+  }
+  svg.plot{ width: 100%; height: auto; display:block; }
+  svg text{ font-family: var(--mono); }
+
+  .sum-panel{
+    background: var(--panel-2);
+    border: 1px solid var(--grid);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: #1d6b39;
+    min-height: 24px;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .legend{
+    display:flex; gap: 18px; flex-wrap: wrap;
+    font-family: var(--mono); font-size: 12px; color: var(--muted);
+    margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--grid);
+  }
+  .legend span{ display:flex; align-items:center; gap:6px; }
+
+  footer{
+    text-align:center; color: var(--muted); font-size: 12px;
+    margin-top: 22px; font-family: var(--mono);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="title-block">
+    <p class="eyebrow">Signals &amp; Systems Lab · Continuous Time</p>
+    <h1>Convolution, in continuous time</h1>
+    <p class="lede">Same idea as before, but now the signals are smooth functions and the sum becomes an integral — an area building up as one signal slides across the other.</p>
+  </header>
+
+  <section class="explainer">
+    <p>For continuous-time signals, <strong>convolution</strong> flips one signal in time, slides it across the other, multiplies the overlap, and instead of adding discrete samples, it <em>integrates</em> — accumulating the area under the product curve.</p>
+    <div class="formula">y(t) = ∫<sub>−∞</sub><sup>∞</sup> x(τ) · h(t − τ) dτ</div>
+    <p>Drag the slider to move <code>t</code> and watch <code>h(t − τ)</code> (cyan) slide across <code>x(τ)</code> (amber). The thin green bars are a Riemann approximation — the little rectangular slices this tool actually sums up to estimate the integral. As you advance <code>t</code>, each resulting area gets added to the output curve below, one point at a time.</p>
+    <p class="note">Signals are windowed to τ = −6…6 so the integral stays finite and fast to compute in the browser.</p>
+  </section>
+
+  <div class="scope">
+    <div class="controls">
+      <div class="signal-card">
+        <div class="swatch-label"><span class="dot a"></span>Signal A — x(t)</div>
+        <select id="signalA"></select>
+        <div class="desc" id="descA"></div>
+      </div>
+      <div class="signal-card">
+        <div class="swatch-label"><span class="dot b"></span>Signal B — h(t)</div>
+        <select id="signalB"></select>
+        <div class="desc" id="descB"></div>
+      </div>
+    </div>
+
+    <div class="transport">
+      <button class="btn" id="prevBtn" aria-label="Step back">◂ Step</button>
+      <button class="btn play" id="playBtn" aria-label="Play">▶ Play</button>
+      <button class="btn" id="nextBtn" aria-label="Step forward">Step ▸</button>
+      <div class="slider-row">
+        <input type="range" id="tSlider" min="-120" max="120" step="1" value="-120" aria-label="Shift t">
+      </div>
+      <div class="n-readout">shift t = <b id="tReadout">-12.0</b></div>
+    </div>
+
+    <div class="graph-panel">
+      <div class="graph-title">
+        <span>Overlap — x(τ) and h(t−τ) (flipped &amp; shifted)</span>
+        <span>τ axis</span>
+      </div>
+      <svg class="plot" id="overlapSvg" viewBox="0 0 720 240" preserveAspectRatio="xMidYMid meet"></svg>
+    </div>
+
+    <div class="graph-panel">
+      <div class="graph-title">
+        <span>Output — y(t) = ∫ x(τ)h(t−τ) dτ</span>
+        <span>t axis</span>
+      </div>
+      <svg class="plot" id="resultSvg" viewBox="0 0 720 220" preserveAspectRatio="xMidYMid meet"></svg>
+    </div>
+
+    <div class="sum-panel" id="sumText">y(−12.0) ≈ 0 (no overlap yet)</div>
+
+    <div class="legend">
+      <span><span class="dot a"></span> x(τ) — Signal A, fixed in place</span>
+      <span><span class="dot b"></span> h(t−τ) — Signal B, flipped &amp; slid to t</span>
+      <span><span class="dot g"></span> Riemann slices — pieces integrated into y(t)</span>
+    </div>
+  </div>
+
+  <footer>Continuous convolution demo · integral approximated by a Riemann sum (Δτ = 0.05) over τ = −6…6</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- signal definitions (continuous, windowed to T_MIN..T_MAX) ----------
+  const T_MIN = -6, T_MAX = 6;
+
+  const SIGNALS = {
+    rect: { name: "Rectangular Pulse", desc: "1 between t = −1.5 and 1.5, zero elsewhere.",
+      fn: t => (Math.abs(t) <= 1.5 ? 1 : 0) },
+    tri: { name: "Triangle Pulse", desc: "Peaks at 1 when t = 0, tapering linearly to 0 by t = ±2.",
+      fn: t => Math.max(0, 1 - Math.abs(t) / 2) },
+    step: { name: "Unit Step (windowed)", desc: "Zero before t = 0, then holds at 1 until the window edge (t = 6).",
+      fn: t => (t >= 0 && t <= T_MAX ? 1 : 0) },
+    expd: { name: "Exponential Decay", desc: "Zero before t = 0, then e^(−0.8t) — nearly gone by the window edge.",
+      fn: t => (t >= 0 && t <= T_MAX ? Math.exp(-0.8 * t) : 0) },
+    gauss: { name: "Gaussian Bump", desc: "A smooth bell curve centered at t = 0, standard deviation 1.",
+      fn: t => Math.exp(-(t * t) / 2) },
+    sine: { name: "Sine Burst", desc: "sin(t) windowed to |t| ≤ 4, zero outside that span.",
+      fn: t => (Math.abs(t) <= 4 ? Math.sin(t) : 0) },
+    ramp: { name: "Ramp", desc: "Rises in a straight line from 0 to 1 across t = 0…6.",
+      fn: t => (t >= 0 && t <= T_MAX ? t / T_MAX : 0) },
+    pulse: { name: "Narrow Pulse (≈ impulse)", desc: "A tall, narrow bump near t = 0 — a stand-in for an ideal impulse.",
+      fn: t => Math.exp(-(t * t) / (2 * 0.15 * 0.15)) }
+  };
+
+  const fmt = (v, d) => (Math.round(v * Math.pow(10, d || 2)) / Math.pow(10, d || 2)).toFixed(d || 2);
+
+  // ---------- numerical convolution (Riemann sum) ----------
+  const DT = 0.05;
+  const T_SAMPLES = [];
+  for (let t = T_MIN; t <= T_MAX + 1e-9; t += DT) T_SAMPLES.push(Math.round(t * 1000) / 1000);
+
+  const SLIDER_MIN = -120, SLIDER_MAX = 120; // t*10
+  function convolveContinuous(fnA, fnB){
+    const y = [];
+    for (let sv = SLIDER_MIN; sv <= SLIDER_MAX; sv++){
+      const tau = sv / 10;
+      let s = 0;
+      for (let i = 0; i < T_SAMPLES.length; i++) s += fnA(T_SAMPLES[i]) * fnB(tau - T_SAMPLES[i]);
+      y.push(s * DT);
+    }
+    return y; // index 0 corresponds to sv = SLIDER_MIN
+  }
+
+  // ---------- DOM ----------
+  const selA = document.getElementById("signalA");
+  const selB = document.getElementById("signalB");
+  const descA = document.getElementById("descA");
+  const descB = document.getElementById("descB");
+  const slider = document.getElementById("tSlider");
+  const tReadout = document.getElementById("tReadout");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const playBtn = document.getElementById("playBtn");
+  const overlapSvg = document.getElementById("overlapSvg");
+  const resultSvg = document.getElementById("resultSvg");
+  const sumText = document.getElementById("sumText");
+
+  Object.keys(SIGNALS).forEach(key => {
+    const optA = document.createElement("option"); optA.value = key; optA.textContent = SIGNALS[key].name;
+    const optB = optA.cloneNode(true);
+    selA.appendChild(optA); selB.appendChild(optB);
+  });
+  selA.value = "rect";
+  selB.value = "gauss";
+
+  let currentSV = SLIDER_MIN;
+  let fnA, fnB, yArr, yMax;
+  let playing = false, playTimer = null;
+
+  const NS = "http://www.w3.org/2000/svg";
+  function svgEl(tag, attrs){
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+  function clear(node){ while (node.firstChild) node.removeChild(node.firstChild); }
+
+  // ---------- overlap graph ----------
+  const OV_W = 720, OV_H = 240;
+  const OV_MARGIN = { l: 34, r: 16, t: 14, b: 28 };
+  const OV_PW = OV_W - OV_MARGIN.l - OV_MARGIN.r;
+  const OV_PH = OV_H - OV_MARGIN.t - OV_MARGIN.b;
+  const OV_TLO = -18, OV_THI = 18;
+  const OV_VLO = -1.3, OV_VHI = 1.3;
+
+  function ovX(t){ return OV_MARGIN.l + (t - OV_TLO) / (OV_THI - OV_TLO) * OV_PW; }
+  function ovY(v){ return OV_MARGIN.t + (OV_VHI - v) / (OV_VHI - OV_VLO) * OV_PH; }
+
+  function curvePath(fn, offset){
+    let d = "";
+    const step = 0.12;
+    for (let t = OV_TLO; t <= OV_THI + 1e-9; t += step){
+      const v = fn(offset === undefined ? t : offset - t);
+      const x = ovX(t), y = ovY(Math.max(OV_VLO, Math.min(OV_VHI, v)));
+      d += (d === "" ? "M" : "L") + x.toFixed(1) + "," + y.toFixed(1) + " ";
+    }
+    return d;
+  }
+
+  function renderOverlap(){
+    clear(overlapSvg);
+    overlapSvg.setAttribute("viewBox", `0 0 ${OV_W} ${OV_H}`);
+
+    for (let t = OV_TLO; t <= OV_THI; t += 6){
+      overlapSvg.appendChild(svgEl("line", { x1: ovX(t), x2: ovX(t), y1: OV_MARGIN.t, y2: OV_H - OV_MARGIN.b, stroke: "#dfe6ec", "stroke-width": 1 }));
+      overlapSvg.appendChild(svgEl("text", { x: ovX(t), y: OV_H - 8, fill: "#5b6b76", "font-size": 10, "text-anchor": "middle" })).textContent = t;
+    }
+    overlapSvg.appendChild(svgEl("line", { x1: OV_MARGIN.l, x2: OV_W - OV_MARGIN.r, y1: ovY(0), y2: ovY(0), stroke: "#c7d2da", "stroke-width": 1 }));
+
+    // Riemann rectangles for the product, sampled over the true integration window
+    const tau = currentSV / 10;
+    const rectStep = 0.4;
+    for (let t = T_MIN; t <= T_MAX + 1e-9; t += rectStep){
+      const xv = fnA(t);
+      const hv = fnB(tau - t);
+      const prod = xv * hv;
+      if (prod === 0) continue;
+      const cx = ovX(t);
+      const w = (rectStep / (OV_THI - OV_TLO)) * OV_PW * 0.85;
+      overlapSvg.appendChild(svgEl("rect", {
+        x: cx - w / 2, width: w,
+        y: Math.min(ovY(0), ovY(prod)), height: Math.max(1, Math.abs(ovY(prod) - ovY(0))),
+        fill: "rgba(47,158,82,0.45)"
+      }));
+    }
+
+    // continuous curves
+    overlapSvg.appendChild(svgEl("path", { d: curvePath(fnA), fill: "none", stroke: "#d9822b", "stroke-width": 2.2 }));
+    overlapSvg.appendChild(svgEl("path", { d: curvePath(fnB, tau), fill: "none", stroke: "#1489a8", "stroke-width": 2.2 }));
+  }
+
+  // ---------- result graph ----------
+  const RS_W = 720, RS_H = 220;
+  const RS_MARGIN = { l: 34, r: 16, t: 14, b: 28 };
+  const RS_PW = RS_W - RS_MARGIN.l - RS_MARGIN.r;
+  const RS_PH = RS_H - RS_MARGIN.t - RS_MARGIN.b;
+
+  function rsX(sv){ return RS_MARGIN.l + (sv - SLIDER_MIN) / (SLIDER_MAX - SLIDER_MIN) * RS_PW; }
+  function rsY(v, vmax){ return RS_MARGIN.t + (vmax - v) / (2 * vmax) * RS_PH; }
+
+  function renderResult(){
+    clear(resultSvg);
+    resultSvg.setAttribute("viewBox", `0 0 ${RS_W} ${RS_H}`);
+
+    for (let sv = SLIDER_MIN; sv <= SLIDER_MAX; sv += 60){
+      resultSvg.appendChild(svgEl("line", { x1: rsX(sv), x2: rsX(sv), y1: RS_MARGIN.t, y2: RS_H - RS_MARGIN.b, stroke: "#dfe6ec", "stroke-width": 1 }));
+      resultSvg.appendChild(svgEl("text", { x: rsX(sv), y: RS_H - 8, fill: "#5b6b76", "font-size": 10, "text-anchor": "middle" })).textContent = fmt(sv / 10, 0);
+    }
+    resultSvg.appendChild(svgEl("line", { x1: RS_MARGIN.l, x2: RS_W - RS_MARGIN.r, y1: rsY(0, yMax), y2: rsY(0, yMax), stroke: "#c7d2da", "stroke-width": 1 }));
+
+    let d = "";
+    for (let sv = SLIDER_MIN; sv <= currentSV; sv++){
+      const v = yArr[sv - SLIDER_MIN];
+      const x = rsX(sv), y = rsY(v, yMax);
+      d += (d === "" ? "M" : "L") + x.toFixed(1) + "," + y.toFixed(1) + " ";
+    }
+    if (d) resultSvg.appendChild(svgEl("path", { d, fill: "none", stroke: "#2f9e52", "stroke-width": 2.4 }));
+
+    const curV = yArr[currentSV - SLIDER_MIN];
+    resultSvg.appendChild(svgEl("circle", { cx: rsX(currentSV), cy: rsY(curV, yMax), r: 4.4, fill: "#d9822b" }));
+  }
+
+  // ---------- sum readout ----------
+  function renderSum(){
+    const tau = currentSV / 10;
+    const rectStep = 0.4;
+    const nSlices = Math.round((T_MAX - T_MIN) / rectStep) + 1;
+    const v = yArr[currentSV - SLIDER_MIN];
+    sumText.textContent = `y(${fmt(tau, 1)}) ≈ Σ x(τᵢ)·h(${fmt(tau, 1)}−τᵢ)·Δτ   (Δτ=0.050, ${T_SAMPLES.length} slices in the actual sum, ${nSlices} shown above)  ≈ ${fmt(v, 3)}`;
+  }
+
+  // ---------- orchestration ----------
+  function renderAll(){
+    tReadout.textContent = fmt(currentSV / 10, 1);
+    slider.value = currentSV;
+    renderOverlap();
+    renderResult();
+    renderSum();
+  }
+
+  function recomputeAll(){
+    fnA = SIGNALS[selA.value].fn;
+    fnB = SIGNALS[selB.value].fn;
+    yArr = convolveContinuous(fnA, fnB);
+    yMax = Math.max(1, ...yArr.map(v => Math.abs(v))) * 1.15;
+    descA.textContent = SIGNALS[selA.value].desc;
+    descB.textContent = SIGNALS[selB.value].desc;
+    renderAll();
+  }
+
+  function stopPlaying(){
+    playing = false;
+    playBtn.textContent = "▶ Play";
+    if (playTimer){ clearInterval(playTimer); playTimer = null; }
+  }
+
+  selA.addEventListener("change", () => { stopPlaying(); recomputeAll(); });
+  selB.addEventListener("change", () => { stopPlaying(); recomputeAll(); });
+  slider.addEventListener("input", () => { stopPlaying(); currentSV = parseInt(slider.value, 10); renderAll(); });
+  prevBtn.addEventListener("click", () => { stopPlaying(); currentSV = Math.max(SLIDER_MIN, currentSV - 2); renderAll(); });
+  nextBtn.addEventListener("click", () => { stopPlaying(); currentSV = Math.min(SLIDER_MAX, currentSV + 2); renderAll(); });
+  playBtn.addEventListener("click", () => {
+    if (playing){ stopPlaying(); return; }
+    playing = true;
+    playBtn.textContent = "❚❚ Pause";
+    if (currentSV >= SLIDER_MAX) currentSV = SLIDER_MIN;
+    playTimer = setInterval(() => {
+      currentSV += 2;
+      if (currentSV > SLIDER_MAX){ stopPlaying(); currentSV = SLIDER_MAX; renderAll(); return; }
+      renderAll();
+    }, 60);
+  });
+
+  recomputeAll();
+})();
+</script>
+</body>
+</html>

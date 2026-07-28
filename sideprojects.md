@@ -138,6 +138,26 @@ This page provides a peak into the side projects I develop for aid in teaching a
     </a>
   </div>
 
+  <div class="project-item" data-category="robotics">
+    <a href="./projects/discrete-convolution.html" target="_blank">
+      <img src="/assets/images/discrete-convo.png" alt="Discrete Convolution" />
+      <div class="tile-body">
+        <span class="tag">Signal Processing</span>
+        <h3>A Demonstration of Discrete Convolution</h3>
+      </div>
+    </a>
+  </div>
+
+  <div class="project-item" data-category="robotics">
+    <a href="./projects/continuous-convolution.html" target="_blank">
+      <img src="/assets/images/cont-convo.png" alt="Continuous Convolution" />
+      <div class="tile-body">
+        <span class="tag">Signal Processing</span>
+        <h3>A Demonstration of Continuous Convolution</h3>
+      </div>
+    </a>
+  </div>
+
   <div class="project-item" data-category="controls">
     <a href="./simulations/sim_dyn_systems.html" target="_blank">
       <img src="/assets/images/dynamic_systems.png" alt="Simulating Dynamical Systems" />
