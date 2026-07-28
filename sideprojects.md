@@ -138,7 +138,7 @@ This page provides a peak into the side projects I develop for aid in teaching a
     </a>
   </div>
 
-  <div class="project-item" data-category="robotics">
+  <div class="project-item" data-category="signal">
     <a href="./projects/discrete-convolution.html" target="_blank">
       <img src="/assets/images/discrete-convo.png" alt="Discrete Convolution" />
       <div class="tile-body">
@@ -148,7 +148,7 @@ This page provides a peak into the side projects I develop for aid in teaching a
     </a>
   </div>
 
-  <div class="project-item" data-category="robotics">
+  <div class="project-item" data-category="signal">
     <a href="./projects/continuous-convolution.html" target="_blank">
       <img src="/assets/images/cont-convo.png" alt="Continuous Convolution" />
       <div class="tile-body">
