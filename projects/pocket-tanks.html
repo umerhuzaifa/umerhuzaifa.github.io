@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pocket Tanks</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Oswald:wght@400;700&display=swap');
+  :root { --khaki:#c8b560; --green:#3d5a1e; --amber:#f39c12; --panel:rgba(20,25,10,0.92); --border:#5a6e2a; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#0d1108; font-family:'Share Tech Mono',monospace; color:var(--khaki); display:flex; flex-direction:column; align-items:center; min-height:100vh; overflow:hidden; user-select:none; }
+  #header { width:100%; text-align:center; padding:8px 0 4px; font-family:'Oswald',sans-serif; font-size:22px; letter-spacing:8px; text-transform:uppercase; color:var(--amber); text-shadow:0 0 20px rgba(243,156,18,0.5); border-bottom:1px solid var(--border); }
+  #game-wrapper { display:flex; flex-direction:column; align-items:center; width:100%; max-width:900px; padding:8px; gap:8px; }
+  #hud { display:flex; justify-content:space-between; width:100%; gap:8px; }
+  .player-panel { background:var(--panel); border:1px solid var(--border); padding:8px 14px; flex:1; }
+  .player-panel.active { border-color:var(--amber); box-shadow:0 0 10px rgba(243,156,18,0.3); }
+  .player-panel h3 { font-family:'Oswald',sans-serif; font-size:13px; letter-spacing:3px; margin-bottom:6px; }
+  .p1-label { color:#5dade2; } .p2-label { color:#ec7063; }
+  .health-bar-bg { background:#222; height:10px; width:100%; border:1px solid #444; }
+  .health-bar { height:100%; transition:width 0.4s; }
+  .p1-bar { background:linear-gradient(90deg,#2980b9,#5dade2); } .p2-bar { background:linear-gradient(90deg,#c0392b,#ec7063); }
+  .hp-text { font-size:11px; margin-top:2px; opacity:0.8; }
+  #center-hud { background:var(--panel); border:1px solid var(--border); padding:8px 16px; text-align:center; min-width:180px; }
+  #turn-label { font-family:'Oswald',sans-serif; font-size:11px; letter-spacing:3px; color:var(--amber); }
+  #weapon-name { font-size:12px; margin-top:2px; color:#aaa; }
+  canvas { border:1px solid var(--border); display:block; cursor:crosshair; }
+  #controls { display:flex; gap:8px; width:100%; align-items:center; background:var(--panel); border:1px solid var(--border); padding:10px 14px; flex-wrap:wrap; }
+  .ctrl-group { display:flex; align-items:center; gap:8px; flex:1; min-width:140px; }
+  .ctrl-label { font-size:11px; letter-spacing:1px; color:#888; white-space:nowrap; }
+  input[type=range] { flex:1; accent-color:var(--amber); height:4px; }
+  .ctrl-value { font-size:13px; color:var(--amber); min-width:36px; text-align:right; }
+  .btn { font-family:'Share Tech Mono',monospace; font-size:13px; letter-spacing:2px; padding:8px 18px; border:1px solid var(--border); background:var(--green); color:var(--khaki); cursor:pointer; text-transform:uppercase; transition:all .15s; }
+  .btn:hover { background:#4a6e28; border-color:var(--amber); color:var(--amber); } .btn:disabled { opacity:.4; cursor:not-allowed; }
+  .btn-fire { background:#6e1a1a; border-color:#c0392b; color:#ec7063; font-size:14px; padding:8px 24px; }
+  .btn-fire:hover { background:#8b2020; color:#fff; }
+  .btn-toggle { background:#1a2a1a; border-color:#5a6e2a; color:#888; }
+  .btn-toggle.active { background:#1a2a0a; border-color:#7ab03a; color:#a0d060; }
+  .btn-toggle:hover { border-color:var(--amber); color:var(--amber); }
+  #weapon-select { display:flex; gap:6px; flex-wrap:wrap; width:100%; }
+  .wpn-btn { font-family:'Share Tech Mono',monospace; font-size:10px; padding:4px 8px; border:1px solid #333; background:#111; color:#777; cursor:pointer; transition:all .1s; letter-spacing:1px; }
+  .wpn-btn:hover { border-color:#555; color:#aaa; } .wpn-btn.selected { border-color:var(--amber); color:var(--amber); background:#1a1500; }
+  #message { font-family:'Oswald',sans-serif; font-size:18px; letter-spacing:4px; color:var(--amber); text-align:center; min-height:28px; text-shadow:0 0 10px rgba(243,156,18,0.6); }
+</style>
+</head>
+<body>
+<div id="header">&#8853; POCKET TANKS &#8853;</div>
+<div id="game-wrapper">
+  <div id="hud">
+    <div class="player-panel active" id="p1panel">
+      <h3 class="p1-label">&#9668; PLAYER 1</h3>
+      <div class="health-bar-bg"><div class="health-bar p1-bar" id="p1bar" style="width:100%"></div></div>
+      <div class="hp-text" id="p1hp">HP: 100</div>
+    </div>
+    <div id="center-hud">
+      <div id="turn-label">TURN 1 &#8212; P1</div>
+      <div id="weapon-name">Shell</div>
+    </div>
+    <div class="player-panel" id="p2panel">
+      <h3 class="p2-label">PLAYER 2 &#9658;</h3>
+      <div class="health-bar-bg"><div class="health-bar p2-bar" id="p2bar" style="width:100%"></div></div>
+      <div class="hp-text" id="p2hp">HP: 100</div>
+    </div>
+  </div>
+  <canvas id="canvas" width="880" height="400"></canvas>
+  <div id="message">PLAYER 1 TURN &#8212; AIM AND FIRE!</div>
+  <div id="controls">
+    <div class="ctrl-group">
+      <span class="ctrl-label">ANGLE</span>
+      <input type="range" id="angleSlider" min="0" max="180" value="45">
+      <span class="ctrl-value" id="angleVal">45&#176;</span>
+    </div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">POWER</span>
+      <input type="range" id="powerSlider" min="5" max="100" value="50">
+      <span class="ctrl-value" id="powerVal">50</span>
+    </div>
+    <button class="btn btn-fire" id="fireBtn">&#128293; FIRE</button>
+    <button class="btn btn-toggle active" id="crosshairBtn">&#9678; AIM ON</button>
+    <button class="btn" id="newGameBtn">NEW GAME</button>
+  </div>
+  <div id="weapon-select"></div>
+</div>
+<script>
+const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height;
+const WEAPONS=[
+  {name:'Shell',color:'#f0c040',radius:18,damage:20,spread:0,count:1,type:'normal'},
+  {name:'Nuke',color:'#ff4400',radius:55,damage:60,spread:0,count:1,type:'normal'},
+  {name:'Cluster',color:'#f0c040',radius:12,damage:12,spread:40,count:5,type:'cluster'},
+  {name:'Dirt Mover',color:'#8B4513',radius:60,damage:5,spread:0,count:1,type:'dirt'},
+  {name:'Napalm',color:'#ff6600',radius:20,damage:15,spread:20,count:3,type:'cluster'},
+  {name:'Sniper',color:'#00ccff',radius:8,damage:35,spread:0,count:1,type:'normal'},
+  {name:'Bouncer',color:'#00ff88',radius:14,damage:18,spread:0,count:1,type:'bounce'},
+  {name:'Wide Boom',color:'#cc44ff',radius:40,damage:30,spread:0,count:1,type:'normal'},
+];
+let terrain=[],tanks=[],turn=0,turnCount=1,projectiles=[],explosions=[],particles=[];
+let firing=false,gameOver=false,selectedWeapon=0,crosshairOn=true,hasMoved=false;
+const MAX_HP=100;
+
+function generateTerrain(){
+  terrain=[];
+  const peaks=3+Math.floor(Math.random()*2);
+  const phases=Array.from({length:peaks},()=>Math.random()*Math.PI*2);
+  const amps=Array.from({length:peaks},()=>15+Math.random()*25);
+  for(let x=0;x<=W;x++){
+    let y=H*0.70;
+    for(let p=0;p<peaks;p++) y-=Math.sin(x*(p+1)*Math.PI*2/W*0.5+phases[p])*amps[p]/(p+1);
+    terrain.push(Math.max(H*0.50,Math.min(H*0.85,y)));
+  }
+  for(let i=0;i<12;i++){
+    const t2=[...terrain];
+    for(let x=4;x<W-4;x++) t2[x]=(terrain[x-4]+terrain[x-2]+terrain[x]*4+terrain[x+2]+terrain[x+4])/8;
+    terrain=t2;
+  }
+}
+function getTerrainY(x){return terrain[Math.max(0,Math.min(W-1,Math.round(x)))];}
+function placeTanks(){
+  const p1x=60+Math.random()*80,p2x=W-60-Math.random()*80;
+  tanks=[{x:p1x,y:getTerrainY(p1x),hp:MAX_HP,angle:45,color:'#5dade2'},{x:p2x,y:getTerrainY(p2x),hp:MAX_HP,angle:135,color:'#ec7063'}];
+}
+
+// --- Trajectory prediction for live crosshair ---
+function simulateLanding(){
+  if(firing||gameOver) return null;
+  const tank=tanks[turn],angle=tank.angle*Math.PI/180;
+  const speed=parseInt(document.getElementById('powerSlider').value)*0.12;
+  let x=tank.x,y=tank.y-18,vx=Math.cos(angle)*speed,vy=-Math.sin(angle)*speed;
+  const path=[];
+  for(let i=0;i<5000;i++){
+    vy+=0.18; x+=vx; y+=vy;
+    if(i%5===0) path.push({x,y});
+    if(x<-10||x>W+10||y>H+50) return null;
+    if(y>=getTerrainY(x)) return {x,y:getTerrainY(x),path};
+  }
+  return null;
+}
+
+function drawCrosshair(landing){
+  if(!landing) return;
+  const {x,y,path}=landing,color=turn===0?'#5dade2':'#ec7063';
+  ctx.save();
+  // Dashed trajectory arc
+  ctx.setLineDash([4,7]);ctx.strokeStyle=color+'55';ctx.lineWidth=1.5;
+  ctx.beginPath();
+  path.forEach((pt,i)=>i===0?ctx.moveTo(pt.x,pt.y):ctx.lineTo(pt.x,pt.y));
+  ctx.stroke();ctx.setLineDash([]);
+  // Pulsing crosshair at impact
+  const pulse=0.65+0.35*Math.sin(Date.now()*0.007),r=11*pulse;
+  ctx.strokeStyle=color;ctx.lineWidth=1.5;ctx.globalAlpha=pulse*0.9;
+  ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x-r*1.7,y);ctx.lineTo(x-r*0.4,y);
+  ctx.moveTo(x+r*0.4,y);ctx.lineTo(x+r*1.7,y);
+  ctx.moveTo(x,y-r*1.7);ctx.lineTo(x,y-r*0.4);
+  ctx.moveTo(x,y+r*0.4);ctx.lineTo(x,y+r*1.7);
+  ctx.stroke();
+  ctx.globalAlpha=pulse;ctx.fillStyle=color;
+  ctx.beginPath();ctx.arc(x,y,2.5,0,Math.PI*2);ctx.fill();
+  ctx.globalAlpha=1;ctx.restore();
+}
+// --- End crosshair ---
+
+function drawSky(){
+  const g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#050d1a');g.addColorStop(0.6,'#0a1a2e');g.addColorStop(1,'#0d2010');
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='rgba(255,255,255,0.5)';
+  for(let i=0;i<80;i++) ctx.fillRect((i*137.5)%W,(i*93.7)%(H*0.5),1,1);
+}
+function drawTerrain(){
+  ctx.beginPath();ctx.moveTo(0,H);
+  for(let x=0;x<W;x++) ctx.lineTo(x,terrain[x]);
+  ctx.lineTo(W,H);ctx.closePath();
+  const g=ctx.createLinearGradient(0,H*0.3,0,H);
+  g.addColorStop(0,'#3d5a1e');g.addColorStop(0.3,'#2d4a14');g.addColorStop(1,'#1a2a08');
+  ctx.fillStyle=g;ctx.fill();
+  ctx.beginPath();
+  for(let x=0;x<W;x++){if(x===0)ctx.moveTo(x,terrain[x]);else ctx.lineTo(x,terrain[x]);}
+  ctx.strokeStyle='#5a8a2a';ctx.lineWidth=2;ctx.stroke();
+}
+function drawTank(tank,idx){
+  ctx.save();ctx.translate(tank.x,tank.y);
+  ctx.fillStyle='rgba(0,0,0,0.3)';ctx.beginPath();ctx.ellipse(0,2,20,5,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle=idx===0?'#2471a3':'#922b21';ctx.beginPath();ctx.roundRect(-16,-10,32,14,4);ctx.fill();
+  ctx.fillStyle=idx===0?'#5dade2':'#ec7063';ctx.beginPath();ctx.roundRect(-12,-16,24,10,4);ctx.fill();
+  ctx.fillStyle='#222';ctx.fillRect(-14,2,8,6);ctx.fillRect(6,2,8,6);
+  ctx.fillStyle='#444';ctx.fillRect(-14,3,28,3);
+  const a=tank.angle*Math.PI/180;
+  ctx.strokeStyle=idx===0?'#a8d0f0':'#f0a0a0';ctx.lineWidth=4;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(0,-8);ctx.lineTo(Math.cos(a)*22,-Math.sin(a)*22-8);ctx.stroke();
+  ctx.fillStyle='rgba(255,255,255,0.8)';ctx.font='bold 9px monospace';ctx.textAlign='center';
+  ctx.fillText(idx===0?'1':'2',0,-9);ctx.restore();
+}
+function drawProjectile(p){
+  ctx.save();ctx.shadowColor=p.color;ctx.shadowBlur=12;ctx.fillStyle=p.color;
+  ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);ctx.fill();
+  if(p.trail&&p.trail.length>1){
+    ctx.beginPath();ctx.moveTo(p.trail[0].x,p.trail[0].y);
+    for(const t of p.trail) ctx.lineTo(t.x,t.y);
+    ctx.strokeStyle=p.color+'66';ctx.lineWidth=2;ctx.stroke();
+  }
+  ctx.restore();
+}
+function drawExplosion(e){
+  const pct=e.t/e.maxT,r=e.radius*Math.sin(pct*Math.PI);
+  ctx.save();
+  const g=ctx.createRadialGradient(e.x,e.y,0,e.x,e.y,r);
+  g.addColorStop(0,'rgba(255,255,200,'+(1-pct)+')');
+  g.addColorStop(0.4,'rgba(255,140,0,'+(0.8*(1-pct))+')');
+  g.addColorStop(1,'rgba(200,50,0,0)');
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(e.x,e.y,r,0,Math.PI*2);ctx.fill();ctx.restore();
+}
+function drawParticle(p){
+  ctx.save();ctx.globalAlpha=p.life/p.maxLife;ctx.fillStyle=p.color;
+  ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();ctx.restore();
+}
+function render(){
+  drawSky();drawTerrain();
+  drawCrosshair(crosshairOn ? simulateLanding() : null);
+  for(const p of particles) drawParticle(p);
+  for(const e of explosions) drawExplosion(e);
+  for(const p of projectiles) drawProjectile(p);
+  for(let i=0;i<tanks.length;i++) if(tanks[i].hp>0) drawTank(tanks[i],i);
+}
+function explode(x,y,radius,damage,type){
+  if(type!=='dirt'){
+    for(let tx=Math.floor(x-radius);tx<=Math.ceil(x+radius);tx++){
+      if(tx<0||tx>=W) continue;
+      const d=Math.abs(tx-x);
+      if(d<radius) terrain[tx]=Math.min(H-5,terrain[tx]+Math.sqrt(radius*radius-d*d)*0.9);
+    }
+  }else{
+    for(let tx=Math.floor(x-radius);tx<=Math.ceil(x+radius);tx++){
+      if(tx<0||tx>=W) continue;
+      const d=Math.abs(tx-x);
+      if(d<radius) terrain[tx]=Math.max(0,terrain[tx]-Math.sqrt(radius*radius-d*d)*1.4);
+    }
+  }
+  for(const t of tanks) t.y=getTerrainY(t.x);
+  explosions.push({x,y,radius,t:0,maxT:30});
+  for(let i=0;i<20;i++){
+    const ang=Math.random()*Math.PI*2,spd=1+Math.random()*4;
+    particles.push({x,y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd-2,
+      r:1+Math.random()*3,color:['#f39c12','#e74c3c','#f0c040','#888'][Math.floor(Math.random()*4)],
+      life:40+Math.random()*30,maxLife:70,grav:0.15});
+  }
+  for(const t of tanks){
+    const d=Math.hypot(t.x-x,t.y-y);
+    if(d<radius+20) t.hp=Math.max(0,t.hp-Math.round(damage*Math.max(0,1-d/(radius+20))));
+  }
+  updateHUD();
+}
+function spawnProjectile(x,y,vx,vy,weapon,owner,sub){
+  const dv=sub?(Math.random()-0.5)*weapon.spread*0.05:0;
+  projectiles.push({x,y,vx:vx+dv,vy:vy+dv,weapon,owner,
+    bounces:weapon.type==='bounce'?2:0,color:weapon.color,trail:[],done:false});
+}
+function fire(){
+  if(firing||gameOver) return;
+  const tank=tanks[turn],weapon=WEAPONS[selectedWeapon];
+  const a=tank.angle*Math.PI/180,speed=parseInt(document.getElementById('powerSlider').value)*0.12;
+  firing=true;document.getElementById('fireBtn').disabled=true;
+  spawnProjectile(tank.x,tank.y-18,Math.cos(a)*speed,-Math.sin(a)*speed,weapon,turn,0);
+}
+let lastTime=0;
+function loop(ts){
+  const dt=Math.min(ts-lastTime,32);lastTime=ts;
+  for(const p of projectiles){
+    if(p.done) continue;
+    p.trail.push({x:p.x,y:p.y});if(p.trail.length>12) p.trail.shift();
+    p.vy+=0.18;p.x+=p.vx;p.y+=p.vy;
+    if(p.x<0||p.x>W||p.y>H+50){p.done=true;continue;}
+    const ty=getTerrainY(p.x);
+    if(p.y>=ty){
+      if(p.bounces>0){p.vy*=-0.6;p.vx*=0.8;p.bounces--;p.y=ty-1;}
+      else{
+        p.done=true;
+        if(p.weapon.type==='cluster'){
+          const cx=p.x,cy=p.y,pw=p.weapon,po=p.owner;
+          for(let i=0;i<pw.count;i++)
+            setTimeout(()=>spawnProjectile(cx,cy-5,(Math.random()-0.5)*3,-(1+Math.random()*3),
+              {...pw,type:'normal',count:1,spread:0},po,i+1),i*50);
+        }else explode(p.x,ty,p.weapon.radius,p.weapon.damage,p.weapon.type);
+      }
+    }
+  }
+  projectiles=projectiles.filter(p=>!p.done);
+  for(const e of explosions) e.t++;
+  explosions=explosions.filter(e=>e.t<e.maxT);
+  for(const p of particles){p.x+=p.vx;p.y+=p.vy;p.vy+=p.grav;p.life--;}
+  particles=particles.filter(p=>p.life>0);
+  if(firing&&projectiles.length===0&&explosions.length===0){
+    firing=false;
+    if(tanks[0].hp<=0&&tanks[1].hp<=0){showMsg('DRAW!');gameOver=true;}
+    else if(tanks[0].hp<=0){showMsg('PLAYER 2 WINS!');gameOver=true;}
+    else if(tanks[1].hp<=0){showMsg('PLAYER 1 WINS!');gameOver=true;}
+    if(!gameOver) setTimeout(()=>{
+      turn=1-turn;turnCount++;
+      document.getElementById('turn-label').textContent='TURN '+turnCount+' \u2014 P'+(turn+1);
+      document.getElementById('p1panel').classList.toggle('active',turn===0);
+      document.getElementById('p2panel').classList.toggle('active',turn===1);
+      document.getElementById('angleSlider').value=tanks[turn].angle;
+      document.getElementById('angleVal').textContent=tanks[turn].angle+'\u00b0';
+      showMsg('PLAYER '+(turn+1)+' TURN  | A/D TO MOVE');updateHUD();
+      hasMoved=false;document.getElementById('fireBtn').disabled=false;
+    },500);
+  }
+  render();requestAnimationFrame(loop);
+}
+function updateHUD(){
+  document.getElementById('p1bar').style.width=(tanks[0].hp/MAX_HP*100)+'%';
+  document.getElementById('p2bar').style.width=(tanks[1].hp/MAX_HP*100)+'%';
+  document.getElementById('p1hp').textContent='HP: '+tanks[0].hp;
+  document.getElementById('p2hp').textContent='HP: '+tanks[1].hp;
+}
+function showMsg(m){document.getElementById('message').textContent=m;}
+document.getElementById('angleSlider').addEventListener('input',function(){
+  document.getElementById('angleVal').textContent=this.value+'\u00b0';
+  tanks[turn].angle=parseInt(this.value);
+});
+document.getElementById('powerSlider').addEventListener('input',function(){
+  document.getElementById('powerVal').textContent=this.value;
+});
+document.getElementById('fireBtn').addEventListener('click',fire);
+document.getElementById('crosshairBtn').addEventListener('click',()=>{
+  crosshairOn=!crosshairOn;
+  const btn=document.getElementById('crosshairBtn');
+  btn.classList.toggle('active',crosshairOn);
+  btn.textContent=crosshairOn?'29b8 AIM ON':'29b8 AIM OFF';
+});
+document.getElementById('newGameBtn').addEventListener('click',initGame);
+const ws=document.getElementById('weapon-select');
+WEAPONS.forEach((w,i)=>{
+  const b=document.createElement('button');
+  b.className='wpn-btn'+(i===0?' selected':'');b.textContent=w.name;
+  b.addEventListener('click',()=>{
+    selectedWeapon=i;
+    document.querySelectorAll('.wpn-btn').forEach((x,j)=>x.classList.toggle('selected',j===i));
+    document.getElementById('weapon-name').textContent=w.name;
+  });ws.appendChild(b);
+});
+document.addEventListener('keydown',e=>{
+  const as=document.getElementById('angleSlider'),ps=document.getElementById('powerSlider');
+  // Blur sliders so they don't swallow arrow keys
+  if(e.key.startsWith('Arrow')){e.preventDefault();document.activeElement && document.activeElement.blur();}
+  if(e.key==='ArrowLeft'){as.value=Math.max(0,+as.value-2);as.dispatchEvent(new Event('input'));}
+  else if(e.key==='ArrowRight'){as.value=Math.min(180,+as.value+2);as.dispatchEvent(new Event('input'));}
+  else if(e.key==='ArrowUp'){ps.value=Math.min(100,+ps.value+2);ps.dispatchEvent(new Event('input'));}
+  else if(e.key==='ArrowDown'){ps.value=Math.max(5,+ps.value-2);ps.dispatchEvent(new Event('input'));}
+  // A/D = move tank laterally (one move per turn)
+  if(e.key==='a'||e.key==='A'){moveTank(-1);}
+  if(e.key==='d'||e.key==='D'){moveTank(1);}
+  if(e.key===' '||e.key==='Enter'){e.preventDefault();fire();}
+});
+function moveTank(dir){
+  if(firing||gameOver||hasMoved) return;
+  const tank=tanks[turn];
+  const step=18*dir;
+  const nx=Math.max(20,Math.min(W-20,tank.x+step));
+  tank.x=nx;
+  tank.y=getTerrainY(nx);
+  hasMoved=true;
+}
+function initGame(){
+  gameOver=false;turn=0;turnCount=1;projectiles=[];explosions=[];particles=[];firing=false;selectedWeapon=0;hasMoved=false;
+  document.querySelectorAll('.wpn-btn').forEach((b,i)=>b.classList.toggle('selected',i===0));
+  document.getElementById('weapon-name').textContent=WEAPONS[0].name;
+  generateTerrain();placeTanks();
+  document.getElementById('turn-label').textContent='TURN 1 \u2014 P1';
+  document.getElementById('p1panel').classList.add('active');
+  document.getElementById('p2panel').classList.remove('active');
+  document.getElementById('angleSlider').value=45;document.getElementById('angleVal').textContent='45\u00b0';
+  document.getElementById('powerSlider').value=50;document.getElementById('powerVal').textContent='50';
+  document.getElementById('fireBtn').disabled=false;
+  updateHUD();showMsg('PLAYER 1 TURN \u2014 A/D TO MOVE');
+}
+initGame();requestAnimationFrame(loop);
+</script>
+</body>
+</html>

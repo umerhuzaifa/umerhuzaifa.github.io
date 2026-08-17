@@ -92,6 +92,7 @@ This page provides a peak into the side projects I develop for aid in teaching a
     <option value="controls">Controls &amp; Simulation</option>
     <option value="signal">Signal Processing</option>
     <option value="tools">Tools &amp; Calculators</option>
+    <option value="games">Games</option>
   </select>
   <span class="portfolio-count" id="portfolioCount"></span>
 </div>
@@ -215,6 +216,25 @@ This page provides a peak into the side projects I develop for aid in teaching a
       </div>
     </a>
   </div>
+  <div class="project-item" data-category="tools">
+    <a href="./projects/robotics_path.html" target="_blank">
+      <img src="/assets/images/robotics_curriculum.jpg" alt="BS in Robotics Curriculum" />
+      <div class="tile-body">
+        <span class="tag">Tools</span>
+        <h3>Course Pathway for BS in Robotics</h3>
+      </div>
+    </a>
+  </div>  
+  <div class="project-item" data-category="games">
+    <a href="./projects/pocket-tanks.html" target="_blank">
+      <img src="/assets/images/pocket-tanks-gameplay.png" alt="Pocket Tanks" />
+      <div class="tile-body">
+        <span class="tag">Games</span>
+        <h3>Pocket Tanks</h3>
+      </div>
+    </a>
+  </div>
+
 
 </div>
 

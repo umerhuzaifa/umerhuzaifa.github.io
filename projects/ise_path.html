@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BS in Robotics — Course Sequence Schematic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-deep:#EEF2F5;
+  --bg-panel:#E4EAEF;
+  --bg-card:#FFFFFF;
+  --bg-card-hi:#F4F8FB;
+  --line-grid: rgba(23,55,84,0.07);
+  --line-grid-strong: rgba(23,55,84,0.14);
+  --copper:#BD6A2E;
+  --copper-soft: rgba(189,106,46,0.14);
+  --cyan:#1D7E8C;
+  --cyan-soft: rgba(29,126,140,0.16);
+  --amber:#C4791E;
+  --teal:#2C6E8C;
+  --slate:#5C7488;
+  --text-hi:#152A3B;
+  --text-mid:#3E5568;
+  --text-dim:#748AA0;
+  --danger-line: rgba(196,121,30,0.9);
+  --radius: 3px;
+  --font-display:'Space Grotesk', sans-serif;
+  --font-body:'IBM Plex Sans', sans-serif;
+  --font-mono:'IBM Plex Mono', monospace;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:
+    linear-gradient(var(--line-grid) 1px, transparent 1px) 0 0/34px 34px,
+    linear-gradient(90deg, var(--line-grid) 1px, transparent 1px) 0 0/34px 34px,
+    var(--bg-deep);
+  color:var(--text-hi);
+  font-family:var(--font-body);
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+::selection{background:var(--copper-soft);}
+
+/* ---------- Header ---------- */
+header.hero{
+  padding:38px 44px 26px;
+  border-bottom:1px solid var(--line-grid-strong);
+  position:relative;
+}
+.eyebrow{
+  font-family:var(--font-mono);
+  font-size:11.5px;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--cyan);
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:10px;
+}
+.eyebrow::before{
+  content:"";
+  width:7px;height:7px;
+  background:var(--cyan);
+  box-shadow:0 0 8px 2px var(--cyan-soft);
+  border-radius:1px;
+  display:inline-block;
+}
+h1{
+  font-family:var(--font-display);
+  font-weight:700;
+  font-size:clamp(26px, 3.4vw, 42px);
+  margin:0 0 10px;
+  letter-spacing:-0.01em;
+  line-height:1.05;
+}
+h1 span{color:var(--copper);}
+.hero-sub{
+  color:var(--text-mid);
+  max-width:640px;
+  font-size:14.5px;
+  line-height:1.55;
+  margin:0;
+}
+.hero-meta{
+  margin-top:20px;
+  display:flex;
+  gap:26px;
+  flex-wrap:wrap;
+  font-family:var(--font-mono);
+  font-size:12px;
+  color:var(--text-dim);
+}
+.hero-meta b{color:var(--text-hi); font-weight:600;}
+
+/* ---------- Layout ---------- */
+.layout{
+  display:grid;
+  grid-template-columns: 1fr 320px;
+  gap:0;
+  align-items:start;
+}
+@media (max-width: 980px){
+  .layout{grid-template-columns:1fr;}
+  aside.sidebar{border-left:none; border-top:1px solid var(--line-grid-strong);}
+}
+
+/* ---------- Map area ---------- */
+main.map-wrap{
+  padding:30px 10px 60px 44px;
+  overflow-x:auto;
+}
+.legend{
+  display:flex;
+  flex-wrap:wrap;
+  gap:18px;
+  margin-bottom:26px;
+  padding:12px 16px;
+  background:var(--bg-panel);
+  border:1px solid var(--line-grid-strong);
+  border-radius:var(--radius);
+  font-size:12px;
+  color:var(--text-mid);
+  font-family:var(--font-mono);
+}
+.legend .item{display:flex; align-items:center; gap:7px;}
+.legend .swatch{width:11px;height:11px;border-radius:2px; flex-shrink:0;}
+.legend .ln{width:22px;height:0; border-top:2px solid var(--cyan); flex-shrink:0;}
+.legend .ln.dash{border-top-style:dashed; border-top-color:var(--amber);}
+.legend button{
+  margin-left:auto;
+  background:transparent;
+  border:1px solid var(--slate);
+  color:var(--text-mid);
+  font-family:var(--font-mono);
+  font-size:11px;
+  padding:5px 10px;
+  border-radius:var(--radius);
+  cursor:pointer;
+  letter-spacing:.04em;
+}
+.legend button:hover{border-color:var(--cyan); color:var(--cyan);}
+
+.grid-outer{position:relative; min-width:980px;}
+svg.traces{position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:5;}
+svg.traces path{
+  fill:none;
+  stroke: var(--cyan);
+  stroke-width:1.6;
+  opacity:0.55;
+  transition:opacity .2s, stroke .2s, stroke-width .2s;
+}
+svg.traces path.dashed{ stroke-dasharray:4 4; stroke:var(--amber); }
+svg.traces circle{ fill:var(--cyan); opacity:0.75; transition:opacity .2s, fill .2s; }
+svg.traces path.dim, svg.traces circle.dim{ opacity:0.08; }
+svg.traces path.active{ opacity:1; stroke-width:2.2; stroke:var(--amber); filter:drop-shadow(0 0 2px rgba(196,121,30,.55)); }
+svg.traces circle.active{ opacity:1; fill:var(--amber); }
+
+.years-row{
+  display:grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap:30px;
+  position:relative;
+  z-index:2;
+}
+.year-col{ min-width:210px; }
+.year-head{
+  font-family:var(--font-display);
+  font-weight:600;
+  font-size:15px;
+  color:var(--text-hi);
+  padding-bottom:8px;
+  margin-bottom:16px;
+  border-bottom:2px solid var(--copper);
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+}
+.year-head small{
+  font-family:var(--font-mono);
+  font-weight:400;
+  font-size:11px;
+  color:var(--text-dim);
+}
+.quarter-block{ margin-bottom:22px; }
+.quarter-label{
+  font-family:var(--font-mono);
+  font-size:10.5px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--teal);
+  margin-bottom:9px;
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+.quarter-label::after{
+  content:"";
+  flex:1;
+  height:1px;
+  background:var(--line-grid-strong);
+}
+.course-list{ display:flex; flex-direction:column; gap:7px; }
+
+.card{
+  background:var(--bg-card);
+  border:1px solid var(--line-grid-strong);
+  border-left:3px solid var(--slate);
+  border-radius:var(--radius);
+  padding:8px 10px;
+  cursor:pointer;
+  transition:transform .12s, background .15s, border-color .15s, opacity .2s, box-shadow .15s;
+  position:relative;
+}
+.card:hover{ background:var(--bg-card-hi); transform:translateX(2px); }
+.card.core{ border-left-color:var(--copper); }
+.card.gened{ border-left-color:var(--teal); }
+.card.elective-slot{ border-left-color:var(--slate); border-left-style:dashed; opacity:0.82;}
+.card .code{
+  font-family:var(--font-mono);
+  font-size:11.5px;
+  color:var(--copper);
+  letter-spacing:.02em;
+}
+.card.gened .code{ color:var(--teal); }
+.card.elective-slot .code{ color:var(--text-dim); }
+.card .name{
+  font-size:12px;
+  line-height:1.3;
+  color:var(--text-mid);
+  margin-top:2px;
+}
+.card .cr{
+  position:absolute;
+  top:8px; right:9px;
+  font-family:var(--font-mono);
+  font-size:10px;
+  color:var(--text-dim);
+}
+.card.selected{
+  background:var(--bg-card-hi);
+  border-left-color:var(--amber);
+  box-shadow:0 0 0 1px var(--amber), 0 0 10px rgba(196,121,30,.18);
+}
+.card.upstream{ border-left-color:var(--cyan); box-shadow:0 0 0 1px var(--cyan); }
+.card.downstream{ border-left-color:var(--amber); box-shadow:0 0 0 1px var(--amber); }
+.card.dimmed{ opacity:0.25; }
+.card .note-flag{
+  position:absolute; bottom:6px; right:8px;
+  font-family:var(--font-mono); font-size:9.5px;
+  color:var(--text-dim);
+}
+
+/* ---------- Sidebar ---------- */
+aside.sidebar{
+  border-left:1px solid var(--line-grid-strong);
+  background:var(--bg-panel);
+  padding:30px 26px 60px;
+  min-height:100%;
+  position:sticky;
+  top:0;
+  align-self:start;
+  max-height:100vh;
+  overflow-y:auto;
+}
+.sidebar h2{
+  font-family:var(--font-display);
+  font-size:16px;
+  margin:0 0 4px;
+  color:var(--text-hi);
+}
+.sidebar .sub{
+  font-size:11.5px;
+  color:var(--text-dim);
+  font-family:var(--font-mono);
+  margin-bottom:18px;
+}
+.req-search{
+  width:100%;
+  background:var(--bg-deep);
+  border:1px solid var(--line-grid-strong);
+  color:var(--text-hi);
+  font-family:var(--font-mono);
+  font-size:12px;
+  padding:8px 10px;
+  border-radius:var(--radius);
+  margin-bottom:18px;
+}
+.req-search:focus{ outline:none; border-color:var(--cyan); }
+.req-section{ margin-bottom:24px; }
+.req-section-title{
+  font-family:var(--font-mono);
+  font-size:11px;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--copper);
+  margin-bottom:10px;
+  display:flex; justify-content:space-between;
+}
+.req-item{
+  padding:7px 0;
+  border-bottom:1px solid rgba(23,55,84,0.08);
+  cursor:pointer;
+  transition:opacity .15s;
+}
+.req-item:hover .req-code{ color:var(--amber); }
+.req-code{
+  font-family:var(--font-mono);
+  font-size:11.5px;
+  color:var(--copper);
+  transition:color .15s;
+}
+.req-name{
+  font-size:12px;
+  color:var(--text-mid);
+  margin-top:1px;
+  line-height:1.35;
+}
+.req-note{
+  font-size:10.5px;
+  color:var(--cyan);
+  margin-top:2px;
+  font-family:var(--font-mono);
+}
+.req-item.hidden{ display:none; }
+.elective-item .req-code{ color:var(--teal); }
+.totals-box{
+  margin-top:8px;
+  background:var(--bg-deep);
+  border:1px solid var(--line-grid-strong);
+  border-radius:var(--radius);
+  padding:14px 16px;
+  font-family:var(--font-mono);
+  font-size:12px;
+}
+.totals-box div{ display:flex; justify-content:space-between; padding:3px 0; color:var(--text-mid); }
+.totals-box div.grand{ margin-top:6px; padding-top:8px; border-top:1px dashed var(--line-grid-strong); color:var(--text-hi); font-weight:600; }
+.totals-box span.n{ color:var(--amber); }
+
+footer{
+  padding:20px 44px 40px;
+  color:var(--text-dim);
+  font-family:var(--font-mono);
+  font-size:11px;
+  border-top:1px solid var(--line-grid-strong);
+  line-height:1.6;
+}
+footer b{ color:var(--text-mid); }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="eyebrow">Course Sequence &amp; Prerequisite Schematic</div>
+  <h1>BS in Robotics — <span>Four-Year Course Map</span></h1>
+  <p class="hero-sub">A wiring diagram for the degree: every course placed by year and quarter, with cyan traces
+  routing each prerequisite into the course it feeds. Click any course to trace its dependency chain.</p>
+  <div class="hero-meta">
+    <div><b>192</b> total quarter hours</div>
+    <div><b>96</b> core credits</div>
+    <div><b>8</b> major elective credits</div>
+    <div><b>12</b> open elective credits</div>
+    <div><b>4</b> years / <b>12</b> quarters</div>
+  </div>
+</header>
+
+<div class="layout">
+  <main class="map-wrap">
+    <div class="legend">
+      <div class="item"><span class="swatch" style="background:var(--copper)"></span> Core requirement</div>
+      <div class="item"><span class="swatch" style="background:var(--teal)"></span> General education</div>
+      <div class="item"><span class="swatch" style="background:var(--slate)"></span> Elective slot</div>
+      <div class="item"><span class="ln"></span> Prerequisite</div>
+      <div class="item"><span class="ln dash"></span> Alt. / dept-noted requirement</div>
+      <button id="resetBtn">Reset view</button>
+    </div>
+
+    <div class="grid-outer" id="gridOuter">
+      <svg class="traces" id="traceSvg"></svg>
+      <div class="years-row" id="yearsRow"></div>
+    </div>
+  </main>
+
+  <aside class="sidebar">
+    <h2>Major Requirements</h2>
+    <div class="sub">Source: "Major Requirements" worksheet</div>
+    <input class="req-search" id="reqSearch" placeholder="Filter courses… (e.g. CSE, MAT, prereq)">
+
+    <div class="req-section">
+      <div class="req-section-title"><span>Core Courses</span><span>96 cr</span></div>
+      <div id="coreList"></div>
+    </div>
+
+    <div class="req-section">
+      <div class="req-section-title"><span>Major Electives — pick 8 cr</span><span id="electiveCount"></span></div>
+      <div id="electiveList"></div>
+    </div>
+
+    <div class="totals-box">
+      <div>Core courses<span class="n">96</span></div>
+      <div>Major electives (select)<span class="n">8</span></div>
+      <div>Open electives (select)<span class="n">12</span></div>
+      <div class="grand">Major total<span class="n">116</span></div>
+      <div>Degree total (incl. gen ed)<span class="n">192</span></div>
+    </div>
+  </aside>
+</div>
+
+<footer>
+  <div><b>Notes on source data:</b> CSE 301 → CSE 303 and CSE 270 in the tentative plan are listed as CSE 302 and CSE 370, respectively, in the Major Requirements sheet — traces follow the plan's own numbering. MAT 140's prerequisite (MAT 130 or placement test) and MAT 349's pending prerequisite change are flagged on their cards but not drawn as traces since those courses aren't scheduled elsewhere in this plan.</div>
+</footer>
+
+<script id="course-data" type="application/json">
+{
+  "courses": [
+    {
+      "id": "c140",
+      "code": "CSC 241",
+      "name": "Introduction to Computer Science I",
+      "credits": 4,
+      "year": 1,
+      "quarter": "Autumn",
+      "category": "core"
+    },
+    {
+      "id": "m140",
+      "code": "MAT 140",
+      "name": "Discrete Mathematics I",
+      "credits": 4,
+      "year": 1,
+      "quarter": "Autumn",
+      "category": "core"
+    },
+    {
+      "id": "l110",
+      "code": "LSP 110",
+      "name": "Discover Chicago",
+      "credits": 4,
+      "year": 1,
+      "quarter": "Autumn",
+      "category": "gened"
+    },
+    {
+      "id": "w103",
+      "code": "WRD 103",
+      "name": "Composition and Rhetoric I",
+      "credits": 4,
+      "year": 1,
+      "quarter": "Autumn",
+      "category": "gened"
+    },
+    {
+      "id": "c242",
+      "code": "CSC 242",
+      "name": "Introduction to Computer Science II",
+      "credits": 4,
+      "year": 1,
+      "quarter": "Winter",
+      "category": "core"
+    },
+    {
+      "id": "l112",
+      "code": "LSP 112",
+      "name": "Focal Point Seminar",
+      "credits": 4,
+      "year": 1,
+      "quarter": "Winter",
+      "category": "gened"
+    },
+    {
+      "id": "w104",
+      "code": "WRD 104",
+      "name": "Composition and Rhetoric II",
+      "credits": 4,
+      "year": 1,
+      "quarter": "Winter",
+      "category": "gened"
+    },
+    {
+      "id": "m150",
+      "code": "MAT 150",
+      "name": "Calculus I",
+      "credits": 4,
+      "year": 1,
+      "quarter": "Winter",
+      "category": "core"
+    },
+    {
+      "id": "a1",
+      "code": "Arts I",
+      "name": "Arts and Literature I",
+      "credits": 4,
+      "year": 1,
+      "quarter": "Spring",
+      "category": "gened"
+    },
+    {
+      "id": "s1",
+      "code": "SCBI I",
+      "name": "Social, Cultural, and Behavioral Inquiry I",
+      "credits": 4,
+      "year": 1,
+      "quarter": "Spring",
+      "category": "gened"
+    },
+    {
+      "id": "cse101",
+      "code": "CSE 101",
+      "name": "Robot Prototyping",
+      "credits": 4,
+      "year": 1,
+      "quarter": "Spring",
+      "category": "core"
+    },
+    {
+      "id": "m151",
+      "code": "MAT 151",
+      "name": "Calculus II",
+      "credits": 4,
+      "year": 1,
+      "quarter": "Spring",
+      "category": "core"
+    },
+    {
+      "id": "c300",
+      "code": "CSC 300",
+      "name": "Data Structures I",
+      "credits": 4,
+      "year": 2,
+      "quarter": "Autumn",
+      "category": "core"
+    },
+    {
+      "id": "cse332",
+      "code": "CSE 332",
+      "name": "Analog and Digital Circuits",
+      "credits": 4,
+      "year": 2,
+      "quarter": "Autumn",
+      "category": "core"
+    },
+    {
+      "id": "ethtech",
+      "code": "ETHTECH",
+      "name": "Ethics in Technology",
+      "credits": 4,
+      "year": 2,
+      "quarter": "Autumn",
+      "category": "gened"
+    },
+    {
+      "id": "s2",
+      "code": "SCBI II",
+      "name": "Social, Cultural, and Behavioral Inquiry II",
+      "credits": 4,
+      "year": 2,
+      "quarter": "Autumn",
+      "category": "gened"
+    },
+    {
+      "id": "c301",
+      "code": "CSC 301",
+      "name": "Data Structures II",
+      "credits": 4,
+      "year": 2,
+      "quarter": "Winter",
+      "category": "core"
+    },
+    {
+      "id": "w204",
+      "code": "WRD 204",
+      "name": "Technical Writing",
+      "credits": 4,
+      "year": 2,
+      "quarter": "Winter",
+      "category": "core"
+    },
+    {
+      "id": "h1",
+      "code": "HIST I",
+      "name": "Historical Inquiry I",
+      "credits": 4,
+      "year": 2,
+      "quarter": "Winter",
+      "category": "gened"
+    },
+    {
+      "id": "cse333",
+      "code": "CSE 333",
+      "name": "Digital Signal Processing",
+      "credits": 4,
+      "year": 2,
+      "quarter": "Winter",
+      "category": "core"
+    },
+    {
+      "id": "cse299",
+      "code": "CSE 299",
+      "name": "Hardware Projects using Raspberry Pi",
+      "credits": 4,
+      "year": 2,
+      "quarter": "Spring",
+      "category": "core"
+    },
+    {
+      "id": "rel1",
+      "code": "RELDIM I",
+      "name": "Religious Dimensions I",
+      "credits": 4,
+      "year": 2,
+      "quarter": "Spring",
+      "category": "gened"
+    },
+    {
+      "id": "l200",
+      "code": "LSP 200",
+      "name": "Seminar on Race, Power, and Resistance",
+      "credits": 4,
+      "year": 2,
+      "quarter": "Spring",
+      "category": "gened"
+    },
+    {
+      "id": "c373",
+      "code": "CSC 373",
+      "name": "Computer Systems I",
+      "credits": 4,
+      "year": 2,
+      "quarter": "Spring",
+      "category": "core"
+    },
+    {
+      "id": "cse301",
+      "code": "CSE 301",
+      "name": "Robot Kinematics and Dynamics",
+      "credits": 4,
+      "year": 3,
+      "quarter": "Autumn",
+      "category": "core"
+    },
+    {
+      "id": "a2",
+      "code": "Arts II",
+      "name": "Arts and Literature II",
+      "credits": 4,
+      "year": 3,
+      "quarter": "Autumn",
+      "category": "gened"
+    },
+    {
+      "id": "m220",
+      "code": "MAT 220",
+      "name": "Linear Algebra",
+      "credits": 4,
+      "year": 3,
+      "quarter": "Autumn",
+      "category": "core"
+    },
+    {
+      "id": "c374",
+      "code": "CSC 374",
+      "name": "Computer Systems II",
+      "credits": 4,
+      "year": 3,
+      "quarter": "Autumn",
+      "category": "core"
+    },
+    {
+      "id": "cse351",
+      "code": "CSE 351",
+      "name": "Embedded Systems I",
+      "credits": 4,
+      "year": 3,
+      "quarter": "Winter",
+      "category": "core"
+    },
+    {
+      "id": "cse361",
+      "code": "CSE 361",
+      "name": "Mathematical Foundations of Autonomous Systems",
+      "credits": 4,
+      "year": 3,
+      "quarter": "Winter",
+      "category": "core"
+    },
+    {
+      "id": "h2",
+      "code": "HIST II",
+      "name": "Historical Inquiry II",
+      "credits": 4,
+      "year": 3,
+      "quarter": "Winter",
+      "category": "gened"
+    },
+    {
+      "id": "m349",
+      "code": "MAT 349",
+      "name": "Applied Probability",
+      "credits": 4,
+      "year": 3,
+      "quarter": "Winter",
+      "category": "core"
+    },
+    {
+      "id": "open1",
+      "code": "Open Elec I",
+      "name": "Open Elective I",
+      "credits": 4,
+      "year": 3,
+      "quarter": "Spring",
+      "category": "elective-slot"
+    },
+    {
+      "id": "cse370",
+      "code": "CSE 370",
+      "name": "Perception and Estimation",
+      "credits": 4,
+      "year": 3,
+      "quarter": "Spring",
+      "category": "core"
+    },
+    {
+      "id": "phil1",
+      "code": "PHIL I",
+      "name": "Philosophical Inquiry I",
+      "credits": 4,
+      "year": 3,
+      "quarter": "Spring",
+      "category": "gened"
+    },
+    {
+      "id": "cse375",
+      "code": "CSE 375",
+      "name": "Introduction to Robotics",
+      "credits": 4,
+      "year": 3,
+      "quarter": "Spring",
+      "category": "core"
+    },
+    {
+      "id": "majorelec1",
+      "code": "Major Elec I",
+      "name": "Major Elective I",
+      "credits": 4,
+      "year": 4,
+      "quarter": "Autumn",
+      "category": "elective-slot"
+    },
+    {
+      "id": "majorelec2",
+      "code": "Major Elec II",
+      "name": "Major Elective II",
+      "credits": 4,
+      "year": 4,
+      "quarter": "Autumn",
+      "category": "elective-slot"
+    },
+    {
+      "id": "a3",
+      "code": "Arts III",
+      "name": "Arts and Literature III",
+      "credits": 4,
+      "year": 4,
+      "quarter": "Autumn",
+      "category": "gened"
+    },
+    {
+      "id": "cse303",
+      "code": "CSE 303",
+      "name": "Planning and Decision Making in Robots",
+      "credits": 4,
+      "year": 4,
+      "quarter": "Autumn",
+      "category": "core"
+    },
+    {
+      "id": "c380",
+      "code": "CSC 380",
+      "name": "Foundations of AI",
+      "credits": 4,
+      "year": 4,
+      "quarter": "Winter",
+      "category": "core"
+    },
+    {
+      "id": "cse393",
+      "code": "CSE 393",
+      "name": "CPSE Practicum I",
+      "credits": 4,
+      "year": 4,
+      "quarter": "Winter",
+      "category": "gened"
+    },
+    {
+      "id": "rel2",
+      "code": "RELDIM II",
+      "name": "Religious Dimension II",
+      "credits": 4,
+      "year": 4,
+      "quarter": "Winter",
+      "category": "gened"
+    },
+    {
+      "id": "scilab",
+      "code": "SciLab",
+      "name": "Scientific Inquiry Lab",
+      "credits": 4,
+      "year": 4,
+      "quarter": "Winter",
+      "category": "gened"
+    },
+    {
+      "id": "s3",
+      "code": "SCBI III",
+      "name": "Social, Cultural, and Behavioral Inquiry III",
+      "credits": 4,
+      "year": 4,
+      "quarter": "Spring",
+      "category": "gened"
+    },
+    {
+      "id": "cse394",
+      "code": "CSE 394",
+      "name": "CPSE Practicum II",
+      "credits": 4,
+      "year": 4,
+      "quarter": "Spring",
+      "category": "core"
+    },
+    {
+      "id": "open2",
+      "code": "Open Elec II",
+      "name": "Open Elective (2)",
+      "credits": 4,
+      "year": 4,
+      "quarter": "Spring",
+      "category": "elective-slot"
+    },
+    {
+      "id": "open3",
+      "code": "Open Elec III",
+      "name": "Open Elective (3)",
+      "credits": 4,
+      "year": 4,
+      "quarter": "Spring",
+      "category": "elective-slot"
+    }
+  ],
+  "edges": [
+    {
+      "from": "m151",
+      "to": "cse332",
+      "note": null
+    },
+    {
+      "from": "cse333",
+      "to": "cse361",
+      "note": null
+    },
+    {
+      "from": "m349",
+      "to": "cse361",
+      "note": "or MAT 351 (not in this plan)"
+    },
+    {
+      "from": "m220",
+      "to": "cse301",
+      "note": "listed as CSE 302 in Major Requirements sheet"
+    },
+    {
+      "from": "cse301",
+      "to": "cse303"
+    },
+    {
+      "from": "cse361",
+      "to": "cse370",
+      "note": "listed as CSE 370 in Major Requirements sheet"
+    },
+    {
+        "from": "c300",
+        "to": "c301"
+    },
+    {
+        "from": "c373",
+        "to": "c374"
+    }
+  ],
+  "notes": {
+    "MAT 140": "Prereq: MAT 130 or placement test (MAT 130 not part of this plan)",    
+    "CSE 101": "Prereq: None"
+  },
+  "coreRequirements": [
+    {
+      "code": "CSC 241",
+      "name": "Introduction to Computer Science I",
+      "credits": 4,
+      "note": null
+    },
+    {
+      "code": "CSC 242",
+      "name": "Introduction to Computer Science II",
+      "credits": 4,
+      "note": null
+    },
+    {
+      "code": "CSC 300",
+      "name": "Data Structures I",
+      "credits": 4,
+      "note": null
+    },
+    {
+      "code": "CSC 301",
+      "name": "Data Structures II",
+      "credits": 4,
+      "note": null
+    },
+    {
+      "code": "CSC 373",
+      "name": "Computer Systems I",
+      "credits": 4,
+      "note": null
+    },
+    {
+      "code": "CSC 374",
+      "name": "Computer Systems II",
+      "credits": 4,
+      "note": null
+    },
+    {
+      "code": "CSC 380",
+      "name": "Foundations of Artificial Intelligence",
+      "credits": 4,
+      "note": null
+    },
+    {
+      "code": "CSE 375",
+      "name": "Introduction to Robotics",
+      "credits": 4,
+      "note": null
+    },
+    {
+      "code": "CSE 101",
+      "name": "Robot Prototyping",
+      "credits": 4,
+      "note": "prereq: None"
+    },
+    {
+      "code": "CSE 299",
+      "name": "Hardware Projects",
+      "credits": 4,
+      "note": null
+    },
+    {
+      "code": "CSE 332",
+      "name": "Analog and Digital Circuits",
+      "credits": 4,
+      "note": "prereq: MAT 151"
+    },
+    {
+      "code": "CSE 333",
+      "name": "Digital Signal Processing",
+      "credits": 4,
+      "note": null
+    },
+    {
+      "code": "CSE 351",
+      "name": "Embedded Systems I",
+      "credits": 4,
+      "note": null
+    },
+    {
+      "code": "CSE 361",
+      "name": "Mathematical Foundation of Autonomous Systems",
+      "credits": 4,
+      "note": "prereq: CSE 333 and (MAT 349 or MAT 351)"
+    },
+    {
+      "code": "CSE 302",
+      "name": "Robot Kinematics and Dynamics",
+      "credits": 4,
+      "note": "prereq: MAT 220"
+    },
+    {
+      "code": "CSE 303",
+      "name": "Planning and Decision Making for Robots",
+      "credits": 4,
+      "note": "prereq: CSE 302"
+    },
+    {
+      "code": "CSE 370",
+      "name": "Perception and Estimation",
+      "credits": 4,
+      "note": "prereq: CSE 361"
+    },
+    {
+      "code": "CSE 394",
+      "name": "Engineering Practicum II (Capstone)",
+      "credits": 4,
+      "note": null
+    },
+    {
+      "code": "MAT 140",
+      "name": "Discrete Mathematics I",
+      "credits": 4,
+      "note": "prereq: MAT 130 or by placement test"
+    },
+    {
+      "code": "MAT 150",
+      "name": "Calculus I",
+      "credits": 4,
+      "note": null
+    },
+    {
+      "code": "MAT 151",
+      "name": "Calculus II",
+      "credits": 4,
+      "note": null
+    },
+    {
+      "code": "MAT 220",
+      "name": "Linear Algebra",
+      "credits": 4,
+      "note": null
+    },
+    {
+      "code": "MAT 349",
+      "name": "Applied Probability",
+      "credits": 4,
+      "note": "Math dept will change prereq to include MAT 140"
+    },
+    {
+      "code": "WRD 204",
+      "name": "Technical Writing",
+      "credits": 4,
+      "note": null
+    }
+  ],
+  "majorElectives": [
+    {
+      "code": "BIO 191",
+      "name": "General Biology I for Science Majors",
+      "credits": 4
+    },
+    {
+      "code": "BIO 192",
+      "name": "General Biology II for Science Majors",
+      "credits": 4
+    },
+    {
+      "code": "BIO 193",
+      "name": "General Biology III for Science Majors",
+      "credits": 4
+    },
+    {
+      "code": "CHE 140",
+      "name": "University Chemistry I",
+      "credits": 4
+    },
+    {
+      "code": "CHE 142",
+      "name": "University Chemistry II",
+      "credits": 4
+    },
+    {
+      "code": "CHE 144",
+      "name": "University Chemistry III",
+      "credits": 4
+    },
+    {
+      "code": "MAT 141",
+      "name": "Discrete Math II",
+      "credits": 4
+    },
+    {
+      "code": "MAT 152",
+      "name": "Calculus III",
+      "credits": 4
+    },
+    {
+      "code": "MAT 260",
+      "name": "Multivariable Calculus I",
+      "credits": 4
+    },
+    {
+      "code": "MAT 261",
+      "name": "Multivariable Calculus II",
+      "credits": 4
+    },
+    {
+      "code": "MAT 304",
+      "name": "Differential Equations",
+      "credits": 4
+    },
+    {
+      "code": "MAT 305",
+      "name": "Graph Theory",
+      "credits": 4
+    },
+    {
+      "code": "MAT 348",
+      "name": "Applied Statistical Methods",
+      "credits": 4
+    },
+    {
+      "code": "MAT 350",
+      "name": "Bayesian Statistics",
+      "credits": 4
+    },
+    {
+      "code": "MAT 381",
+      "name": "Fourier Analysis and Special Functions",
+      "credits": 4
+    },
+    {
+      "code": "MAT 384",
+      "name": "Mathematical Modeling",
+      "credits": 4
+    },
+    {
+      "code": "MAT 385",
+      "name": "Numerical Analysis I",
+      "credits": 4
+    },
+    {
+      "code": "MAT 386",
+      "name": "Numerical Analysis II",
+      "credits": 4
+    },
+    {
+      "code": "PHY 231",
+      "name": "Linear Electric Circuits",
+      "credits": 4
+    },
+    {
+      "code": "PHY 170",
+      "name": "University Physics I",
+      "credits": 4
+    },
+    {
+      "code": "PHY 171",
+      "name": "University Physics II",
+      "credits": 4
+    },
+    {
+      "code": "PHY 172",
+      "name": "University Physics III",
+      "credits": 4
+    },
+    {
+      "code": "PHY 270",
+      "name": "University Physics IV",
+      "credits": 4
+    },
+    {
+      "code": "PHY 300",
+      "name": "Methods of Computational and Theoretical Physics I",
+      "credits": 4
+    },
+    {
+      "code": "PHY 301",
+      "name": "Methods of Computational and Theoretical Physics II",
+      "credits": 4
+    },
+    {
+      "code": "PHY 320",
+      "name": "Electricity and Magnetism I",
+      "credits": 4
+    },
+    {
+      "code": "PHY 321",
+      "name": "Electricity and Magnetism II",
+      "credits": 4
+    },
+    {
+      "code": "PHY 370",
+      "name": "Electronics",
+      "credits": 4
+    },
+    {
+      "code": "300-lvl",
+      "name": "Any 300-level CSC, CSE, CSEC, DS, or SE course",
+      "credits": 4
+    }
+  ],
+  "totals": {
+    "core": 96,
+    "electivePick": 8,
+    "openPick": 12,
+    "total": 116,
+    "grandTotal": 192
+  }
+}
+</script>
+
+<script>
+const DATA = JSON.parse(document.getElementById('course-data').textContent);
+const { courses, edges, notes, coreRequirements, majorElectives } = DATA;
+
+// ---------- Build the year/quarter grid ----------
+const yearsRow = document.getElementById('yearsRow');
+const YEARS = [1,2,3,4];
+const QUARTERS = ["Autumn","Winter","Spring"];
+const YEAR_LABEL = {1:"First Year",2:"Second Year",3:"Third Year",4:"Fourth Year"};
+
+YEARS.forEach(y=>{
+  const col = document.createElement('div');
+  col.className = 'year-col';
+  const yearCourses = courses.filter(c=>c.year===y);
+  const yearCredits = yearCourses.reduce((s,c)=>s+c.credits,0);
+  col.innerHTML = `<div class="year-head">${YEAR_LABEL[y]}<small>${yearCredits} cr</small></div>`;
+
+  QUARTERS.forEach(q=>{
+    const qc = yearCourses.filter(c=>c.quarter===q);
+    if(!qc.length) return;
+    const block = document.createElement('div');
+    block.className = 'quarter-block';
+    block.innerHTML = `<div class="quarter-label">${q}</div>`;
+    const list = document.createElement('div');
+    list.className = 'course-list';
+    qc.forEach(c=>{
+      const card = document.createElement('div');
+      card.className = `card ${c.category}`;
+      card.dataset.id = c.id;
+      card.dataset.code = c.code;
+      const noteHtml = notes[c.code] ? `<div class="note-flag" title="${notes[c.code]}">note</div>` : '';
+      card.innerHTML = `<div class="cr">${c.credits}cr</div><div class="code">${c.code}</div><div class="name">${c.name}</div>${noteHtml}`;
+      card.addEventListener('click', ()=>toggleSelect(c.id));
+      list.appendChild(card);
+    });
+    block.appendChild(list);
+    col.appendChild(block);
+  });
+  yearsRow.appendChild(col);
+});
+
+// ---------- Build adjacency for highlighting ----------
+const upstreamMap = {};   // course -> [prereqs]
+const downstreamMap = {}; // course -> [dependents]
+edges.forEach(e=>{
+  (upstreamMap[e.to] = upstreamMap[e.to]||[]).push(e.from);
+  (downstreamMap[e.from] = downstreamMap[e.from]||[]).push(e.to);
+});
+
+function collectChain(id){
+  const up = new Set(), down = new Set();
+  (function walkUp(cid){
+    (upstreamMap[cid]||[]).forEach(p=>{ if(!up.has(p)){ up.add(p); walkUp(p);} });
+  })(id);
+  (function walkDown(cid){
+    (downstreamMap[cid]||[]).forEach(d=>{ if(!down.has(d)){ down.add(d); walkDown(d);} });
+  })(id);
+  return {up, down};
+}
+
+// ---------- SVG trace drawing ----------
+const svg = document.getElementById('traceSvg');
+const gridOuter = document.getElementById('gridOuter');
+
+function drawTraces(){
+  const outerRect = gridOuter.getBoundingClientRect();
+  gridOuter.style.height = yearsRow.getBoundingClientRect().height + 'px';
+  svg.setAttribute('viewBox', `0 0 ${outerRect.width} ${outerRect.height}`);
+  svg.setAttribute('width', outerRect.width);
+  svg.setAttribute('height', outerRect.height);
+  svg.innerHTML = '';
+
+  edges.forEach((e,i)=>{
+    const srcEl = document.querySelector(`.card[data-id="${e.from}"]`);
+    const tgtEl = document.querySelector(`.card[data-id="${e.to}"]`);
+    if(!srcEl || !tgtEl) return;
+    const s = srcEl.getBoundingClientRect();
+    const t = tgtEl.getBoundingClientRect();
+    const sameCol = Math.abs(s.left - t.left) < 4;
+
+    const x1 = s.right - outerRect.left;
+    const y1 = s.top + s.height/2 - outerRect.top;
+    let x2 = t.left - outerRect.left;
+    let y2 = t.top + t.height/2 - outerRect.top;
+
+    let d;
+    if(sameCol){
+      x2 = t.right - outerRect.left;
+      const gutter = x1 + 16 + (i%3)*5;
+      d = `M ${x1} ${y1} L ${gutter} ${y1} L ${gutter} ${y2} L ${x2} ${y2}`;
+    } else {
+      const midX = (x1 + x2)/2;
+      d = `M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`;
+    }
+    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d', d);
+    path.dataset.from = e.from;
+    path.dataset.to = e.to;
+    if(e.note) path.classList.add('dashed');
+    svg.appendChild(path);
+
+    [[x1,y1],[x2,y2]].forEach(([cx,cy])=>{
+      const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      c.setAttribute('cx',cx); c.setAttribute('cy',cy); c.setAttribute('r',2.6);
+      c.dataset.from = e.from; c.dataset.to = e.to;
+      svg.appendChild(c);
+    });
+
+    if(e.note){
+      const title = document.createElementNS('http://www.w3.org/2000/svg','title');
+      title.textContent = e.note;
+      path.appendChild(title);
+    }
+  });
+}
+
+window.addEventListener('resize', drawTraces);
+requestAnimationFrame(drawTraces);
+setTimeout(drawTraces, 300); // catch late font metrics shift
+
+// ---------- Selection / highlighting ----------
+let selectedId = null;
+
+function clearSelection(){
+  selectedId = null;
+  document.querySelectorAll('.card').forEach(c=>c.classList.remove('selected','upstream','downstream','dimmed'));
+  document.querySelectorAll('svg.traces path, svg.traces circle').forEach(el=>el.classList.remove('active','dim'));
+}
+
+function toggleSelect(id){
+  if(selectedId === id){ clearSelection(); return; }
+  selectedId = id;
+  const {up, down} = collectChain(id);
+
+  document.querySelectorAll('.card').forEach(card=>{
+    const cid = card.dataset.id;
+    card.classList.remove('selected','upstream','downstream','dimmed');
+    if(cid === id) card.classList.add('selected');
+    else if(up.has(cid)) card.classList.add('upstream');
+    else if(down.has(cid)) card.classList.add('downstream');
+    else card.classList.add('dimmed');
+  });
+
+  document.querySelectorAll('svg.traces path, svg.traces circle').forEach(el=>{
+    const f = el.dataset.from, t = el.dataset.to;
+    const relevant = (f===id || t===id || up.has(f) || up.has(t) || down.has(f) || down.has(t))
+                      && (up.has(f) || up.has(t) || down.has(f) || down.has(t) || f===id || t===id)
+                      && ( (up.has(f) && (up.has(t)||t===id)) || (down.has(t) && (down.has(f)||f===id)) || f===id || t===id );
+    if(relevant){ el.classList.add('active'); }
+    else { el.classList.add('dim'); }
+  });
+}
+
+document.getElementById('resetBtn').addEventListener('click', clearSelection);
+gridOuter.addEventListener('click', (ev)=>{ if(ev.target===gridOuter) clearSelection(); });
+
+// ---------- Sidebar: Major Requirements ----------
+const coreList = document.getElementById('coreList');
+coreRequirements.forEach(r=>{
+  const el = document.createElement('div');
+  el.className = 'req-item';
+  el.dataset.code = r.code;
+  el.dataset.search = (r.code + ' ' + r.name + ' ' + (r.note||'')).toLowerCase();
+  el.innerHTML = `<div class="req-code">${r.code}</div><div class="req-name">${r.name}</div>${r.note?`<div class="req-note">${r.note}</div>`:''}`;
+  el.addEventListener('click', ()=>focusCourseByCode(r.code));
+  coreList.appendChild(el);
+});
+
+const electiveList = document.getElementById('electiveList');
+<!-- document.getElementById('electiveCount').textContent = majorElectives.length + ' options'; -->
+majorElectives.forEach(r=>{
+  const el = document.createElement('div');
+  el.className = 'req-item elective-item';
+  el.dataset.search = (r.code + ' ' + r.name).toLowerCase();
+  el.innerHTML = `<div class="req-code">${r.code}</div><div class="req-name">${r.name}</div>`;
+  electiveList.appendChild(el);
+});
+
+function focusCourseByCode(code){
+  // Try to find a scheduled course matching this code (handles CSE numbering variants loosely)
+  let course = courses.find(c=>c.code === code);
+  if(!course){
+    // loose match: same subject + close number, e.g. CSE 302 -> CSE 301
+    const subj = code.split(' ')[0];
+    course = courses.find(c=>c.code.startsWith(subj) && c.category==='core');
+  }
+  if(course){
+    toggleSelect(course.id);
+    const el = document.querySelector(`.card[data-id="${course.id}"]`);
+    if(el) el.scrollIntoView({behavior:'smooth', block:'center', inline:'center'});
+  }
+}
+
+document.getElementById('reqSearch').addEventListener('input', (e)=>{
+  const q = e.target.value.trim().toLowerCase();
+  document.querySelectorAll('.req-item').forEach(item=>{
+    item.classList.toggle('hidden', q && !item.dataset.search.includes(q));
+  });
+});
+</script>
+</body>
+</html>
