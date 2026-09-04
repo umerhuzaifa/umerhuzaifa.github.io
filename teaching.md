@@ -16,6 +16,10 @@ CSE 394 - Cyberphysical Systems Engineering Practicum II -->
 <!-- CSE 351 Embedded Systems I -->
 <!-- CSE 362 Mathematical Foundations of Autonomous Systems -->
 
+## Currently Teaching:
+
+[CSC 241 - Introduction to Computer Science I](teaching/CSC241_403_Syllabus.html)
+
 ## Courses taught
 
 ### Senior Undergraduate / Graduate Courses
