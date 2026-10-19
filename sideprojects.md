@@ -235,7 +235,15 @@ This page provides a peak into the side projects I develop for aid in teaching a
     </a>
   </div>
 
-
+ <div class="project-item" data-category="tools">
+    <a href="./projects/faq_page.html" target="_blank">
+      <img src="/assets/images/pocket-tanks-gameplay.png" alt="Pocket Tanks" />
+      <div class="tile-body">
+        <span class="tag">Tools</span>
+        <h3>FAQ Page</h3>
+      </div>
+    </a>
+  </div>
 </div>
 
 <script>

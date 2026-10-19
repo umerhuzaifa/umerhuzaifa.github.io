@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Python Visualizer · CSC 241</title>
+<link rel="stylesheet" href="style.css">
+<script>
+  /* Where the in-browser Python engine (Pyodide) is loaded from.
+     The default is a public CDN. To self-host, copy the files from the
+     "pyodide" npm package into a folder on your site and point this at it
+     (the value must end with a slash). */
+  window.PYTUTOR = {
+    pyodideBase: "https://cdn.jsdelivr.net/npm/pyodide@314.0.7/",
+    maxSteps: 2000
+  };
+</script>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <div class="logo" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg>
+    </div>
+    <div>
+      <h1>Python Visualizer</h1>
+      <p>CSC 241 · Introduction to Computing I</p>
+    </div>
+  </div>
+  <div class="top-actions">
+    <span id="engineStatus" class="pill loading" role="status">Loading Python…</span>
+    <label class="select-wrap">
+      <span>Examples</span>
+      <select id="exampleSelect" aria-label="Choose an example program"></select>
+    </label>
+    <button id="shareBtn" type="button" class="ghost" title="Copy a link that opens this exact program">Copy link</button>
+  </div>
+</header>
+
+<div id="watchBox" class="watch" hidden>
+  <span class="watch-tag">What to watch</span>
+  <span id="watchText"></span>
+</div>
+
+<div id="banner" class="banner" role="alert" hidden></div>
+
+<main class="layout">
+  <section class="left">
+    <div class="panel code-panel">
+      <div class="panel-head">
+        <span>Python 3 code</span>
+        <span id="modeHint" class="hint">Edit, then press Visualize</span>
+      </div>
+
+      <div id="editorWrap" class="editor-wrap">
+        <div id="gutter" class="gutter" aria-hidden="true"></div>
+        <textarea id="editor" spellcheck="false" autocapitalize="off" autocomplete="off"
+                  wrap="off" aria-label="Python code editor"></textarea>
+      </div>
+
+      <div id="codeView" class="code-view" hidden aria-label="Code being executed"></div>
+
+      <div class="code-actions">
+        <button id="visualizeBtn" type="button" class="primary" disabled>Visualize execution</button>
+        <button id="editBtn" type="button" class="ghost" hidden>✎ Edit code</button>
+        <span class="kbd-hint" id="kbdHint">Ctrl/⌘ + Enter</span>
+      </div>
+    </div>
+
+    <div id="controls" class="controls" hidden>
+      <div class="status-row">
+        <span id="status" class="status">Step 1 of 1</span>
+        <span class="legend">
+          <span class="lg lg-next">▶</span> next line to run
+          <span class="lg lg-prev">▶</span> line just run
+        </span>
+      </div>
+      <input type="range" id="slider" min="0" max="0" value="0" aria-label="Execution step">
+      <div class="btns">
+        <button id="bFirst" type="button" title="First step (Home)">⏮ First</button>
+        <button id="bBack" type="button" title="Back (←)">◀ Back</button>
+        <button id="bPlay" type="button" class="accent" title="Play / pause (Space)">▶ Play</button>
+        <button id="bFwd" type="button" title="Forward (→)">Forward ▶</button>
+        <button id="bLast" type="button" title="Last step (End)">Last ⏭</button>
+        <label class="speed">Speed
+          <input type="range" id="speed" min="1" max="5" value="3" aria-label="Playback speed">
+        </label>
+      </div>
+    </div>
+
+    <div class="panel out-panel">
+      <div class="panel-head"><span>Program output</span></div>
+      <pre id="out" class="out" aria-live="polite"></pre>
+    </div>
+  </section>
+
+  <section class="right panel">
+    <div class="panel-head cols-head">
+      <span>Frames</span>
+      <span>Objects</span>
+    </div>
+    <div id="caption" class="caption" aria-live="polite">
+      <div class="cap-main">Press <b>Visualize execution</b> to see your program run one line at a time.</div>
+      <div class="cap-changes"></div>
+    </div>
+    <div id="vizScroll" class="viz-scroll">
+      <div id="viz" class="viz">
+        <svg id="arrows" class="arrows" aria-hidden="true"></svg>
+        <div class="cols">
+          <div id="framesCol" class="frames-col"></div>
+          <div id="objsCol" class="objs-col"></div>
+        </div>
+        <div id="placeholder" class="placeholder">
+          <div class="ph-art" aria-hidden="true">
+            <span class="ph-box">x</span><span class="ph-arrow">→</span><span class="ph-obj">[ 1 | 2 | 3 ]</span>
+          </div>
+          <p>Variables live in <b>frames</b> on the left.<br>
+          Lists, dictionaries and other objects live on the right,<br>
+          and arrows show which variable points to which object.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <p>Runs entirely in your browser (Python via WebAssembly). Code you enter is processed locally and is never sent to a server.</p>
+  <p class="legal">
+    © 2026 Umer Huzaifa. <strong>Python Visualizer</strong> is an independent teaching tool created for CSC 241 at DePaul University.
+    It is not affiliated with, endorsed by, or derived from the source code of
+    <a href="https://pythontutor.com" target="_blank" rel="noopener">Python Tutor</a>.
+    The idea of visualizing program execution as frames, objects and pointer arrows was popularized by Python Tutor,
+    created by Philip Guo, and students are encouraged to try it as well.
+    Python runs in your browser using <a href="https://pyodide.org" target="_blank" rel="noopener">Pyodide</a>
+    (Mozilla Public License 2.0). “Python” is a trademark of the Python Software Foundation.
+    Provided for educational use, as is, without warranty.
+  </p>
+</footer>
+
+<script src="examples.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

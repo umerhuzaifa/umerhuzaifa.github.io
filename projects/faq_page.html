@@ -1,0 +1,255 @@
+---
+layout: default
+title: CDM Student FAQ
+---
+
+<style>
+  .faq-wrap {
+    --navy: #00205b;
+    --blue: #1d4ed8;
+    --ink: #0f172a;
+    --muted: #64748b;
+    --line: #e2e8f0;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+    color: var(--ink);
+  }
+  .faq-wrap * { box-sizing: border-box; }
+
+  /* Hero */
+  .faq-hero {
+    background: linear-gradient(135deg, #00205b 0%, #1d4ed8 60%, #38bdf8 100%);
+    color: #fff;
+    border-radius: 20px;
+    padding: 36px 28px 30px;
+    margin: 0 0 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .faq-hero::after {
+    content: "";
+    position: absolute; right: -60px; top: -60px;
+    width: 220px; height: 220px; border-radius: 50%;
+    background: rgba(255,255,255,0.10);
+  }
+  .faq-hero h1 { margin: 0 0 6px; font-size: 30px; font-weight: 700; letter-spacing: -0.02em; color: #fff; }
+  .faq-hero p { margin: 0 0 20px; font-size: 15px; opacity: 0.9; max-width: 520px; }
+
+  .faq-search-box { position: relative; max-width: 480px; }
+  .faq-search-box svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; fill: none; stroke: var(--muted); stroke-width: 2; stroke-linecap: round; }
+  .faq-search-box input {
+    width: 100%; padding: 13px 16px 13px 42px;
+    font-size: 15px; font-family: inherit;
+    border: 0; border-radius: 12px; outline: none;
+    background: #fff; color: var(--ink);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  }
+  .faq-search-box input:focus { box-shadow: 0 0 0 3px rgba(255,255,255,0.45), 0 8px 24px rgba(0,0,0,0.18); }
+
+  /* Filter chips */
+  .faq-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; }
+  .faq-chip {
+    border: 1px solid var(--line); background: var(--card); color: var(--ink);
+    padding: 7px 14px; border-radius: 999px; font-size: 13px; font-weight: 500;
+    cursor: pointer; font-family: inherit; transition: all .15s ease;
+  }
+  .faq-chip:hover { border-color: var(--blue); color: var(--blue); }
+  .faq-chip.active { background: var(--navy); border-color: var(--navy); color: #fff; }
+
+  /* Grid + cards */
+  .faq-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 18px; align-items: stretch; }
+  .faq-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex; flex-direction: column;
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  }
+  .faq-card:hover { transform: translateY(-3px); box-shadow: 0 14px 32px rgba(15,23,42,0.10); border-color: #cbd5e1; }
+  .faq-tag {
+    align-self: flex-start;
+    font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    padding: 4px 9px; border-radius: 999px; margin-bottom: 12px;
+    background: #e0e7ff; color: #3730a3;
+  }
+  .faq-tag.registration { background: #dbeafe; color: #1e40af; }
+  .faq-tag.advising { background: #dcfce7; color: #166534; }
+  .faq-tag.courses { background: #fef3c7; color: #92400e; }
+  .faq-tag.money { background: #fce7f3; color: #9d174d; }
+  .faq-tag.support { background: #ede9fe; color: #5b21b6; }
+
+  .faq-card h3 { margin: 0 0 10px; font-size: 17px; font-weight: 650; line-height: 1.35; letter-spacing: -0.01em; color: var(--ink); }
+  .faq-card p { margin: 0 0 10px; font-size: 14px; line-height: 1.6; color: #334155; }
+  .faq-card .faq-spacer { flex: 1; }
+  .faq-card a.faq-link {
+    align-self: flex-start;
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 8px; padding: 8px 14px;
+    font-size: 13px; font-weight: 600; text-decoration: none;
+    color: var(--blue); background: #eff6ff; border-radius: 10px;
+    transition: background .15s ease, color .15s ease;
+  }
+  .faq-card a.faq-link:hover { background: var(--blue); color: #fff; }
+
+  .faq-hidden { display: none !important; }
+  .faq-empty { display: none; text-align: center; color: var(--muted); padding: 40px 0; font-size: 15px; }
+
+  @media (max-width: 600px) {
+    .faq-hero { padding: 26px 20px; border-radius: 16px; }
+    .faq-hero h1 { font-size: 24px; }
+  }
+  @media (prefers-color-scheme: dark) {
+    .faq-wrap { --ink: #e5e7eb; --muted: #94a3b8; --line: #334155; --card: #1e293b; }
+    .faq-card p { color: #cbd5e1; }
+    .faq-card a.faq-link { background: #1e3a8a; color: #bfdbfe; }
+    .faq-card a.faq-link:hover { background: #3b82f6; color: #fff; }
+  }
+</style>
+
+<div class="faq-wrap">
+
+<div class="faq-hero">
+<h1>CDM Student FAQ</h1>
+<p>Quick answers to common questions about registration, advising, courses, and campus resources.</p>
+<div class="faq-search-box">
+<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.5" y2="16.5"></line></svg>
+<input type="search" id="faq-search" placeholder="Search questions..." aria-label="Search FAQ" autocomplete="off">
+</div>
+</div>
+
+<div class="faq-chips" id="faq-chips">
+<button class="faq-chip active" data-filter="all">All</button>
+<button class="faq-chip" data-filter="registration">Registration</button>
+<button class="faq-chip" data-filter="advising">Advising</button>
+<button class="faq-chip" data-filter="courses">Courses &amp; D2L</button>
+<button class="faq-chip" data-filter="money">Financial Aid</button>
+<button class="faq-chip" data-filter="support">Careers &amp; Support</button>
+</div>
+
+<div class="faq-grid" id="faq-grid">
+
+<div class="faq-card" data-cat="registration">
+<span class="faq-tag registration">Registration</span>
+<h3>When can I add/drop classes?</h3>
+<p>Please see the academic calendar for deadlines. Be sure to talk to Financial Aid/Student Accounts about how this might affect your tuition account, especially if you receive any form of financial aid.</p>
+<div class="faq-spacer"></div>
+<a class="faq-link" href="https://academics.depaul.edu/calendar/Pages/default.aspx" target="_blank" rel="noopener">Academic Calendar &rarr;</a>
+</div>
+
+<div class="faq-card" data-cat="registration">
+<span class="faq-tag registration">Registration</span>
+<h3>What class do I take next for my major?</h3>
+<p>Check your program requirements in your Degree Progress Report. In Campus Connect select Academic Progress &gt; Degree Progress &gt; Run Report.</p>
+<p>Full-time status is 12 credit hours per term for undergraduates and 8 for graduate students. Undergraduates often take 16 or 18 credit hours to stay on track for graduation (special circumstances may call for a reduced load).</p>
+<div class="faq-spacer"></div>
+<a class="faq-link" href="https://campusconnect.depaul.edu/psp/CSPRD92/?cmd=login" target="_blank" rel="noopener">Campus Connect &rarr;</a>
+</div>
+
+<div class="faq-card" data-cat="advising">
+<span class="faq-tag advising">Advising</span>
+<h3>How do I find my academic advisor?</h3>
+<p>You can find your assigned advisor on the CDM website, or in Campus Connect &gt; Advising, Progress &amp; Graduation &gt; Advisors.</p>
+<div class="faq-spacer"></div>
+<a class="faq-link" href="https://myresources.depaul.edu/cdm/current-students/advising" target="_blank" rel="noopener">CDM Advising &rarr;</a>
+</div>
+
+<div class="faq-card" data-cat="advising">
+<span class="faq-tag advising">Advising</span>
+<h3>How can I meet with an advisor?</h3>
+<p>You may schedule an appointment with an advisor in MyDePaul.</p>
+<div class="faq-spacer"></div>
+<a class="faq-link" href="https://my.depaul.edu/" target="_blank" rel="noopener">MyDePaul &rarr;</a>
+</div>
+
+<div class="faq-card" data-cat="advising">
+<span class="faq-tag advising">Advising</span>
+<h3>Looking for helpful videos about registration, course planning, and more?</h3>
+<p>We have videos, guides, and templates to choose from. Reviewing these resources will help you be a more successful student at CDM.</p>
+<div class="faq-spacer"></div>
+<a class="faq-link" href="https://myresources.depaul.edu/cdm/current-students/advising/advising-resource-center" target="_blank" rel="noopener">Advising Resource Center &rarr;</a>
+</div>
+
+<div class="faq-card" data-cat="courses">
+<span class="faq-tag courses">Courses &amp; D2L</span>
+<h3>Where do I access my coursework/assignments?</h3>
+<p>Log in to your D2L classroom.</p>
+<div class="faq-spacer"></div>
+<a class="faq-link" href="https://resources.depaul.edu/student-success/technology/desire2learn/Pages/default.aspx" target="_blank" rel="noopener">Desire2Learn (D2L) &rarr;</a>
+</div>
+
+<div class="faq-card" data-cat="courses">
+<span class="faq-tag courses">Courses &amp; D2L</span>
+<h3>Why aren't my classes on D2L yet?</h3>
+<p>Professors have until the week of classes to open their courses in D2L. Keep checking back, and feel free to reach out to the professor for clarification. Email addresses are in the directory.</p>
+</div>
+
+<div class="faq-card" data-cat="courses">
+<span class="faq-tag courses">Courses &amp; D2L</span>
+<h3>Why does my class time show "to be announced"?</h3>
+<p>Your class may be online and asynchronous, which never has a scheduled time. Refer to the syllabus on D2L for more info.</p>
+</div>
+
+<div class="faq-card" data-cat="money">
+<span class="faq-tag money">Financial Aid</span>
+<h3>Do you have questions about financial aid?</h3>
+<p>Please contact the Office of Financial Aid for any questions about your financial aid.</p>
+<div class="faq-spacer"></div>
+<a class="faq-link" href="https://www.depaul.edu/tuition-and-aid/financial-aid-forms-and-resources/contact-us" target="_blank" rel="noopener">Contact Financial Aid &rarr;</a>
+</div>
+
+<div class="faq-card" data-cat="support">
+<span class="faq-tag support">Careers &amp; Support</span>
+<h3>How do I get help applying for jobs/internships?</h3>
+<p>The Career Center offers services and resources such as resume reviews, interview prep, career fairs and events, and more.</p>
+<div class="faq-spacer"></div>
+<a class="faq-link" href="https://careercenter.depaul.edu/" target="_blank" rel="noopener">Career Center &rarr;</a>
+</div>
+
+<div class="faq-card" data-cat="support">
+<span class="faq-tag support">Careers &amp; Support</span>
+<h3>Looking for tutoring, mentoring, or wellness support?</h3>
+<p>See DePaul's Student Success website for information about tutoring, mentoring, personal health and wellness, and more.</p>
+<div class="faq-spacer"></div>
+<a class="faq-link" href="https://resources.depaul.edu/student-success/Pages/default.aspx" target="_blank" rel="noopener">Student Success &rarr;</a>
+</div>
+
+</div>
+
+<div class="faq-empty" id="faq-empty">No questions match your search. Try different keywords.</div>
+
+</div>
+
+<script>
+  (function () {
+    var input = document.getElementById('faq-search');
+    var chips = document.querySelectorAll('#faq-chips .faq-chip');
+    var cards = document.querySelectorAll('#faq-grid .faq-card');
+    var empty = document.getElementById('faq-empty');
+    var filter = 'all';
+
+    function apply() {
+      var q = input.value.trim().toLowerCase();
+      var shown = 0;
+      cards.forEach(function (card) {
+        var okCat = filter === 'all' || card.getAttribute('data-cat') === filter;
+        var okText = !q || card.textContent.toLowerCase().indexOf(q) !== -1;
+        var show = okCat && okText;
+        card.classList.toggle('faq-hidden', !show);
+        if (show) shown++;
+      });
+      empty.style.display = shown ? 'none' : 'block';
+    }
+
+    input.addEventListener('input', apply);
+    chips.forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        chips.forEach(function (c) { c.classList.remove('active'); });
+        chip.classList.add('active');
+        filter = chip.getAttribute('data-filter');
+        apply();
+      });
+    });
+  })();
+</script>
