@@ -244,6 +244,16 @@ This page provides a peak into the side projects I develop for aid in teaching a
       </div>
     </a>
   </div>
+
+<div class="project-item" data-category="tools">
+    <a href="./PyTutor/index.html" target="_blank">
+      <img src="./assets/images/python_visualize.png" alt="Python Visualizer" />
+      <div class="tile-body">
+        <span class="tag">Tools</span>
+        <h3>Python Visualizer</h3>
+      </div>
+    </a>
+  </div>
 </div>
 
 <script>
